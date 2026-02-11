@@ -1,0 +1,28 @@
+:root {
+
+    /* Brand colors */
+    --color-primary: #00a1ff;
+    --color-main: #111c2d;
+    --color-card: #1a2537;
+
+
+
+    /* text colors */
+    --text-primary: #ffffff;
+    --text-secondary: #7b877e;
+
+    /* Backgrounds */
+    --bg-main: #111c2d;
+    --bg-card: #1a2537;
+
+    /* Fonts */
+    --font-heading: "Lexend", sans-serif;
+    --font-body: "Jost", sans-serif;
+
+     /* UI */
+  --border-radius: 15px;
+}
+
+body {
+    font-family: var(--font-body);
+}
