@@ -1,13 +1,14 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar.jsx";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
     return (
-        <div className="flex min-h-screen bg-slate-100">
+        <div className="flex h-screen bg-slate-100">
             <AdminSidebar />
 
             <main className="flex-1 p-6 lg:p-8">
-                {children}
+                <Outlet />
             </main>
         </div>
     );

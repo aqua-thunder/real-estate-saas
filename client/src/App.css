@@ -8,8 +8,9 @@
 
 
     /* text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #7b877e;
+    --text-primary: #00a1ff;
+    --text-secondary: #ffffff;
+    --text-card: #7b877e;
 
     /* Backgrounds */
     --bg-main: #111c2d;
@@ -19,8 +20,8 @@
     --font-heading: "Lexend", sans-serif;
     --font-body: "Jost", sans-serif;
 
-     /* UI */
-  --border-radius: 15px;
+    /* UI */
+    --border-radius: 15px;
 }
 
 body {

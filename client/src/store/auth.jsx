@@ -6,6 +6,7 @@ export const AuthProvider = ({ children }) => {
 
     const [user, setUser] = useState('')
     const [isLoading, setIsLoading] = useState(true)
+    const [location, setLocation] = useState('')
 
 
     const [token, setToken] = useState(() => {
@@ -47,10 +48,37 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.log("Error fetching user data");
+            setIsLoading(false);
         }
 
     }
 
+    const getLocation = async () => {
+        try {
+            setIsLoading(true)
+            const response = await fetch("http://localhost:7000/api/admin/locations", {
+                method: "GET",
+                headers: {
+                    Authorization: authorizationToken
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setLocation(data.location);
+                setIsLoading(false)
+            } else {
+                setIsLoading(false)
+            }
+        } catch (error) {
+            console.log("Error fetching user data");
+            setIsLoading(false);
+        }
+    }
+
+
+    useEffect(() => {
+        getLocation();
+    }, [])
 
     useEffect(() => {
         if (token) {
@@ -62,7 +90,7 @@ export const AuthProvider = ({ children }) => {
     }, [token]);
 
     return (
-        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, storetokenInLS, logoutUser, }}>
+        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, storetokenInLS, logoutUser, location }}>
             {children}
         </AuthContext.Provider>
     );
