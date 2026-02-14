@@ -42,7 +42,10 @@ const getAllLocations = async (req, res) => {
             state: 1,
             city: 1
         })
-        res.status(200).json(locations)
+         if (!locations) {
+            res.status(400).json({ msg: "No locations Found" })
+        }
+        res.status(200).json({ msg: locations })
     } catch (error) {
         res.status(500).json({ message: error.message })
     }

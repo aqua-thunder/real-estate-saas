@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Input from "../components/ui/input";
 import Button from "../components/ui/Button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import Input from "../components/ui/Input";
 
 const SignInPage = () => {
     const [user, setUser] = useState({

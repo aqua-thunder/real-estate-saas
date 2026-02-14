@@ -22,4 +22,4 @@ router.patch("/locations/:id/toggle", authMiddleware, roleMiddleware("SUPER_ADMI
 
 // Approve Owner
 router.patch("/owner/:ownerId/approve", authMiddleware, roleMiddleware("SUPER_ADMIN"), approveOwner)
-module.exports = router;
+module.exports = router; 

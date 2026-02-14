@@ -18,20 +18,25 @@ export default function Input({
     const isPassword = type === "password";
 
     const base =
-        "w-full px-4 py-3  rounded-xl outline-none transition text-[var(--color-black)]";
+        "w-full px-4 py-3  outline-none transition text-[var(--color-black)]";
 
     const variants = {
         default: `
       border border-gray-600
       focus:border-[var(--color-primary)]
-      text-[var(--text-primary)]
+      text-[var(--text-primary)] rounded-xl
+    `,
+    formInput:`
+    border border-gray-600
+      focus:border-[var(--color-primary)]
+      text-[var(--text-secondary)] rounded-full
     `
     };
 
     return (
         <div className="space-y-2">
             {label && (
-                <label className={`block text-sm font-semibold  ${labelClassName || "text-[var(--text-primary)]"}`}>
+                <label className={`block text-sm font-semibold  ${labelClassName || "text-[var(--text-secondary)]"}`}>
                     {label}
                 </label>
             )}

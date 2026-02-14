@@ -64,7 +64,8 @@ export const AuthProvider = ({ children }) => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setLocation(data.location);
+                setLocation(data.msg);
+                console.log(data.msg)
                 setIsLoading(false)
             } else {
                 setIsLoading(false)
