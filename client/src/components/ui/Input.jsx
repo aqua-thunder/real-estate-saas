@@ -24,7 +24,7 @@ export default function Input({
         default: `
       border border-gray-600
       focus:border-[var(--color-primary)]
-      text-[var(--text-primary)] rounded-xl
+      text-[var(--text-secondary)] rounded-xl
     `,
     formInput:`
     border border-gray-600

@@ -3,8 +3,10 @@ import Button from "../components/ui/Button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth";
 import Input from "../components/ui/Input";
+import { useToast } from '../store/ToastContext';
 
 const SignInPage = () => {
+    const { toast } = useToast();
     const [user, setUser] = useState({
         email: "",
         password: "",
@@ -40,7 +42,7 @@ const SignInPage = () => {
                 setUser({ email: "", password: "" });
                 navigate("/admin/dashboard")
             } else {
-                console.log(res_data);
+                toast.error(res_data.message)
             }
         } catch (error) {
             console.error("Login error:", error);

@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Globe, Navigation, Plus, X } from 'lucide-react';
 import { useAuth } from '../../store/auth';
 import Input from '../../components/ui/Input';
@@ -9,6 +8,13 @@ import { useToast } from '../../store/ToastContext';
 const Location = () => {
     const { toast } = useToast();
     const { location } = useAuth();
+    const [locations, setLocations] = useState([]);
+    useEffect(() => {
+        if (Array.isArray(location)) {
+            setLocations(location);
+        }
+    }, [location]);
+
     const [openForm, setOpenForm] = useState(false);
     const [locationInState, setLocationInState] = useState({
         country: "",
@@ -26,6 +32,49 @@ const Location = () => {
         }));
     };
 
+    // Change the status of location
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:7000/api/admin/locations/${id}/toggle`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                }
+            );
+
+            if (response.ok) {
+
+                // ✅ Update UI instantly
+                setLocations((prev) =>
+                    prev.map((loc) =>
+                        loc._id === id ? { ...loc, status: newStatus } : loc
+                    )
+                );
+
+                toast.success(
+                    `Location ${newStatus === "active" ? "Activated" : "Disabled"} Successfully`
+                );
+
+            } else {
+                toast.error("Failed to update status");
+            }
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong");
+        }
+    };
+
+
+
+    // Submit form 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -84,9 +133,19 @@ const Location = () => {
             {/* Location Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {
-                    Array.isArray(location) && location.map((item, index) => (
+                    Array.isArray(locations) && locations.map((item, index) => (
 
-                        <div key={index} className="group bg-[var(--bg-card)] rounded-2xl p-6 shadow-sm border border-[var(--color-card)] hover:shadow-m transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                        <div
+                            key={index}
+                            className={`
+        group rounded-2xl p-6 shadow-sm border
+        transition-all duration-300 hover:-translate-y-1 relative overflow-hidden
+
+        ${item.status === "active"
+                                    ? "bg-[var(--bg-card)] border-[var(--color-card)] opacity-100"
+                                    : "bg-[var(--color-card)] border-[var(--color-card)] opacity-60 grayscale"}
+    `}
+                        >
 
                             {/* Decorative Background Icon */}
                             <Globe
@@ -100,9 +159,15 @@ const Location = () => {
                                         <MapPin size={24} />
                                     </div>
 
-                                    <span className="px-3 py-1 bg-[rgba(0,161,255,0.1)] text-[var(--color-primary)] text-xs font-bold uppercase tracking-wide rounded-full">
-                                        Active
-                                    </span>
+                                    <select
+                                        value={item.status}
+                                        onChange={(e) => handleStatusChange(item._id, e.target.value)}
+                                        className=" px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                                    >
+                                        <option value="active">Active</option>
+                                        <option value="disabled">Disable</option>
+                                    </select>
+
                                 </div>
 
                                 <div className="space-y-1">
@@ -128,9 +193,9 @@ const Location = () => {
                                     <div className="flex items-center gap-3 text-sm text-[var(--text-card)]">
                                         <Globe size={16} className="text-[var(--color-primary)]" />
                                         <span>
-                                            Country:{" "}
+                                            City:{" "}
                                             <span className="font-semibold text-[var(--text-secondary)]">
-                                                {item.country}
+                                                {item.city}
                                             </span>
                                         </span>
                                     </div>
