@@ -1,5 +1,27 @@
 const Owner = require("../../models/Owner-model.js");
 
+
+// Get all owner
+
+const getOwner = async (req, res) => {
+    try {
+        const owners = await Owner.find().sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            msg: owners
+        });
+
+    } catch (error) {
+        console.log("Error fetching owners:", error);
+        return res.status(500).json({
+            message: "Failed to fetch owners"
+        });
+    }
+};
+
+
+
+// Approve Owner from Super Admin
 const approveOwner = async (req, res) => {
     try {
         const { ownerId } = req.params;
@@ -29,4 +51,4 @@ const approveOwner = async (req, res) => {
     }
 };
 
-module.exports = { approveOwner };
+module.exports = { approveOwner, getOwner };

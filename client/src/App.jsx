@@ -18,6 +18,7 @@ import Reports from './pages/admin/Reports.jsx'
 import Subscriptions from './pages/admin/Subscriptions.jsx'
 import AuditLogs from './pages/admin/AuditLogs.jsx'
 import Profile from './pages/admin/Profile.jsx'
+import Logout from './auth/Logout.jsx'
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
           <Route element={<PublicRoute />}>
             <Route path="/" element={<SignInPage />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/logout" element={<Logout />} />
           </Route>
 
           {/* Admin routes */}

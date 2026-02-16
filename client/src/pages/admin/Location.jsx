@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Globe, Navigation, Plus, X } from 'lucide-react';
+import { MapPin, Globe, Navigation, Plus, X, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '../../store/auth';
 import Input from '../../components/ui/Input';
 import Button from "../../components/ui/Button";
@@ -21,6 +21,8 @@ const Location = () => {
         state: "",
         city: ""
     });
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
 
 
     const handleChange = (e) => {
@@ -54,7 +56,7 @@ const Location = () => {
                 // ✅ Update UI instantly
                 setLocations((prev) =>
                     prev.map((loc) =>
-                        loc._id === id ? { ...loc, status: newStatus } : loc
+                        loc._id === id ? { ...loc, isActive: newStatus === "active" } : loc
                     )
                 );
 
@@ -72,6 +74,43 @@ const Location = () => {
         }
     };
 
+    // Handle Edit
+    const handleEdit = (loc) => {
+        setLocationInState({
+            country: loc.country,
+            state: loc.state,
+            city: loc.city
+        });
+        setEditId(loc._id);
+        setIsEditing(true);
+        setOpenForm(true);
+    };
+
+    // Handle Delete
+    const handleDelete = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this location?")) return;
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`http://localhost:7000/api/admin/locations/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                setLocations((prev) => prev.filter((loc) => loc._id !== id));
+                toast.success("Location Deleted Successfully");
+            } else {
+                toast.error("Failed to delete location");
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Something went wrong");
+        }
+    };
+
 
 
     // Submit form 
@@ -79,9 +118,14 @@ const Location = () => {
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:7000/api/admin/locations",
+            const url = isEditing
+                ? `http://localhost:7000/api/admin/locations/${editId}`
+                : "http://localhost:7000/api/admin/locations";
+            const method = isEditing ? "PUT" : "POST";
+
+            const response = await fetch(url,
                 {
-                    method: "POST",
+                    method: method,
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
@@ -93,20 +137,34 @@ const Location = () => {
             const res_data = await response.json();
 
             if (response.ok) {
-                console.log("Location Added:", res_data);
+                if (isEditing) {
+                    setLocations((prev) =>
+                        prev.map((loc) => (loc._id === editId ? res_data.location : loc))
+                    );
+                    toast.success("Location Updated Successfully");
+                } else {
+                    // Refresh or add manually? Re-fetching is safer or just use response
+                    // Since it's a SPA, manually updating is better for UX
+                    // But backend returns 'generateLocation', let's fix it to be consistent
+                    const newLoc = res_data.generateLocation || res_data.location;
+                    setLocations((prev) => [...prev, newLoc]);
+                    toast.success("Location Added Successfully");
+                }
+
                 setLocationInState({
                     country: "",
                     state: "",
                     city: ""
                 });
-                //  Close modal
+                setIsEditing(false);
+                setEditId(null);
                 setOpenForm(false);
-                toast.success("Location Added Successfully")
             } else {
-                console.log("Error:", res_data.message);
+                toast.error(res_data.message || "Error occurred");
             }
         } catch (error) {
             console.log("Submit Error:", error);
+            toast.error("Something went wrong");
         }
     };
 
@@ -124,90 +182,77 @@ const Location = () => {
                     </p>
                 </div>
 
-                <button onClick={() => setOpenForm(true)} className="flex items-center gap-2 bg-[var(--color-primary)] text-[var(--text-secondary)] px-5 py-2.5 rounded-xl hover:opacity-90 transition-all shadow-md active:scale-95">
+                <button
+                    onClick={() => {
+                        setIsEditing(false);
+                        setLocationInState({ country: "", state: "", city: "" });
+                        setOpenForm(true);
+                    }}
+                    className="flex items-center gap-2 bg-[var(--color-primary)] text-[var(--text-secondary)] px-5 py-2.5 rounded-xl hover:opacity-90 transition-all shadow-md active:scale-95"
+                >
                     <Plus size={20} />
                     <span className="font-medium">Add Location</span>
                 </button>
             </div>
 
-            {/* Location Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {
-                    Array.isArray(locations) && locations.map((item, index) => (
-
-                        <div
-                            key={index}
-                            className={`
-        group rounded-2xl p-6 shadow-sm border
-        transition-all duration-300 hover:-translate-y-1 relative overflow-hidden
-
-        ${item.status === "active"
-                                    ? "bg-[var(--bg-card)] border-[var(--color-card)] opacity-100"
-                                    : "bg-[var(--color-card)] border-[var(--color-card)] opacity-60 grayscale"}
-    `}
-                        >
-
-                            {/* Decorative Background Icon */}
-                            <Globe
-                                className="absolute -right-4 -bottom-4 text-[var(--color-primary)] opacity-10 group-hover:scale-110 transition-transform duration-500"
-                                size={100}
-                            />
-
-                            <div className="relative z-10 space-y-4">
-                                <div className="flex items-start justify-between">
-                                    <div className="p-3 bg-[rgba(0,161,255,0.1)] text-[var(--color-primary)] rounded-xl group-hover:bg-[var(--color-primary)] group-hover:text-[var(--text-secondary)] transition-colors duration-300">
-                                        <MapPin size={24} />
-                                    </div>
-
-                                    <select
-                                        value={item.status}
-                                        onChange={(e) => handleStatusChange(item._id, e.target.value)}
-                                        className=" px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                                    >
-                                        <option value="active">Active</option>
-                                        <option value="disabled">Disable</option>
-                                    </select>
-
-                                </div>
-
-                                <div className="space-y-1">
-                                    <h3 className="text-xl font-bold text-[var(--text-secondary)]">
-                                        {item.state}
-                                    </h3>
-                                    <p className="text-[var(--text-card)] font-medium flex items-center gap-2">
-                                        {item.state}, {item.country}
-                                    </p>
-                                </div>
-
-                                <div className="pt-4 border-t border-[var(--color-card)] flex flex-col gap-2">
-                                    <div className="flex items-center gap-3 text-sm text-[var(--text-card)]">
-                                        <Navigation size={16} className="text-[var(--color-primary)]" />
-                                        <span>
-                                            State:{" "}
-                                            <span className="font-semibold text-[var(--text-secondary)]">
-                                                {item.state}
-                                            </span>
-                                        </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-3 text-sm text-[var(--text-card)]">
-                                        <Globe size={16} className="text-[var(--color-primary)]" />
-                                        <span>
-                                            City:{" "}
-                                            <span className="font-semibold text-[var(--text-secondary)]">
-                                                {item.city}
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                }
+            {/* Location Table */}
+            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--color-card)] shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-[var(--color-card)] bg-[var(--color-card)]/50">
+                                <th className="p-4 font-bold text-[var(--text-secondary)]">#</th>
+                                <th className="p-4 font-bold text-[var(--text-secondary)]">Country</th>
+                                <th className="p-4 font-bold text-[var(--text-secondary)]">State</th>
+                                <th className="p-4 font-bold text-[var(--text-secondary)]">City</th>
+                                <th className="p-4 font-bold text-[var(--text-secondary)]">Status</th>
+                                <th className="p-4 font-bold text-[var(--text-secondary)] text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Array.isArray(locations) && locations.map((item, index) => (
+                                <tr key={item._id} className={`border-b border-[var(--color-card)] hover:bg-[var(--color-card)]/30 transition-colors ${!item.isActive ? "opacity-60 grayscale" : ""}`}>
+                                    <td className="p-4 text-[var(--text-card)]">{index + 1}</td>
+                                    <td className="p-4 font-medium text-[var(--text-secondary)]">{item.country}</td>
+                                    <td className="p-4 text-[var(--text-card)]">{item.state}</td>
+                                    <td className="p-4 text-[var(--text-card)]">{item.city}</td>
+                                    <td className="p-4">
+                                        <select
+                                            value={item.isActive ? "active" : "disabled"}
+                                            onChange={(e) => handleStatusChange(item._id, e.target.value)}
+                                            className="px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] cursor-pointer"
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="disabled">Disable</option>
+                                        </select>
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="flex items-center justify-center gap-3">
+                                            <button
+                                                onClick={() => handleEdit(item)}
+                                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                title="Edit Location"
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(item._id)}
+                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                title="Delete Location"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {openForm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
                     <div className="bg-[var(--bg-card)] w-full max-w-md p-6 rounded-2xl border border-[var(--color-card)] shadow-xl relative">
 
                         {/* Close Button */}
@@ -219,12 +264,11 @@ const Location = () => {
                         </button>
 
                         <h3 className="text-xl font-bold text-[var(--text-secondary)] mb-6">
-                            Add New Location
+                            {isEditing ? "Update Location" : "Add New Location"}
                         </h3>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-
                                 <Input
                                     label="Country"
                                     name="country"
@@ -262,7 +306,7 @@ const Location = () => {
                             </div>
 
                             <Button type="primary" className="w-full" htmlType="submit">
-                                Save Location
+                                {isEditing ? "Update Location" : "Save Location"}
                             </Button>
 
                         </form>

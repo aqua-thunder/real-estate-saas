@@ -5,7 +5,7 @@ const authMiddleware = require("../middlewares/auth-middleware.js");
 const roleMiddleware = require("../middlewares/role-middleware.js");
 
 const locationController = require("../controllers/admin/location-controller.js");
-const { approveOwner } = require("../controllers/admin/owner-approval-controller.js")
+const OwnerController = require("../controllers/admin/Owner-controller.js")
 
 // Create locations
 router.post("/locations", authMiddleware, roleMiddleware("SUPER_ADMIN"), locationController.createLocation);
@@ -19,7 +19,13 @@ router.put("/locations/:id", authMiddleware, roleMiddleware("SUPER_ADMIN"), loca
 // Enable / Disable location
 router.patch("/locations/:id/toggle", authMiddleware, roleMiddleware("SUPER_ADMIN"), locationController.toggleLocationStatus);
 
+// Delete location
+router.delete("/locations/:id", authMiddleware, roleMiddleware("SUPER_ADMIN"), locationController.deleteLocation);
+
 
 // Approve Owner
-router.patch("/owner/:ownerId/approve", authMiddleware, roleMiddleware("SUPER_ADMIN"), approveOwner)
+router.patch("/owner/:ownerId/approve", authMiddleware, roleMiddleware("SUPER_ADMIN"), OwnerController.approveOwner)
+
+// Get Owner
+router.get("/getOwners", authMiddleware, roleMiddleware("SUPER_ADMIN"), OwnerController.getOwner)
 module.exports = router; 

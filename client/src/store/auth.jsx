@@ -7,6 +7,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const [location, setLocation] = useState([])
+    const [owners, setOwners] = useState([])
 
 
     const [token, setToken] = useState(() => {
@@ -76,9 +77,31 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+    const getOwners = async () => {
+        try {
+            setIsLoading(true)
+            const response = await fetch("http://localhost:7000/api/admin/getOwners", {
+                method: "GET",
+                headers: {
+                    Authorization: authorizationToken
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setOwners(data.msg)
+                console.log(data.msg)
+                setIsLoading(false)
+            }
+        } catch (error) {
+            console.log("Error fetching owner data");
+            setIsLoading(false);
+        }
+    }
+
 
     useEffect(() => {
         getLocation();
+        getOwners();
     }, [])
 
     useEffect(() => {
@@ -91,7 +114,7 @@ export const AuthProvider = ({ children }) => {
     }, [token]);
 
     return (
-        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, storetokenInLS, logoutUser, location }}>
+        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, storetokenInLS, logoutUser, location, owners }}>
             {children}
         </AuthContext.Provider>
     );

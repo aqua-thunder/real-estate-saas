@@ -1,14 +1,10 @@
 import React from 'react';
 import { UserPlus, Search, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '../../store/auth';
 
-const users = [
-    { id: 1, name: "John Doe", email: "john@example.com", role: "Admin", status: "Active" },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Manager", status: "Active" },
-    { id: 3, name: "Robert Johnson", email: "robert@example.com", role: "Viewer", status: "Inactive" },
-    { id: 4, name: "Emily Davis", email: "emily@example.com", role: "Editor", status: "Active" },
-];
 
 const User = () => {
+    const {owners} = useAuth();
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
@@ -36,21 +32,21 @@ const User = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50 text-slate-600 text-sm font-semibold uppercase">
-                                <th className="p-4 border-b">Name</th>
-                                <th className="p-4 border-b">Email</th>
-                                <th className="p-4 border-b">Role</th>
+                                <th className="p-4 border-b">Owner Type</th>
+                                <th className="p-4 border-b">Comapny Name</th>
+                                <th className="p-4 border-b">contactNumber</th>
                                 <th className="p-4 border-b">Status</th>
                                 <th className="p-4 border-b text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {owners.map((user) => (
                                 <tr key={user.id} className="hover:bg-slate-50 transition-colors text-sm text-slate-700">
-                                    <td className="p-4 border-b font-medium">{user.name}</td>
-                                    <td className="p-4 border-b">{user.email}</td>
+                                    <td className="p-4 border-b font-medium">{user.ownerType}</td>
+                                    <td className="p-4 border-b">{user.companyName}</td>
                                     <td className="p-4 border-b">
                                         <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-semibold">
-                                            {user.role}
+                                            {user.contactNumber}
                                         </span>
                                     </td>
                                     <td className="p-4 border-b">
