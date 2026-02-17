@@ -1,12 +1,12 @@
 const mongoose = require("mongoose")
 
 const propertySchema = new mongoose.Schema({
-    owner: { 
+    owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Owner",
         required: true
     },
-    name: {
+    propertyName: {
         type: String,
         required: true
     },
@@ -16,8 +16,7 @@ const propertySchema = new mongoose.Schema({
         required: true
     },
     location: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Location",
+        type: String,
         required: true
     },
     address: {
@@ -25,6 +24,18 @@ const propertySchema = new mongoose.Schema({
         required: true
     },
     totalUnit: {
+        type: Number,
+        required: true
+    },
+    occupiedUnits: {
+        type: Number,
+        required: true
+    },
+    vacantUnits: {
+        type: Number,
+        required: true
+    },
+    revenue: {
         type: Number,
         required: true
     },

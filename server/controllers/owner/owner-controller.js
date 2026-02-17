@@ -9,7 +9,7 @@ const registerOwner = async (req, res) => {
             return res.status(403).json({ message: "Access denied" });
         }
 
-        const { ownerType, companyName, contactNumber, address } = req.body;
+        const { ownerType, companyName, contactNumber } = req.body;
 
         // Check if owner profile already exists
         const existingOwner = await Owner.findOne({ user: userId });
@@ -23,7 +23,6 @@ const registerOwner = async (req, res) => {
             ownerType,
             companyName,
             contactNumber,
-            address,
         });
 
         res.status(201).json({

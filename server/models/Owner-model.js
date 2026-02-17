@@ -24,10 +24,6 @@ const ownerSchema = new mongoose.Schema({
         required: true
     },
 
-    address: {
-        type: String
-    },
-
     isApproved: {
         type: Boolean,
         default: false

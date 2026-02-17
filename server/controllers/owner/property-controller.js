@@ -5,32 +5,46 @@ const Property = require("../../models/Property-Model");
 const createProperty = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, propertyType, location, address, totalUnit, isActive } = req.body;
+        console.log("Owner data", userId);
 
-        const owner = await Owner.findOne({ user: userId });
+        const {
+            propertyName,
+            propertyType,
+            location,
+            address,
+            totalUnit,
+            isActive
+        } = req.body;
+
+        // 1️⃣ Find Owner directly by _id
+        const owner = await Owner.findById(userId);
 
         if (!owner) {
             return res.status(400).json({ message: "Owner not found" });
         }
 
-        if (!owner.isApproved) {
-            console.log("Owner address:", owner.isApproved);
-            return res.status(403).json({ message: "Owner not approved by admin" });
+        // 2️⃣ Check approvalStatus (UPDATED)
+        if (owner.approvalStatus !== "APPROVED") {
+            return res.status(403).json({
+                message: "Owner not approved by admin"
+            });
         }
 
-        // Validate location
-        const existingLocation = await Location.findById(location);
-        if (!existingLocation) {
-            return res.status(400).json({ message: "Invalid location" });
-        }
+        // 3️⃣ Calculate default values
+        const occupiedUnits = 0;
+        const vacantUnits = totalUnit; // initially all vacant
+        const revenue = 0; // initially no revenue
 
         const property = await Property.create({
             owner: owner._id,
-            name,
+            propertyName,
             propertyType,
-            location,
+            location,        // string now
             address,
             totalUnit,
+            occupiedUnits,
+            vacantUnits,
+            revenue,
             isActive
         });
 
@@ -44,13 +58,13 @@ const createProperty = async (req, res) => {
     }
 };
 
+
 const updateProperty = async (req, res) => {
     try {
         const userId = req.user._id;
         const propertyId = req.params.id;
 
-        // 1️⃣ Find owner
-        const owner = await Owner.findOne({ user: userId });
+        const owner = await Owner.findById(userId);
 
         if (!owner) {
             return res.status(403).json({
@@ -58,7 +72,12 @@ const updateProperty = async (req, res) => {
             });
         }
 
-        // 2️⃣ Match property with Owner._id
+        if (owner.approvalStatus !== "APPROVED") {
+            return res.status(403).json({
+                message: "Owner not approved"
+            });
+        }
+
         const property = await Property.findOne({
             _id: propertyId,
             owner: owner._id
@@ -70,25 +89,41 @@ const updateProperty = async (req, res) => {
             });
         }
 
-        Object.assign(property, req.body);
+        // Allowed fields only
+        const allowedFields = [
+            "propertyName",
+            "propertyType",
+            "location",
+            "address",
+            "totalUnit",
+            "isActive"
+        ];
+
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                property[field] = req.body[field];
+            }
+        });
+
         await property.save();
 
         res.status(200).json({
             message: "Property updated successfully",
             property
         });
+
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+
 const deleteProperty = async (req, res) => {
     try {
-        const userId = req.user._id;      // from JWT
+        const userId = req.user._id;
         const propertyId = req.params.id;
 
-        // 1️⃣ Find owner profile using logged-in user
-        const owner = await Owner.findOne({ user: userId });
+        const owner = await Owner.findById(userId);
 
         if (!owner) {
             return res.status(403).json({
@@ -96,7 +131,6 @@ const deleteProperty = async (req, res) => {
             });
         }
 
-        // 2️⃣ Find property that belongs to this owner
         const property = await Property.findOne({
             _id: propertyId,
             owner: owner._id
@@ -107,7 +141,7 @@ const deleteProperty = async (req, res) => {
                 message: "You are not allowed to delete this property"
             });
         }
-        // 4️⃣ Delete property
+
         await property.deleteOne();
 
         res.status(200).json({
@@ -117,6 +151,7 @@ const deleteProperty = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 module.exports = { createProperty, updateProperty, deleteProperty };
