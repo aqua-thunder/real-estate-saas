@@ -182,17 +182,15 @@ const Location = () => {
                     </p>
                 </div>
 
-                <button
-                    onClick={() => {
-                        setIsEditing(false);
-                        setLocationInState({ country: "", state: "", city: "" });
-                        setOpenForm(true);
-                    }}
-                    className="flex items-center gap-2 bg-[var(--color-primary)] text-[var(--text-secondary)] px-5 py-2.5 rounded-xl hover:opacity-90 transition-all shadow-md active:scale-95"
-                >
+
+                <Button onClick={() => {
+                    setIsEditing(false);
+                    setLocationInState({ country: "", state: "", city: "" });
+                    setOpenForm(true);
+                }}>
                     <Plus size={20} />
                     <span className="font-medium">Add Location</span>
-                </button>
+                </Button>
             </div>
 
             {/* Location Table */}

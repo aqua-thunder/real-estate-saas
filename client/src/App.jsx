@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import PublicRoute from './store/PubliRoute.jsx'
 import SignInPage from './auth/SignInPage.jsx'
@@ -39,6 +39,7 @@ function App() {
           {/* Admin routes */}
           <Route element={<ProtectedRoute role={"SUPER_ADMIN"} />}>
             <Route element={<AdminLayout />}>
+              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/dashboard" element={<Dashboard />} />
               <Route path="/admin/users" element={<User />} />
               <Route path="/admin/roles" element={<Role />} />

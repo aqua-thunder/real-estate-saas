@@ -1,28 +1,39 @@
 import React, { useState } from "react";
-import { Search, Mail, Bell, User, ChevronDown } from "lucide-react";
+import { Search, Mail, Bell, User, ChevronDown, Menu } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
     const [openAccount, setOpenAccount] = useState(false);
 
     return (
         <header className="w-full bg-[var(--bg-card)] border-b border-[var(--color-card)] px-4 md:px-8 py-4 flex items-center justify-between">
 
-            {/* 🔍 LEFT SIDE — SEARCH */}
-            <div className="relative w-full max-w-xs md:max-w-md">
-                <Search
-                    size={18}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
-                />
-                <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
-                />
+            {/* LEFT SIDE — Hamburger + Search */}
+            <div className="flex items-center gap-3 flex-1">
+                {/* Hamburger Menu (Mobile Only) */}
+                <button
+                    onClick={onToggleSidebar}
+                    className="lg:hidden p-2 rounded-lg hover:bg-[var(--color-card)] transition-colors"
+                >
+                    <Menu size={24} className="text-[var(--text-secondary)]" />
+                </button>
 
+                {/* 🔍 SEARCH */}
+                <div className="relative w-full max-w-xs md:max-w-md">
+                    <Search
+                        size={18}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
+                    />
+                </div>
             </div>
 
-            {/* 🔔 RIGHT SIDE */}
+
+            {/* RIGHT SIDE */}
             <div className="flex items-center gap-4 md:gap-6 ml-4">
 
                 {/* Inbox */}

@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import {
     LayoutDashboard,
     Users,
@@ -11,7 +10,6 @@ import {
     CreditCard,
     FileSearch,
     UserCog,
-    Menu,
     X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -29,27 +27,14 @@ const menuItems = [
     { name: "Profile & Security", icon: UserCog, path: "/admin/profile" },
 ];
 
-const AdminSidebar = () => {
-    const [isOpen, setIsOpen] = useState(false);
-
+const AdminSidebar = ({ isOpen, onClose }) => {
     return (
         <>
-            {/* Mobile Top Bar */}
-            <div className="lg:hidden sticky top-0 z-40 flex items-center justify-between bg-[var(--color-card)] text-[var(--text-secondary)] px-6 py-4 shadow-md">
-                <h1 className="text-xl font-bold font-[var(--font-heading)] hidden lg:block">Admin Panel</h1>
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="p-2 rounded-lg hover:bg-slate-800/50 transition-colors"
-                >
-                    <Menu size={24} />
-                </button>
-            </div>
-
             {/* Overlay (Mobile) */}
             {isOpen && (
                 <div
                     className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm transition-opacity"
-                    onClick={() => setIsOpen(false)}
+                    onClick={onClose}
                 />
             )}
 
@@ -60,12 +45,12 @@ const AdminSidebar = () => {
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 flex flex-col`}
             >
-                {/* Header */}
+                {/* Header  */}
                 <div className="flex items-center justify-between px-6 py-6 border-b border-slate-700/50">
                     <h2 className="text-2xl font-bold text-[var(--text-secondary)] font-[var(--font-heading)]">Admin Panel</h2>
                     <button
                         className="lg:hidden p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition-colors"
-                        onClick={() => setIsOpen(false)}
+                        onClick={onClose}
                     >
                         <X size={20} />
                     </button>
@@ -79,7 +64,7 @@ const AdminSidebar = () => {
                             <NavLink
                                 key={index}
                                 to={item.path}
-                                onClick={() => setIsOpen(false)}
+                                onClick={onClose}
                                 className={({ isActive }) =>
                                     `flex items-center gap-3 px-4 py-3.5 rounded-full text-sm font-medium transition-all duration-300  group
                    ${isActive
@@ -101,7 +86,7 @@ const AdminSidebar = () => {
 
 
                 {/* Footer */}
-                <div className="absolute bottom-0 w-full px-6 py-4 border-t border-slate-800 text-xs text-slate-400">
+                <div className="px-6 py-4 border-t border-slate-800 text-xs text-slate-400">
                     © 2026 Your SaaS
                 </div>
             </aside>

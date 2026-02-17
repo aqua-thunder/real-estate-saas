@@ -8,9 +8,14 @@ const user_Schema = new mongoose.Schema({
     email: {
         required: true,
         type: String,
+        unique: true,
     },
     password: {
         required: true,
+        type: String,
+    },
+    phone: {
+        required: false,
         type: String,
     },
     role: {
@@ -26,7 +31,16 @@ const user_Schema = new mongoose.Schema({
     },
     isActive: {
         type: Boolean,
-    }
+        default: true,
+    },
+    isBlocked: {
+        type: Boolean,
+        default: false,
+    },
+    lastLoginAt: {
+        type: Date,
+    },
+
 })
 
 const User = new mongoose.model("User", user_Schema)
