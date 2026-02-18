@@ -10,8 +10,14 @@ const createProperty = async (req, res) => {
         const {
             propertyName,
             propertyType,
+            description,
             location,
             address,
+            city,
+            state,
+            zipCode,
+            country,
+            totalFloors,
             totalUnit,
             isActive
         } = req.body;
@@ -44,18 +50,22 @@ const createProperty = async (req, res) => {
         // 3️⃣ Calculate default values
         const occupiedUnits = 0;
         const vacantUnits = totalUnit || 0; // initially all vacant
-        const revenue = 0; // initially no revenue
-
         const property = await Property.create({
             owner: owner._id,
             propertyName,
             propertyType,
+            description,
             location,
             address,
+            city,
+            state,
+            zipCode,
+            country,
+            totalFloors,
             totalUnit,
             occupiedUnits,
             vacantUnits,
-            revenue,
+            totalRevenue: 0,
             isActive: isActive !== undefined ? isActive : true
         });
 
@@ -96,7 +106,14 @@ const getProperties = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
-        const properties = await Property.find(query).populate("owner", "companyName ownerType");
+        const properties = await Property.find(query).populate({
+            path: "owner",
+            select: "companyName ownerType",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        });
 
         res.status(200).json({
             message: "Properties fetched successfully",
@@ -131,8 +148,14 @@ const updateProperty = async (req, res) => {
         const allowedFields = [
             "propertyName",
             "propertyType",
+            "description",
             "location",
             "address",
+            "city",
+            "state",
+            "zipCode",
+            "country",
+            "totalFloors",
             "totalUnit",
             "isActive"
         ];

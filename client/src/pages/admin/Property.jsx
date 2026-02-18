@@ -12,7 +12,8 @@ import {
     ChevronRight,
     LayoutGrid,
     Search,
-    Filter
+    Filter,
+    Eye
 } from "lucide-react";
 import { useAuth } from "../../store/auth";
 import { useToast } from "../../store/ToastContext";
@@ -22,8 +23,14 @@ import Input from "../../components/ui/Input";
 const initialState = {
     propertyName: "",
     propertyType: "RESIDENTIAL",
+    description: "",
     location: "",
     address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    totalFloors: 1,
     totalUnit: "",
     isActive: true
 };
@@ -38,6 +45,8 @@ const Property = () => {
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const [openViewProperty, setOpenViewProperty] = useState(false);
+    const [selectedProperty, setSelectedProperty] = useState(null);
     const isEditing = Boolean(editId);
 
     const fetchProperties = async () => {
@@ -120,8 +129,14 @@ const Property = () => {
         setFormData({
             propertyName: property.propertyName,
             propertyType: property.propertyType,
+            description: property.description || "",
             location: property.location,
             address: property.address,
+            city: property.city || "",
+            state: property.state || "",
+            zipCode: property.zipCode || "",
+            country: property.country || "",
+            totalFloors: property.totalFloors || 1,
             totalUnit: property.totalUnit,
             isActive: property.isActive
         });
@@ -194,7 +209,7 @@ const Property = () => {
                     { label: "Total Properties", value: properties.length, icon: Building2, color: "bg-blue-500" },
                     { label: "Total Units", value: properties.reduce((acc, p) => acc + (p.totalUnit || 0), 0), icon: LayoutGrid, color: "bg-purple-500" },
                     { label: "Total Vacant", value: properties.reduce((acc, p) => acc + (p.vacantUnits || 0), 0), icon: Users, color: "bg-green-500" },
-                    { label: "Active Revenue", value: `$${properties.reduce((acc, p) => acc + (p.revenue || 0), 0).toLocaleString()}`, icon: DollarSign, color: "bg-orange-500" }
+                    { label: "Active Revenue", value: `$${properties.reduce((acc, p) => acc + (p.totalRevenue || 0), 0).toLocaleString()}`, icon: DollarSign, color: "bg-orange-500" }
                 ].map((stat, i) => (
                     <div key={i} className="p-6 bg-[var(--bg-card)] rounded-3xl border border-[var(--color-card)] shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
                         <div className={`absolute top-0 right-0 w-24 h-24 ${stat.color}/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500`}></div>
@@ -241,38 +256,45 @@ const Property = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Owner</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Property Details</th>
+                                {user?.role === "SUPER_ADMIN" && (
+                                    <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Owner</th>
+                                )}
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Category</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Location</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Capacity</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Performance</th>
+                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Total Revenue</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--color-card)]">
                             {loading ? (
-                                <tr><td colSpan="6" className="p-16 text-center text-[var(--text-card)] font-medium animate-pulse">Synchronizing database...</td></tr>
+                                <tr><td colSpan={user?.role === "SUPER_ADMIN" ? "7" : "6"} className="p-16 text-center text-[var(--text-card)] font-medium animate-pulse">Synchronizing database...</td></tr>
                             ) : filteredProperties.length > 0 ? (
                                 filteredProperties.map((property) => (
                                     <tr key={property._id} className="group hover:bg-[var(--color-card)]/20 transition-all duration-300">
                                         <td className="p-6">
-                                            <div className="flex items-center gap-2 text-[var(--text-secondary)] font-semibold">
-
-                                                {property.owner.companyName}
-                                            </div>
-                                        </td>
-                                        <td className="p-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                                                    <Home size={22} className="text-blue-500" />
-                                                </div>
+
                                                 <div>
                                                     <div className="font-bold text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</div>
                                                     <div className="text-xs text-[var(--text-card)] font-medium mt-1 truncate max-w-[200px]">{property.address}</div>
                                                 </div>
                                             </div>
                                         </td>
+                                        {user?.role === "SUPER_ADMIN" && (
+                                            <td className="p-6">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="text-sm font-bold text-[var(--text-secondary)]">
+                                                        {property.owner?.user?.name || "N/A"}
+                                                        {property.owner?.companyName && (
+                                                            <span className="block text-[10px] text-[var(--text-card)] font-medium uppercase">
+                                                                {property.owner.companyName}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        )}
                                         <td className="p-6">
                                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${property.propertyType === 'RESIDENTIAL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                                                 property.propertyType === 'COMMERCIAL' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
@@ -282,34 +304,23 @@ const Property = () => {
                                             </span>
                                         </td>
                                         <td className="p-6">
-                                            <div className="flex items-center gap-2 text-[var(--text-secondary)] font-semibold">
-                                                <MapPin size={14} className="text-red-500/70" />
+                                            <div className="flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-sm">
                                                 {property.location}
                                             </div>
                                         </td>
+
                                         <td className="p-6">
-                                            <div>
-                                                <div className="flex justify-between items-center mb-1 text-[10px] font-bold text-[var(--text-card)]">
-                                                    <span>{property.totalUnit - property.vacantUnits} OCCUPIED</span>
-                                                    <span>{Math.round(((property.totalUnit - property.vacantUnits) / property.totalUnit) * 100) || 0}%</span>
-                                                </div>
-                                                <div className="w-32 h-2 bg-[var(--color-card)] rounded-full overflow-hidden">
-                                                    <div
-                                                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                                                        style={{ width: `${((property.totalUnit - property.vacantUnits) / property.totalUnit) * 100 || 0}%` }}
-                                                    ></div>
-                                                </div>
-                                                <div className="text-[10px] text-[var(--text-card)] mt-2 uppercase font-black">{property.vacantUnits} Vacant of {property.totalUnit} Total</div>
+                                            <div className="p-3 rounded-2xl">
+                                                <div className="text-lg font-black text-green-600 dark:text-green-400 mt-1">${property.totalRevenue?.toLocaleString() || 0}</div>
                                             </div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="p-3 bg-green-500/5 rounded-2xl border border-green-500/10">
-                                                <div className="text-[10px] font-bold text-green-600/70 uppercase">Total Revenue</div>
-                                                <div className="text-lg font-black text-green-600 dark:text-green-400 mt-1">${property.revenue?.toLocaleString() || 0}</div>
-                                            </div>
-                                        </td>
-                                        <td className="p-6">
-                                            <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
+                                            <div className="flex items-center justify-center gap-1 transition-opacity duration-300">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedProperty(property);
+                                                        setOpenViewProperty(true);
+                                                    }} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Eye size={18} /></button>
                                                 <button onClick={() => handleEdit(property)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
                                                 <button onClick={() => handleDelete(property._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
                                             </div>
@@ -318,7 +329,7 @@ const Property = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="p-20 text-center">
+                                    <td colSpan={user?.role === "SUPER_ADMIN" ? "7" : "6"} className="p-20 text-center">
                                         <div className="flex flex-col items-center gap-4">
                                             <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center text-[var(--text-card)] border-4 border-[var(--color-card)] border-dashed animate-spin-slow">
                                                 <Building2 size={40} />
@@ -333,6 +344,7 @@ const Property = () => {
                         </tbody>
                     </table>
                 </div>
+
             </div>
 
             {/* Modal - Modern & Slick */}
@@ -373,19 +385,32 @@ const Property = () => {
                                     required
                                 />
 
-                                {/* Category + Units */}
-                                <div className="grid grid-cols-2 gap-6">
+                                {/* Description */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
+                                        Property Description
+                                    </label>
+                                    <textarea
+                                        name="description"
+                                        value={formData.description}
+                                        onChange={handleChange}
+                                        rows="2"
+                                        placeholder="Brief description of the property..."
+                                        className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
+                                    />
+                                </div>
 
+                                {/* Category + Units + Floors */}
+                                <div className="grid grid-cols-3 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                            Property Category
+                                            Category
                                         </label>
-
                                         <select
                                             name="propertyType"
                                             value={formData.propertyType}
                                             onChange={handleChange}
-                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
+                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
                                             required
                                         >
                                             <option value="RESIDENTIAL">Residential</option>
@@ -395,43 +420,95 @@ const Property = () => {
                                     </div>
 
                                     <Input
-                                        label="Inventory (Units)"
+                                        label="Total Units"
                                         name="totalUnit"
                                         type="number"
                                         value={formData.totalUnit}
                                         onChange={handleChange}
                                         placeholder="e.g. 24"
                                         variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)] border border-white/10 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
                                         required
                                         min="1"
                                     />
 
+                                    <Input
+                                        label="Total Floors"
+                                        name="totalFloors"
+                                        type="number"
+                                        value={formData.totalFloors}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 5"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        min="1"
+                                    />
                                 </div>
 
-                                {/* Location */}
-                                <Input
-                                    label="Location"
-                                    name="location"
-                                    value={formData.location}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Manhattan, NYC"
-                                    variant="formInput"
-                                    className="text-sm py-4 rounded-2xl bg-[var(--color-card)] border border-white/10 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition"
-                                    required
-                                />
+                                {/* Location & City/State */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input
+                                        label="Location"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Manhattan"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        required
+                                    />
+                                    <Input
+                                        label="City"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        placeholder="e.g. New York"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <Input
+                                        label="State"
+                                        name="state"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        placeholder="e.g. NY"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                    />
+                                    <Input
+                                        label="Zip Code"
+                                        name="zipCode"
+                                        value={formData.zipCode}
+                                        onChange={handleChange}
+                                        placeholder="10001"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                    />
+                                    <Input
+                                        label="Country"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleChange}
+                                        placeholder="USA"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                    />
+                                </div>
 
                                 {/* Address */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                        Full Logistics Address
+                                        Full Address
                                     </label>
 
                                     <textarea
                                         name="address"
                                         value={formData.address}
                                         onChange={handleChange}
-                                        rows="3"
+                                        rows="2"
                                         placeholder="Enter precise location coordinates..."
                                         className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
                                         required
@@ -441,7 +518,7 @@ const Property = () => {
                             </div>
 
                             {/* Buttons */}
-                            <div className="flex gap-4 pt-4 sticky bottom-0 bg-[var(--bg-card)] pb-2 mt-4 border-t border-white/5">
+                            <div className="flex gap-4 pt-4 sticky  bg-[var(--bg-card)] mt-4 border-t border-white/5">
 
                                 <Button
                                     type="button"
@@ -466,6 +543,8 @@ const Property = () => {
                 </div>
             )}
 
+
+
             <style jsx>{`
                 @keyframes spin-slow {
                     from { transform: rotate(0deg); }
@@ -488,8 +567,147 @@ const Property = () => {
                     background: var(--text-card);
                 }
             `}</style>
+
+            {openViewProperty && selectedProperty && (
+                <ViewProperty
+                    property={selectedProperty}
+                    onClose={() => setOpenViewProperty(false)}
+                />
+            )}
         </div>
     );
 };
 
 export default Property;
+
+
+function ViewProperty({ property, onClose }) {
+    return (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={onClose}></div>
+
+            <div className="bg-[var(--bg-card)] w-full max-w-2xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
+                {/* Modal Header */}
+                <div className="p-8 pb-4 flex justify-between items-center relative z-10">
+                    <div>
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500">
+                                <Building2 size={24} />
+                            </div>
+                            <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
+                                Property Details
+                            </h3>
+                        </div>
+                        <p className="text-[var(--text-card)] font-medium mt-1 ml-11">
+                            Comprehensive analysis of {property.propertyName}
+                            {property.owner?.user?.name && <span className="ml-1 text-blue-500 text-xs font-bold"> • Owned by {property.owner.user.name}</span>}
+                        </p>
+                    </div>
+                    <button onClick={onClose} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+                </div>
+
+                <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-8 mb-6"></div>
+
+                <div className="p-8 pt-0 space-y-8 max-h-[75vh] overflow-y-auto relative z-10 custom-scrollbar">
+                    {/* Hero Stats */}
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="p-4 bg-[var(--color-card)] rounded-3xl border border-white/5 space-y-1">
+                            <div className="text-[10px] font-bold text-[var(--text-card)] uppercase tracking-wider">Total Units</div>
+                            <div className="text-xl font-black text-[var(--text-secondary)]">{property.totalUnit}</div>
+                        </div>
+                        <div className="p-4 bg-green-500/5 rounded-3xl border border-green-500/10 space-y-1">
+                            <div className="text-[10px] font-bold text-green-600/70 uppercase tracking-wider">Revenue</div>
+                            <div className="text-xl font-black text-green-600">${property.totalRevenue?.toLocaleString()}</div>
+                        </div>
+                        <div className="p-4 bg-purple-500/5 rounded-3xl border border-purple-500/10 space-y-1">
+                            <div className="text-[10px] font-bold text-purple-600/70 uppercase tracking-wider">Occupancy</div>
+                            <div className="text-xl font-black text-purple-600">{Math.round(((property.totalUnit - property.vacantUnits) / property.totalUnit) * 100) || 0}%</div>
+                        </div>
+                    </div>
+
+                    {/* Information Grid */}
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Basic Info */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-xs font-black text-[var(--color-primary)] uppercase tracking-widest">
+                                <LayoutGrid size={14} />
+                                Basic Information
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">Category</span>
+                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.propertyType}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">Floors</span>
+                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.totalFloors || 1}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">Status</span>
+                                    <span className={`text-xs font-black px-2 py-0.5 rounded-md ${property.isActive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                                        {property.isActive ? 'OPERATIONAL' : 'INACTIVE'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Location Details */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 text-xs font-black text-[var(--color-primary)] uppercase tracking-widest">
+                                <MapPin size={14} />
+                                Geographical Data
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">City</span>
+                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.city || "N/A"}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">State</span>
+                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.state || "N/A"}</span>
+                                </div>
+                                <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                    <span className="text-sm font-medium text-[var(--text-card)]">Country</span>
+                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.country || "N/A"}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Large Text Sections */}
+                    <div className="space-y-6">
+                        <div className="p-6 bg-[var(--color-card)] rounded-[2rem] border border-white/5 relative group overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                <MapPin size={48} />
+                            </div>
+                            <div className="text-[10px] font-black text-[var(--text-card)] uppercase tracking-widest mb-2">Primary Logistics Address</div>
+                            <div className="text-sm font-bold text-[var(--text-secondary)] leading-relaxed">
+                                {property.address}
+                                <div className="text-xs text-[var(--text-card)] mt-1 font-medium">{property.zipCode && `Postal Code: ${property.zipCode}`}</div>
+                            </div>
+                        </div>
+
+                        {property.description && (
+                            <div className="p-6 bg-[var(--color-card)] rounded-[2rem] border border-white/5 min-h-[100px]">
+                                <div className="text-[10px] font-black text-[var(--text-card)] uppercase tracking-widest mb-2">Asset Description</div>
+                                <div className="text-sm font-medium text-[var(--text-card)] leading-relaxed italic">
+                                    "{property.description}"
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Footer */}
+                    <div className="pt-4">
+                        <Button
+                            onClick={onClose}
+                            className="w-full py-5 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black shadow-xl shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                        >
+                            CLOSE INSPECTION
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
