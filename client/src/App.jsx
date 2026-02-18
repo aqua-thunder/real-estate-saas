@@ -22,8 +22,6 @@ import Logout from './auth/Logout.jsx'
 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
       <BrowserRouter>
@@ -36,22 +34,50 @@ function App() {
             <Route path="/logout" element={<Logout />} />
           </Route>
 
-          {/* Admin routes */}
-          <Route element={<ProtectedRoute role={"SUPER_ADMIN"} />}>
+          {/* Admin Layout Wrapper */}
+          <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"]} />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+
+              {/* All logged in users can access these */}
               <Route path="/admin/dashboard" element={<Dashboard />} />
-              <Route path="/admin/users" element={<User />} />
-              <Route path="/admin/roles" element={<Role />} />
-              <Route path="/admin/locations" element={<Location />} />
-              <Route path="/admin/properties" element={<Property />} />
-              <Route path="/admin/settings" element={<Settings />} />
-              <Route path="/admin/reports" element={<Reports />} />
-              <Route path="/admin/subscriptions" element={<Subscriptions />} />
-              <Route path="/admin/audit-logs" element={<AuditLogs />} />
               <Route path="/admin/profile" element={<Profile />} />
+
+              {/* Roles: Super Admin Only */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+                <Route path="/admin/roles" element={<Role />} />
+                <Route path="/admin/settings" element={<Settings />} />
+                <Route path="/admin/audit-logs" element={<AuditLogs />} />
+              </Route>
+
+              {/* Roles: Super Admin & Manager */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "MANAGER"]} />}>
+                <Route path="/admin/users" element={<User />} />
+              </Route>
+
+              {/* Roles: Super Admin, Owner, Manager, Technician */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TECHNICIAN"]} />}>
+                <Route path="/admin/locations" element={<Location />} />
+              </Route>
+
+              {/* Roles: Super Admin, Owner, Manager, Tenant */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"]} />}>
+                <Route path="/admin/properties" element={<Property />} />
+              </Route>
+
+              {/* Roles: Super Admin, Owner, Manager */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
+                <Route path="/admin/reports" element={<Reports />} />
+              </Route>
+
+              {/* Roles: Super Admin, Owner */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
+                <Route path="/admin/subscriptions" element={<Subscriptions />} />
+              </Route>
             </Route>
           </Route>
+
+          <Route path="/unauthorized" element={<div className="h-screen flex items-center justify-center text-white bg-[var(--bg-main)]">Unauthorized Access</div>} />
         </Routes>
       </BrowserRouter>
     </>

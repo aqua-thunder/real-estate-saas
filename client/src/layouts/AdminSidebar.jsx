@@ -13,21 +13,27 @@ import {
     X,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../store/auth";
 
 const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-    { name: "Users", icon: Users, path: "/admin/users" },
-    { name: "Role", icon: ShieldCheck, path: "/admin/roles" },
-    { name: "Location", icon: MapPin, path: "/admin/locations" },
-    { name: "Property", icon: Building2, path: "/admin/properties" },
-    { name: "Settings", icon: Settings, path: "/admin/settings" },
-    { name: "Reports", icon: BarChart3, path: "/admin/reports" },
-    { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions" },
-    { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs" },
-    { name: "Profile & Security", icon: UserCog, path: "/admin/profile" },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Users", icon: Users, path: "/admin/users", roles: ["SUPER_ADMIN", "MANAGER"] },
+    { name: "Role", icon: ShieldCheck, path: "/admin/roles", roles: ["SUPER_ADMIN"] },
+    { name: "Location", icon: MapPin, path: "/admin/locations", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TECHNICIAN"] },
+    { name: "Property", icon: Building2, path: "/admin/properties", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"] },
+    { name: "Settings", icon: Settings, path: "/admin/settings", roles: ["SUPER_ADMIN"] },
+    { name: "Reports", icon: BarChart3, path: "/admin/reports", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
+    { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
+    { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
+    { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
 ];
 
 const AdminSidebar = ({ isOpen, onClose }) => {
+    const { user } = useAuth();
+    const userRole = user?.role || "TENANT";
+
+    const filteredMenuItems = menuItems.filter(item => item.roles.includes(userRole));
+
     return (
         <>
             {/* Overlay (Mobile) */}
@@ -58,7 +64,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
 
                 {/* Menu */}
                 <nav className="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
-                    {menuItems.map((item, index) => {
+                    {filteredMenuItems.map((item, index) => {
                         const Icon = item.icon;
                         return (
                             <NavLink

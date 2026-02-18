@@ -26,7 +26,7 @@ const register = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: role || "TENANT",  // safe default
+            role: "TENANT", // All public signups are tenants by default
             phone
         });
 

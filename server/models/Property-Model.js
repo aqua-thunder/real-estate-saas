@@ -29,19 +29,22 @@ const propertySchema = new mongoose.Schema({
     },
     occupiedUnits: {
         type: Number,
-        required: true
+        default: 0
     },
+
     vacantUnits: {
         type: Number,
-        required: true
+        default: 0
     },
+
     revenue: {
         type: Number,
-        required: true
+        default: 0
     },
+
     isActive: {
         type: Boolean,
-        required: true
+        default: true
     }
 })
 

@@ -1,4 +1,5 @@
 const User = require("../../models/User-model.js")
+const Owner = require("../../models/Owner-model.js")
 const bcrypt = require("bcrypt")
 
 const addUser = async (req, res) => {
@@ -19,6 +20,18 @@ const addUser = async (req, res) => {
             phone,
             role,
         })
+
+        // If the role is OWNER, automatically create an approved Owner profile
+        if (role === "OWNER") {
+            await Owner.create({
+                user: newUser._id,
+                ownerType: "INDIVIDUAL", // Default to individual
+                contactNumber: phone || "0000000000",
+                isApproved: true, // Admin created owners are auto-approved
+                approvedBy: req.user._id // The admin who created them
+            });
+        }
+
         res.status(201).json({ msg: "User created successfully", newUser })
 
     } catch (error) {

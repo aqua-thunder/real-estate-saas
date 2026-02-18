@@ -16,15 +16,26 @@ const createProperty = async (req, res) => {
             isActive
         } = req.body;
 
-        // 1️⃣ Find Owner directly by _id
-        const owner = await Owner.findById(userId);
+        // 1️⃣ Find Owner by user field, not _id
+        let owner = await Owner.findOne({ user: userId });
 
         if (!owner) {
-            return res.status(400).json({ message: "Owner not found" });
+            // Safety: Handle existing users with OWNER role who might be missing a profile record
+            if (req.user.role === "OWNER" || req.user.role === "SUPER_ADMIN") {
+                owner = await Owner.create({
+                    user: userId,
+                    ownerType: "INDIVIDUAL",
+                    contactNumber: req.user.phone || "0000000000",
+                    isApproved: true,
+                    approvedBy: userId
+                });
+            } else {
+                return res.status(400).json({ message: "Owner profile not found" });
+            }
         }
 
-        // 2️⃣ Check approvalStatus (UPDATED)
-        if (owner.approvalStatus !== "APPROVED") {
+        // 2️⃣ Check isApproved (based on model)
+        if (!owner.isApproved) {
             return res.status(403).json({
                 message: "Owner not approved by admin"
             });
@@ -32,20 +43,20 @@ const createProperty = async (req, res) => {
 
         // 3️⃣ Calculate default values
         const occupiedUnits = 0;
-        const vacantUnits = totalUnit; // initially all vacant
+        const vacantUnits = totalUnit || 0; // initially all vacant
         const revenue = 0; // initially no revenue
 
         const property = await Property.create({
             owner: owner._id,
             propertyName,
             propertyType,
-            location,        // string now
+            location,
             address,
             totalUnit,
             occupiedUnits,
             vacantUnits,
             revenue,
-            isActive
+            isActive: isActive !== undefined ? isActive : true
         });
 
         res.status(201).json({
@@ -58,35 +69,62 @@ const createProperty = async (req, res) => {
     }
 };
 
+const getProperties = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const role = req.user.role;
+
+        let query = {};
+
+        if (role === "OWNER") {
+            let owner = await Owner.findOne({ user: userId });
+
+            // Safety: If an OWNER user exists but has no Owner profile, create one
+            if (!owner) {
+                owner = await Owner.create({
+                    user: userId,
+                    ownerType: "INDIVIDUAL",
+                    contactNumber: req.user.phone || "0000000000",
+                    isApproved: true, // Existing owners are considered approved
+                });
+            }
+            query = { owner: owner._id };
+        } else if (role === "SUPER_ADMIN") {
+            // Admin sees all properties
+            query = {};
+        } else {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const properties = await Property.find(query).populate("owner", "companyName ownerType");
+
+        res.status(200).json({
+            message: "Properties fetched successfully",
+            properties
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 const updateProperty = async (req, res) => {
     try {
         const userId = req.user._id;
+        const role = req.user.role;
         const propertyId = req.params.id;
 
-        const owner = await Owner.findById(userId);
-
-        if (!owner) {
-            return res.status(403).json({
-                message: "Owner profile not found"
-            });
-        }
-
-        if (owner.approvalStatus !== "APPROVED") {
-            return res.status(403).json({
-                message: "Owner not approved"
-            });
-        }
-
-        const property = await Property.findOne({
-            _id: propertyId,
-            owner: owner._id
-        });
-
+        const property = await Property.findById(propertyId);
         if (!property) {
-            return res.status(403).json({
-                message: "You are not allowed to update this property"
-            });
+            return res.status(404).json({ message: "Property not found" });
+        }
+
+        // Authorization check
+        if (role === "OWNER") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner || property.owner.toString() !== owner._id.toString()) {
+                return res.status(403).json({ message: "You are not allowed to update this property" });
+            }
         }
 
         // Allowed fields only
@@ -105,6 +143,11 @@ const updateProperty = async (req, res) => {
             }
         });
 
+        // Recalculate vacant units if total units changed
+        if (req.body.totalUnit !== undefined) {
+            property.vacantUnits = req.body.totalUnit - (property.occupiedUnits || 0);
+        }
+
         await property.save();
 
         res.status(200).json({
@@ -117,29 +160,23 @@ const updateProperty = async (req, res) => {
     }
 };
 
-
 const deleteProperty = async (req, res) => {
     try {
         const userId = req.user._id;
+        const role = req.user.role;
         const propertyId = req.params.id;
 
-        const owner = await Owner.findById(userId);
-
-        if (!owner) {
-            return res.status(403).json({
-                message: "Owner profile not found"
-            });
+        const property = await Property.findById(propertyId);
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
         }
 
-        const property = await Property.findOne({
-            _id: propertyId,
-            owner: owner._id
-        });
-
-        if (!property) {
-            return res.status(403).json({
-                message: "You are not allowed to delete this property"
-            });
+        // Authorization check
+        if (role === "OWNER") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner || property.owner.toString() !== owner._id.toString()) {
+                return res.status(403).json({ message: "You are not allowed to delete this property" });
+            }
         }
 
         await property.deleteOne();
@@ -153,5 +190,4 @@ const deleteProperty = async (req, res) => {
     }
 };
 
-
-module.exports = { createProperty, updateProperty, deleteProperty };
+module.exports = { createProperty, updateProperty, deleteProperty, getProperties };

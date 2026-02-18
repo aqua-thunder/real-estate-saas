@@ -8,31 +8,41 @@ const SignUpPage = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    role: "",
     password: "",
+    confirmPassword: "",
   });
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
   const { storetokenInLS } = useAuth();
 
-  // ✅ Works for Input + Select
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:7000/api/auth/register",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            password: form.password
+          }),
         }
       );
 
@@ -41,9 +51,12 @@ const SignUpPage = () => {
       if (response.ok) {
         storetokenInLS(res_data.token);
         navigate("/");
+      } else {
+        setError(res_data.message || "Registration failed");
       }
     } catch (error) {
       console.log("Register error:", error);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -97,37 +110,6 @@ const SignUpPage = () => {
               required
             />
 
-            {/* ✅ Role Dropdown */}
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-[var(--text-secondary)]">
-                Role
-              </label>
-
-              <select
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                required
-                className="
-                  w-full px-4 py-3 rounded-lg
-                  bg-[var(--bg-main)]
-                  text-white
-                  border border-white/10
-                  focus:outline-none
-                  focus:ring-1 focus:ring-[var(--color-primary)]
-                "
-              >
-                <option value="" disabled>
-                  Select Role
-                </option>
-                <option value="SUPER_ADMIN">Super Admin</option>
-                <option value="OWNER">Owner</option>
-                <option value="MANAGER">Manager</option>
-                <option value="TENANT">Tenant</option>
-                <option value="TECHNICIAN">Technician</option>
-              </select>
-            </div>
-
             <Input
               label="Password"
               type="password"
@@ -136,6 +118,19 @@ const SignUpPage = () => {
               onChange={handleChange}
               required
             />
+
+            <Input
+              label="Confirm Password"
+              type="password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+
+            {error && (
+              <p className="text-red-500 text-sm">{error}</p>
+            )}
           </div>
 
           <Button type="primary" className="w-full mt-6" htmlType="submit">
