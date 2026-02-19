@@ -177,31 +177,7 @@ const Property = () => {
     return (
         <div className="space-y-6 animate-fadeIn">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-8 bg-[var(--bg-card)] rounded-3xl shadow-xl border border-[var(--color-card)] backdrop-blur-md relative overflow-hidden group">
-                {/* Background Decoration */}
-                <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 bg-[var(--color-primary)]/5 rounded-full blur-3xl group-hover:bg-[var(--color-primary)]/10 transition-all duration-700"></div>
 
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-3 bg-gradient-to-br from-[var(--color-primary)] to-blue-600 rounded-2xl text-white shadow-lg shadow-[var(--color-primary)]/20">
-                            <Building2 size={28} />
-                        </div>
-                        <h2 className="text-3xl font-extrabold text-[var(--text-secondary)] tracking-tight">
-                            Property Management
-                        </h2>
-                    </div>
-                    <p className="text-[var(--text-card)] text-sm max-w-md ml-14">
-                        Monitor your real estate performance, manage unit occupancy, and track revenue across your portfolio.
-                    </p>
-                </div>
-
-                <div className="flex gap-3 mt-6 md:mt-0 relative z-10">
-                    <Button onClick={() => { resetForm(); setOpenForm(true); }} className="px-6 py-6 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-105 transition-transform duration-300 border-none shadow-xl shadow-[var(--color-primary)]/30">
-                        <Plus size={20} className="mr-2" />
-                        <span className="font-bold">Add Property</span>
-                    </Button>
-                </div>
-            </div>
 
             {/* Stats Overview (Optional placeholders) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -227,26 +203,38 @@ const Property = () => {
             </div>
 
             {/* Controls Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-[var(--bg-card)] p-4 rounded-3xl border border-[var(--color-card)] shadow-sm">
-                <div className="relative w-full sm:max-w-md">
-                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" />
-                    <input
-                        type="text"
-                        placeholder="Search properties by name or location..."
-                        className="w-full bg-[var(--color-card)] border-none rounded-2xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-[var(--color-primary)] text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] transition-all"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-[var(--color-card)] rounded-2xl border border-[var(--color-card)] hover:bg-[var(--bg-card)] text-sm font-semibold transition-all">
-                        <Filter size={18} />
-                        Filter
-                    </button>
-                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-[var(--color-card)] rounded-2xl border border-[var(--color-card)] hover:bg-[var(--bg-card)] text-sm font-semibold transition-all">
-                        <LayoutGrid size={18} />
-                        View
-                    </button>
+            <div className="relative overflow-hidden bg-[var(--bg-card)] p-4 sm:p-5 rounded-3xl border border-[var(--color-card)] shadow-sm">
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-primary)]/40 to-transparent"></div>
+
+                <div className="flex flex-col xl:flex-row gap-3 xl:gap-4 xl:items-center xl:justify-between">
+                    <div className="relative w-full xl:max-w-xl">
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" />
+                        <input
+                            type="text"
+                            placeholder="Search properties by name or location..."
+                            className="w-full h-12 bg-[var(--color-card)]/90 border border-transparent rounded-2xl pl-12 pr-4 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/70 focus:border-[var(--color-primary)]/20 transition-all"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:flex gap-2 w-full xl:w-auto">
+                        <button className="h-12 px-4 flex items-center justify-center gap-2 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] transition-all">
+                            <Filter size={17} />
+                            Filter
+                        </button>
+                        <button className="h-12 px-4 flex items-center justify-center gap-2 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] transition-all">
+                            <LayoutGrid size={17} />
+                            View
+                        </button>
+                        <Button
+                            onClick={() => { resetForm(); setOpenForm(true); }}
+                            className="col-span-2 sm:col-span-1 h-12 px-5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 border-none shadow-lg shadow-[var(--color-primary)]/30"
+                        >
+                            <Plus size={19} className="mr-2" />
+                            <span className="font-bold">Add Property</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
 

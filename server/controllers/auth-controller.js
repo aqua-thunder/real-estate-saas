@@ -131,7 +131,45 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
 
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ message: "All password fields are required" });
+        }
 
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: "New password and confirm password do not match" });
+        }
 
-module.exports = { register, login, user, getAllUsers }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: "New password must be at least 6 characters long" });
+        }
+
+        const existingUser = await User.findById(req.user._id);
+        if (!existingUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, existingUser.password);
+        if (!isCurrentPasswordValid) {
+            return res.status(400).json({ message: "Current password is incorrect" });
+        }
+
+        const isSamePassword = await bcrypt.compare(newPassword, existingUser.password);
+        if (isSamePassword) {
+            return res.status(400).json({ message: "New password must be different from current password" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        existingUser.password = hashedPassword;
+        await existingUser.save();
+
+        return res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { register, login, user, getAllUsers, changePassword }
