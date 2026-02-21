@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Globe, Navigation, Plus, X, Edit, Trash2 } from 'lucide-react';
-import { useAuth } from '../../store/auth';
-import Input from '../../components/ui/Input';
-import Button from "../../components/ui/Button";
-import { useToast } from '../../store/ToastContext';
+import { useAuth } from '../store/auth';
+import Input from '../components/ui/Input';
+import Button from "../components/ui/Button";
+import { useToast } from '../store/ToastContext';
 
 const Location = () => {
     const { toast } = useToast();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
-import { useToast } from "../../store/ToastContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import { useToast } from "../store/ToastContext";
 import { Plus, Edit, Trash2, X, Shield, Users, Database, LayoutGrid, Search, Layers } from "lucide-react";
 
 const initialState = {
@@ -172,81 +172,106 @@ const Subscriptions = () => {
                 </div>
             </div>
 
-            {/* List Table */}
-            <div className="bg-[var(--bg-card)] rounded-[2rem] border border-[var(--color-card)] shadow-2xl overflow-hidden relative">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Plan Name</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Pricing</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Limits (Prop/Unit/Mgr)</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Storage</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Status</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--color-card)]">
-                            {loading ? (
-                                <tr><td colSpan="6" className="p-16 text-center text-[var(--text-card)] font-medium animate-pulse">Syncing subscription models...</td></tr>
-                            ) : filteredPlans.length > 0 ? (
-                                filteredPlans.map((plan) => (
-                                    <tr key={plan._id} className="group hover:bg-[var(--color-card)]/20 transition-all duration-300">
-                                        <td className="p-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-[var(--color-primary)]/10 rounded-xl text-[var(--color-primary)]">
-                                                    <Layers size={18} />
-                                                </div>
-                                                <div className="font-bold text-[var(--text-secondary)]">{plan.name}</div>
-                                            </div>
-                                        </td>
-                                        <td className="p-6">
-                                            <div className="space-y-1">
-                                                <div className="text-sm font-black text-green-500">${plan.priceMonthly}/mo</div>
-                                                <div className="text-[10px] text-[var(--text-card)] font-bold uppercase">${plan.priceYearly}/yr</div>
-                                            </div>
-                                        </td>
-                                        <td className="p-6 text-center">
-                                            <div className="flex justify-center items-center gap-2">
-                                                <span className="px-3 py-1 bg-blue-500/10 text-blue-500 rounded-lg text-xs font-bold">{plan.propertyLimit}</span>
-                                                <span className="px-3 py-1 bg-purple-500/10 text-purple-500 rounded-lg text-xs font-bold">{plan.unitLimit}</span>
-                                                <span className="px-3 py-1 bg-orange-500/10 text-orange-500 rounded-lg text-xs font-bold">{plan.managerLimit}</span>
-                                            </div>
-                                        </td>
-                                        <td className="p-6 text-center font-bold text-sm text-[var(--text-secondary)]">
-                                            {plan.storageLimitMB}MB
-                                        </td>
-                                        <td className="p-6 text-center">
-                                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${plan.isActive ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-                                                {plan.isActive ? 'ACTIVE' : 'INACTIVE'}
-                                            </span>
-                                        </td>
-                                        <td className="p-6">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button onClick={() => handleEdit(plan)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete(plan._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="6" className="p-20 text-center">
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center text-[var(--text-card)] border-4 border-[var(--color-card)] border-dashed">
-                                                <Shield size={40} />
-                                            </div>
-                                            <div className="text-xl font-black text-[var(--text-secondary)] mt-4 tracking-tight">No Plans Configured</div>
-                                            <p className="text-[var(--text-card)] text-sm max-w-xs">Your subscription model is empty. Define your first tier to start scaling.</p>
-                                            <Button onClick={() => setOpenForm(true)} className="mt-4 rounded-2xl px-10">Create First Plan</Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+            {/* Grid of Plan Cards */}
+            {loading ? (
+                <div className="flex flex-col items-center justify-center p-20 space-y-4">
+                    <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[var(--text-card)] font-medium animate-pulse">Syncing subscription models...</p>
                 </div>
-            </div>
+            ) : filteredPlans.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredPlans.map((plan) => (
+                        <div key={plan._id} className="group relative bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--color-card)] p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
+                            {/* Decorative Background Element */}
+                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--color-primary)]/5 rounded-full blur-3xl group-hover:bg-[var(--color-primary)]/10 transition-colors"></div>
+
+                            {/* Plan Header */}
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-[var(--color-primary)]/10 rounded-2xl text-[var(--color-primary)] group-hover:scale-110 transition-transform">
+                                        <Layers size={22} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xl font-black text-[var(--text-secondary)] tracking-tight">{plan.name}</h4>
+                                        <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-[9px] font-black tracking-widest uppercase border ${plan.isActive ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
+                                            {plan.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="flex gap-1">
+                                    <button onClick={() => handleEdit(plan)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Edit Plan"><Edit size={18} /></button>
+                                    <button onClick={() => handleDelete(plan._id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all" title="Delete Plan"><Trash2 size={18} /></button>
+                                </div>
+                            </div>
+
+                            {/* Pricing Section */}
+                            <div className="mb-8 p-6 bg-[var(--color-card)]/30 rounded-3xl border border-white/5">
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-4xl font-black text-[var(--text-secondary)]">${plan.priceMonthly}</span>
+                                    <span className="text-[var(--text-card)] font-bold text-sm">/ month</span>
+                                </div>
+                                <div className="mt-2 text-xs font-bold text-green-500/80 uppercase tracking-wider">
+                                    Annual billing: ${plan.priceYearly}/yr
+                                </div>
+                            </div>
+
+                            {/* Features/Limits List */}
+                            <div className="space-y-4 mb-8">
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
+                                        <LayoutGrid size={16} className="text-[var(--color-primary)]" />
+                                        Property Limit
+                                    </div>
+                                    <span className="font-black text-[var(--text-secondary)]">{plan.propertyLimit} Units</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
+                                        <Layers size={16} className="text-purple-500" />
+                                        Unit Capacity
+                                    </div>
+                                    <span className="font-black text-[var(--text-secondary)]">{plan.unitLimit} Units</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
+                                        <Users size={16} className="text-orange-500" />
+                                        Manager Access
+                                    </div>
+                                    <span className="font-black text-[var(--text-secondary)]">{plan.managerLimit} Seats</span>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
+                                        <Database size={16} className="text-blue-400" />
+                                        Cloud Storage
+                                    </div>
+                                    <span className="font-black text-[var(--text-secondary)]">{plan.storageLimitMB}MB</span>
+                                </div>
+                            </div>
+
+                            {/* Trial Footer */}
+                            <div className="flex items-center gap-2 pt-4 border-t border-white/5">
+                                <Shield size={14} className="text-[var(--text-card)]" />
+                                <span className="text-[10px] font-bold text-[var(--text-card)] uppercase tracking-widest">
+                                    {plan.trialDays > 0 ? `${plan.trialDays} Day Free Trial available` : 'No Free Trial'}
+                                </span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="bg-[var(--bg-card)] rounded-[3rem] border border-[var(--color-card)] p-20 text-center shadow-xl">
+                    <div className="flex flex-col items-center gap-6">
+                        <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center text-[var(--text-card)] border-4 border-[var(--color-card)] border-dashed animate-pulse">
+                            <Shield size={40} />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-[var(--text-secondary)] tracking-tight">No Tiers Found</h3>
+                            <p className="text-[var(--text-card)] text-sm max-w-xs mx-auto mt-2">Scale your business by defining new subscription models.</p>
+                        </div>
+                        <Button onClick={() => setOpenForm(true)} className="rounded-2xl px-12 py-4">Establish First Plan</Button>
+                    </div>
+                </div>
+            )}
+
 
             {/* Modal Form */}
             {openForm && (

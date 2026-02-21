@@ -9,5 +9,6 @@ router.post("/login", authController.login);
 router.get("/user", authMiddleware, authController.user)
 router.get("/all-users", authMiddleware, roleMiddleware("SUPER_ADMIN"), authController.getAllUsers)
 router.put("/change-password", authMiddleware, authController.changePassword)
+router.put("/profile", authMiddleware, authController.updateProfile)
 
 module.exports = router

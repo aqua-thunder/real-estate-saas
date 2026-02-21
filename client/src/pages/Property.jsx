@@ -15,10 +15,10 @@ import {
     Filter,
     Eye
 } from "lucide-react";
-import { useAuth } from "../../store/auth";
-import { useToast } from "../../store/ToastContext";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
+import { useAuth } from "../store/auth";
+import { useToast } from "../store/ToastContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 const initialState = {
     propertyName: "",

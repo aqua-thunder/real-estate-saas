@@ -99,5 +99,5 @@ const propertySchema = new mongoose.Schema({
 
 })
 
-const Property = new mongoose.model("Property", propertySchema)
+const Property = mongoose.model("Property", propertySchema)
 module.exports = Property

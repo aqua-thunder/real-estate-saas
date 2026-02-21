@@ -25,7 +25,7 @@ const user_Schema = new mongoose.Schema({
             "OWNER",
             "MANAGER",
             "TENANT",
-            "TECHNICIAN",
+            "MAINTENANCE_STAFF",
         ],
         default: "TENANT",
     },
@@ -43,5 +43,5 @@ const user_Schema = new mongoose.Schema({
 
 })
 
-const User = new mongoose.model("User", user_Schema)
+const User = mongoose.model("User", user_Schema)
 module.exports = User

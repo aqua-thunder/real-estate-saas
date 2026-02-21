@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { UserPlus, Edit, Trash2, X } from "lucide-react";
-import { useAuth } from "../../store/auth";
-import { useToast } from "../../store/ToastContext";
-import Button from "../../components/ui/Button";
-import Input from "../../components/ui/Input";
+import { useAuth } from "../store/auth";
+import { useToast } from "../store/ToastContext";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 const initialState = {
     name: "",
@@ -281,7 +281,7 @@ const User = () => {
                                     <option value="TENANT">Tenant</option>
                                     <option value="OWNER">Owner</option>
                                     <option value="MANAGER">Manager</option>
-                                    <option value="TECHNICAL">Technical</option>
+                                    <option value="MAINTENANCE_STAFF">Maintenance Staff</option>
                                     <option value="SUPER_ADMIN">Super Admin</option>
                                 </select>
                             </div>

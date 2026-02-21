@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import Input from "../../components/ui/Input";
-import { useAuth } from "../../store/auth";
-import { useToast } from "../../store/ToastContext";
+import React, { useEffect, useState } from "react";
+import Input from "../components/ui/Input";
+import { useAuth } from "../store/auth";
+import { useToast } from "../store/ToastContext";
 
 const Profile = () => {
     const [twoFAEnabled, setTwoFAEnabled] = useState(false);
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
+    const [formData, setFormData] = useState({ name: "", email: "", phone: "", role: "" });
     const { toast } = useToast();
     const [passwordForm, setPasswordForm] = useState({
         currentPassword: "",
@@ -13,6 +14,18 @@ const Profile = () => {
         confirmPassword: ""
     });
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                name: user.name || "",
+                email: user.email || "",
+                phone: user.phone || "",
+                role: user.role || ""
+            });
+        }
+    }, [user]);
 
     const handlePasswordFieldChange = (e) => {
         const { name, value } = e.target;
@@ -69,6 +82,51 @@ const Profile = () => {
         }
     };
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+
+    const handleSave = async () => {
+        try {
+            setIsSavingProfile(true);
+            const token = localStorage.getItem("token");
+
+            const response = await fetch("http://localhost:7000/api/auth/profile", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setUser(data.user);
+                toast.success(data.message || "Profile updated successfully");
+            } else {
+                toast.error(data.message || "Failed to update profile");
+            }
+        } catch (error) {
+            console.error("Profile update error:", error);
+            toast.error("Something went wrong while updating profile");
+        } finally {
+            setIsSavingProfile(false);
+        }
+    };
+
+
     return (
         <div className="min-h-screen bg-[var(--bg-card)] p-4 md:p-8">
             <div className="max-w-6xl mx-auto space-y-8">
@@ -95,7 +153,8 @@ const Profile = () => {
                                 type="text"
                                 name="name"
                                 label="Full Name"
-                                value={user.name}
+                                value={formData?.name || ""}
+                                onChange={handleChange}
                                 placeholder="Enter full name"
                                 required
                             />
@@ -106,9 +165,10 @@ const Profile = () => {
                             <Input
                                 type="text"
                                 name="email"
-                                value={user.email}
+                                value={formData?.email || ""}
                                 label="Enter Your Email"
                                 placeholder="Enter Email"
+                                onChange={handleChange}
                                 required
 
                             />
@@ -120,9 +180,10 @@ const Profile = () => {
                             <Input
                                 type="number"
                                 name="phone"
-                                value={user.phone}
+                                value={formData?.phone || ""}
                                 label="Enter Your Phone Number"
                                 placeholder="Enter Phone Number"
+                                onChange={handleChange}
                                 required
 
                             />
@@ -132,18 +193,22 @@ const Profile = () => {
                             <Input
                                 type="text"
                                 name="role"
-                                value={user.role}
+                                value={formData?.role || ""}
                                 label="Your Role"
                                 placeholder="Enter Your Role"
-                                required
+                                readOnly
 
                             />
                         </div>
                     </div>
 
                     <div className="mt-6">
-                        <button className="px-6 py-2 bg-green-600 text-[var(--text-secondary)] rounded-lg hover:bg-green-700 transition">
-                            Update Profile
+                        <button
+                            onClick={handleSave}
+                            disabled={isSavingProfile}
+                            className="px-6 py-2 bg-green-600 text-[var(--text-secondary)] rounded-lg hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed transition"
+                        >
+                            {isSavingProfile ? "Updating..." : "Update Profile"}
                         </button>
                     </div>
                 </div>

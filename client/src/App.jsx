@@ -8,17 +8,18 @@ import SignInPage from './auth/SignInPage.jsx'
 import SignUpPage from './auth/SignUpPage.jsx'
 import ProtectedRoute from './store/ProtectedRoute.jsx'
 import AdminLayout from './layouts/AdminLayout.jsx'
-import Dashboard from './pages/admin/Dashboard.jsx'
-import User from './pages/admin/User.jsx'
-import Role from './pages/admin/Role.jsx'
-import Location from './pages/admin/Location.jsx'
-import Property from './pages/admin/Property.jsx'
-import Settings from './pages/admin/Settings.jsx'
-import Reports from './pages/admin/Reports.jsx'
-import Subscriptions from './pages/admin/Subscriptions.jsx'
-import AuditLogs from './pages/admin/AuditLogs.jsx'
-import Profile from './pages/admin/Profile.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import User from './pages/User.jsx'
+import Role from './pages/Role.jsx'
+import Location from './pages/Location.jsx'
+import Property from './pages/Property.jsx'
+import Settings from './pages/Settings.jsx'
+import Reports from './pages/Reports.jsx'
+import Subscriptions from './pages/Subscriptions.jsx'
+import AuditLogs from './pages/AuditLogs.jsx'
+import Profile from './pages/Profile.jsx'
 import Logout from './auth/Logout.jsx'
+import FloorUnit from './pages/FloorUnit.jsx'
 
 
 function App() {
@@ -64,6 +65,12 @@ function App() {
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"]} />}>
                 <Route path="/admin/properties" element={<Property />} />
               </Route>
+
+              {/* Roles: Owner */}
+              <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
+                <Route path="/owner/floor" element={<FloorUnit />} />
+              </Route>
+
 
               {/* Roles: Super Admin, Owner, Manager */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
