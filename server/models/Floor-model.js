@@ -6,6 +6,13 @@ const FloorSchema = new mongoose.Schema({
         ref: "Property",
         required: true
     },
+
+    ownerId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true
+    },
     name: {
         type: String,
         required: true
@@ -22,6 +29,12 @@ const FloorSchema = new mongoose.Schema({
         default: true
     }
 })
+
+// Prevent duplicate floor number inside same property
+FloorSchema.index(
+    { propertyId: 1, floorNumber: 1 },
+    { unique: true }
+);
 
 const Floor = mongoose.model("Floor", FloorSchema)
 module.exports = Floor

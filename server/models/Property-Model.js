@@ -42,34 +42,14 @@ const propertySchema = new mongoose.Schema({
     // 🏢 Structure
     totalFloors: {
         type: Number,
-        default: 1
+        default: 0
     },
 
     totalUnit: {
         type: Number,
-        required: true
-    },
-
-    occupiedUnits: {
-        type: Number,
         default: 0
     },
 
-    vacantUnits: {
-        type: Number,
-        default: 0
-    },
-
-    // 💰 Financial Summary (auto calculated)
-    totalRevenue: {
-        type: Number,
-        default: 0
-    },
-
-    totalMaintenanceCost: {
-        type: Number,
-        default: 0
-    },
 
     // 🖼 Property Images
     images: [
@@ -98,6 +78,12 @@ const propertySchema = new mongoose.Schema({
     }
 
 })
+
+// Prevent duplicate property name per owner
+propertySchema.index(
+    { owner: 1, propertyName: 1 },
+    { unique: true }
+);
 
 const Property = mongoose.model("Property", propertySchema)
 module.exports = Property

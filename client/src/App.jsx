@@ -66,12 +66,6 @@ function App() {
                 <Route path="/admin/properties" element={<Property />} />
               </Route>
 
-              {/* Roles: Owner */}
-              <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
-                <Route path="/owner/floor" element={<FloorUnit />} />
-              </Route>
-
-
               {/* Roles: Super Admin, Owner, Manager */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
                 <Route path="/admin/reports" element={<Reports />} />
@@ -80,6 +74,12 @@ function App() {
               {/* Roles: Super Admin, Owner */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
                 <Route path="/admin/subscriptions" element={<Subscriptions />} />
+              </Route>
+
+
+              {/* Roles: Owner */}
+              <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
+                <Route path="/owner/floor" element={<FloorUnit />} />
               </Route>
             </Route>
           </Route>

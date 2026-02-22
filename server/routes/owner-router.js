@@ -7,6 +7,7 @@ const roleMiddleware = require("../middlewares/role-middleware");
 const { registerOwner } = require("../controllers/owner/owner-controller.js");
 const PropertyController = require("../controllers/owner/property-controller.js");
 const FloorController = require("../controllers/owner/floore-controller.js")
+const UnitController = require("../controllers/owner/unit-controller.js")
 
 // Owner registration
 router.post("/register", authMiddleware, roleMiddleware("OWNER"), registerOwner);
@@ -20,4 +21,11 @@ router.delete("/property/:id", authMiddleware, roleMiddleware("OWNER", "SUPER_AD
 
 // Floore Management
 router.post("/floor", authMiddleware, roleMiddleware("OWNER"), FloorController.createFloor)
+router.get("/floors", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), FloorController.getFloors)
+
+
+// Unit Management
+router.post("/unit", authMiddleware, roleMiddleware("OWNER"), UnitController.createUnit)
+router.get("/units", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), UnitController.getUnits)
+
 module.exports = router;
