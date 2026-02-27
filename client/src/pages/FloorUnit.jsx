@@ -16,12 +16,20 @@ import {
   DollarSign,
   CheckCircle2,
   AlertCircle,
+  Edit,
   Trash2
 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+
+const initialFloorData = {
+  propertyId: "",
+  name: "",
+  floorNumber: "",
+  description: ""
+};
 
 const FloorUnit = () => {
   const { toast } = useToast();
@@ -37,13 +45,9 @@ const FloorUnit = () => {
   // Form states
   const [openFloorForm, setOpenFloorForm] = useState(false);
   const [openUnitForm, setOpenUnitForm] = useState(false);
+  const [editFloorId, setEditFloorId] = useState(null);
 
-  const [floorData, setFloorData] = useState({
-    propertyId: "",
-    name: "",
-    floorNumber: "",
-    description: ""
-  });
+  const [floorData, setFloorData] = useState(initialFloorData);
 
   const [unitData, setUnitData] = useState({
     propertyId: "",
@@ -61,6 +65,7 @@ const FloorUnit = () => {
   });
 
   const [selectedPropertyForUnit, setSelectedPropertyForUnit] = useState("");
+  const isEditingFloor = Boolean(editFloorId);
 
   // Fetch initial data
   const fetchProperties = async () => {
@@ -137,8 +142,12 @@ const FloorUnit = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:7000/api/owner/floor", {
-        method: "POST",
+      const response = await fetch(
+        isEditingFloor
+          ? `http://localhost:7000/api/owner/floor/${editFloorId}`
+          : "http://localhost:7000/api/owner/floor",
+        {
+        method: isEditingFloor ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
@@ -147,15 +156,16 @@ const FloorUnit = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        toast.success("Floor created successfully");
+        toast.success(isEditingFloor ? "Floor updated successfully" : "Floor created successfully");
         setOpenFloorForm(false);
-        setFloorData({ propertyId: "", name: "", floorNumber: "", description: "" });
+        setEditFloorId(null);
+        setFloorData(initialFloorData);
         fetchFloors();
       } else {
-        toast.error(data.msg || "Failed to create floor");
+        toast.error(data.msg || "Failed to save floor");
       }
     } catch (error) {
-      toast.error("Error creating floor");
+      toast.error("Error saving floor");
     }
   };
 
@@ -189,7 +199,7 @@ const FloorUnit = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteFloor = async (id) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`http://localhost:7000/api/owner/floor/${id}`, {
@@ -203,7 +213,7 @@ const FloorUnit = () => {
         setFloors(prev => prev.filter(p => p._id !== id));
       } else {
         const data = await response.json();
-        toast.error(data.message || "Failed to delete");
+        toast.error(data.msg || data.message || "Failed to delete");
       }
 
     } catch (error) {
@@ -211,6 +221,17 @@ const FloorUnit = () => {
       toast.error("Something went wrong");
     }
   }
+
+  const handleEditFloor = (floor) => {
+    setFloorData({
+      propertyId: floor.propertyId?._id || floor.propertyId || "",
+      name: floor.name || "",
+      floorNumber: floor.floorNumber ?? "",
+      description: floor.description || ""
+    });
+    setEditFloorId(floor._id);
+    setOpenFloorForm(true);
+  };
 
 
 
@@ -294,7 +315,15 @@ const FloorUnit = () => {
             </span>
           </h2>
           <Button
-            onClick={() => activeTab === "floors" ? setOpenFloorForm(true) : setOpenUnitForm(true)}
+            onClick={() => {
+              if (activeTab === "floors") {
+                setEditFloorId(null);
+                setFloorData(initialFloorData);
+                setOpenFloorForm(true);
+                return;
+              }
+              setOpenUnitForm(true);
+            }}
             className="rounded-2xl px-8 h-12 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-primary)]/20"
           >
             <Plus size={18} className="mr-2" />
@@ -341,12 +370,15 @@ const FloorUnit = () => {
                       {units.filter(u => u.floorId?._id === floor._id).length}
                     </td>
                     <td className="p-6 text-center text-sm font-bold text-[var(--text-secondary)]">
-                      <button onClick={() => handleDelete(floor._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={() => handleEditFloor(floor)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
+                        <button onClick={() => handleDeleteFloor(floor._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                      </div>
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="5" className="p-20 text-center">
+                    <td colSpan="6" className="p-20 text-center">
                       <div className="flex flex-col items-center opacity-40">
                         <Layers size={64} className="mb-4" />
                         <div className="text-xl font-black">No Floors Established</div>
@@ -425,14 +457,22 @@ const FloorUnit = () => {
       {/* Floor Modal */}
       {openFloorForm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => setOpenFloorForm(false)}></div>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => {
+            setOpenFloorForm(false);
+            setEditFloorId(null);
+            setFloorData(initialFloorData);
+          }}></div>
           <div className="bg-[var(--bg-card)] w-full max-w-xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
             <div className="p-8 pb-4 flex justify-between items-center relative z-10">
               <div>
-                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">Establish Floor</h3>
+                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">{isEditingFloor ? "Modify Floor" : "Establish Floor"}</h3>
                 <p className="text-[var(--text-card)] font-medium mt-1">Define properties floor levels</p>
               </div>
-              <button onClick={() => setOpenFloorForm(false)} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+              <button onClick={() => {
+                setOpenFloorForm(false);
+                setEditFloorId(null);
+                setFloorData(initialFloorData);
+              }} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
             </div>
             <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-8 mb-6"></div>
             <form onSubmit={handleFloorSubmit} className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
@@ -444,7 +484,8 @@ const FloorUnit = () => {
                     value={floorData.propertyId}
                     onChange={handleFloorChange}
                     required
-                    className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer"
+                    disabled={isEditingFloor}
+                    className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer disabled:opacity-50"
                   >
                     <option value="">-- Choose Property --</option>
                     {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
@@ -483,8 +524,12 @@ const FloorUnit = () => {
                 </div>
               </div>
               <div className="flex gap-4 pt-4 border-t border-white/5">
-                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => setOpenFloorForm(false)}>Cancel</Button>
-                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-black shadow-xl shadow-blue-500/30 border-none" htmlType="submit">DEPLOY FLOOR</Button>
+                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => {
+                  setOpenFloorForm(false);
+                  setEditFloorId(null);
+                  setFloorData(initialFloorData);
+                }}>Cancel</Button>
+                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-black shadow-xl shadow-blue-500/30 border-none" htmlType="submit">{isEditingFloor ? "UPDATE FLOOR" : "DEPLOY FLOOR"}</Button>
               </div>
             </form>
           </div>

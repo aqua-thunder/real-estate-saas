@@ -21,6 +21,7 @@ router.delete("/property/:id", authMiddleware, roleMiddleware("OWNER", "SUPER_AD
 
 // Floore Management
 router.post("/floor", authMiddleware, roleMiddleware("OWNER"), FloorController.createFloor)
+router.put("/floor/:id", authMiddleware, roleMiddleware("OWNER"), FloorController.updateFloor)
 router.delete("/floor/:id", authMiddleware, roleMiddleware("OWNER"), FloorController.deleteFloor)
 router.get("/floors", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), FloorController.getFloors)
 
