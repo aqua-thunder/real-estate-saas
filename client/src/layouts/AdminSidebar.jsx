@@ -27,6 +27,7 @@ const menuItems = [
     { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
     { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN"] },
 ];
 
 const AdminSidebar = ({ isOpen, onClose }) => {
