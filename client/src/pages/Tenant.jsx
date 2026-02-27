@@ -151,7 +151,7 @@ const Tenant = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 md:p-8 font-[var(--font-body)] relative">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-8 font-[var(--font-body)] relative">
 
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -161,18 +161,18 @@ const Tenant = () => {
                     </h1>
                     <p className="text-[var(--text-card)] mt-1">Manage your residents, leases, and financial records in one place.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button type="secondary" onClick={() => { }} className="mt-0! px-4! py-2!">
+                <div className="grid grid-cols-2 md:flex items-center gap-3">
+                    <Button type="secondary" onClick={() => { }} className="mt-0! px-4! py-2! w-full md:w-auto">
                         <Download size={18} /> Export
                     </Button>
-                    <Button type="primary" onClick={() => setIsAddingTenant(true)} className="mt-0! px-4! py-2!">
+                    <Button type="primary" onClick={() => setIsAddingTenant(true)} className="mt-0! px-4! py-2! w-full md:w-auto">
                         <Plus size={18} /> Add Tenant
                     </Button>
                 </div>
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-6 md:mb-8">
                 {Object.entries(summary).map(([key, data]) => {
                     const Icon = data.icon;
                     return (
@@ -195,7 +195,7 @@ const Tenant = () => {
             </div>
 
             {/* Filters and Search */}
-            <div className="bg-[var(--bg-card)] rounded-2xl p-4 mb-6 border border-white/5 shadow-lg flex flex-col lg:flex-row gap-4">
+            <div className="bg-[var(--bg-card)] rounded-2xl p-4 mb-6 border border-white/5 shadow-lg flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-card)]" size={18} />
                     <input
@@ -219,7 +219,7 @@ const Tenant = () => {
                             {status}
                         </button>
                     ))}
-                    <div className="h-10 w-px bg-white/10 mx-1 hidden lg:block"></div>
+                    <div className="h-10 w-px bg-white/10 mx-1 hidden md:block"></div>
                     <select className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-[var(--text-card)] focus:outline-none">
                         <option>All Properties</option>
                         <option>Skyline Heights</option>
@@ -228,9 +228,10 @@ const Tenant = () => {
                 </div>
             </div>
 
-            {/* Table Section */}
+            {/* Table/Card View Section */}
             <div className="bg-[var(--bg-card)] rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
-                <div className="overflow-x-auto">
+                {/* Desktop Table View (Hidden on Mobile/Tablet) */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-white/5 text-[var(--text-card)] text-xs uppercase tracking-widest font-bold">
@@ -316,13 +317,74 @@ const Tenant = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Mobile/Tablet Card View (Hidden on Desktop) */}
+                <div className="lg:hidden divide-y divide-white/5">
+                    {filteredTenants.length > 0 ? (
+                        filteredTenants.map((tenant) => (
+                            <div
+                                key={tenant.id}
+                                className="p-4 hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer"
+                                onClick={() => setSelectedTenant(tenant)}
+                            >
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                            {tenant.avatar}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-white font-semibold text-sm">{tenant.name}</h4>
+                                            <p className="text-[var(--text-card)] text-xs">{tenant.property} • {tenant.unit}</p>
+                                        </div>
+                                    </div>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${getStatusColor(tenant.paymentStatus)}`}>
+                                        {tenant.paymentStatus}
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 text-xs">
+                                    <div className="space-y-1">
+                                        <p className="text-[var(--text-card)] uppercase tracking-wider font-bold text-[9px]">Lease End</p>
+                                        <div className="flex items-center gap-1.5 text-white">
+                                            <Calendar size={12} className="text-[var(--color-primary)]" />
+                                            <span>{tenant.leaseEnd}</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-[var(--text-card)] uppercase tracking-wider font-bold text-[9px]">Monthly Rent</p>
+                                        <p className="text-white font-bold">₹{tenant.rent.toLocaleString()}</p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                                    <div className={`text-[10px] font-bold px-2 py-0.5 rounded ${tenant.pending > 0 ? 'text-rose-400 bg-rose-500/10' : 'text-emerald-400 bg-emerald-500/10'}`}>
+                                        {tenant.pending > 0 ? `₹${tenant.pending.toLocaleString()} Due` : 'Payment Clear'}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button className="p-2 hover:bg-white/10 rounded-lg text-[var(--text-card)]" onClick={(e) => e.stopPropagation()}>
+                                            <Mail size={16} />
+                                        </button>
+                                        <button className="p-2 hover:bg-white/10 rounded-lg text-[var(--text-card)]" onClick={(e) => e.stopPropagation()}>
+                                            <MoreVertical size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-10 text-center">
+                            <Users size={40} className="mx-auto text-white/10 mb-3" />
+                            <p className="text-[var(--text-card)] text-sm">No results found.</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Tenant Detail Drawer */}
             {selectedTenant && (
                 <div className="fixed inset-0 z-50 flex justify-end">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedTenant(null)}></div>
-                    <div className="relative w-full max-w-lg bg-[var(--bg-card)] h-full overflow-y-auto shadow-2xl border-l border-white/10 animate-slide-in">
+                    <div className="relative w-full sm:max-w-md lg:max-w-lg bg-[var(--bg-card)] h-full overflow-y-auto shadow-2xl border-l border-white/10 animate-slide-in">
                         <div className="sticky top-0 z-10 bg-[var(--bg-card)] border-b border-white/5 p-6 flex items-center justify-between">
                             <h2 className="text-xl font-bold text-white">Tenant Details</h2>
                             <button
@@ -447,7 +509,7 @@ const Tenant = () => {
             {isAddingTenant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsAddingTenant(false)}></div>
-                    <div className="relative w-full max-w-2xl bg-[var(--bg-card)] rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-zoom-in">
+                    <div className="relative w-full max-w-2xl bg-[var(--bg-card)] md:rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-zoom-in h-full md:h-auto overflow-y-auto">
                         <div className="p-6 border-b border-white/5 flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-white">Add New Tenant</h2>
                             <button onClick={() => setIsAddingTenant(false)} className="p-2 hover:bg-white/5 rounded-full text-[var(--text-card)] transition-colors">
