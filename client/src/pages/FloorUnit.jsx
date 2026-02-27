@@ -15,7 +15,8 @@ import {
   Bath,
   DollarSign,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Trash2
 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
@@ -188,6 +189,31 @@ const FloorUnit = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:7000/api/owner/floor/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        toast.success("Floor Deleted Successfully")
+        setFloors(prev => prev.filter(p => p._id !== id));
+      } else {
+        const data = await response.json();
+        toast.error(data.message || "Failed to delete");
+      }
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  }
+
+
+
   const filteredFloorsForUnit = floors.filter(f => f.propertyId?._id === selectedPropertyForUnit);
 
   return (
@@ -288,6 +314,7 @@ const FloorUnit = () => {
                   <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Floor Level</th>
                   <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Description</th>
                   <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Units</th>
+                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-card)]/50">
@@ -312,6 +339,9 @@ const FloorUnit = () => {
                     </td>
                     <td className="p-6 text-center text-sm font-bold text-[var(--text-secondary)]">
                       {units.filter(u => u.floorId?._id === floor._id).length}
+                    </td>
+                    <td className="p-6 text-center text-sm font-bold text-[var(--text-secondary)]">
+                      <button onClick={() => handleDelete(floor._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
                     </td>
                   </tr>
                 )) : (

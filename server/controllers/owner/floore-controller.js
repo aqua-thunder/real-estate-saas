@@ -1,6 +1,7 @@
 const Floor = require("../../models/Floor-model.js");
 const Owner = require("../../models/Owner-model.js");
 const Property = require("../../models/Property-Model.js");
+const Unit = require("../../models/Unit-model.js");
 
 const createFloor = async (req, res) => {
     try {
@@ -47,6 +48,50 @@ const createFloor = async (req, res) => {
     }
 };
 
+const deleteFloor = async (req, res)=>{
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const role = req.user.role;
+
+        if (role !== "OWNER" && role !== "SUPER_ADMIN") {
+            return res.status(403).json({ msg: "Unauthorized access" });
+        }
+
+        const floor = await Floor.findById(id);
+        if (!floor) {
+            return res.status(404).json({ msg: "Floor not found" });
+        }
+
+        const property = await Property.findById(floor.propertyId);
+        if (!property) {
+            return res.status(404).json({ msg: "Property not found for this floor" });
+        }
+
+        if (role === "OWNER") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner || property.owner.toString() !== owner._id.toString()) {
+                return res.status(403).json({ msg: "Unauthorized to delete floor in this property" });
+            }
+        }
+
+        const unitExists = await Unit.exists({ floorId: id });
+        if (unitExists) {
+            return res.status(400).json({ msg: "Cannot delete floor with existing units" });
+        }
+
+        await floor.deleteOne();
+        await Property.findByIdAndUpdate(floor.propertyId, { $inc: { totalFloors: -1 } });
+
+        return res.status(200).json({ msg: "Floor deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({
+            msg: "Server error",
+            error: error.message
+        });
+    }
+}
+
 const getFloors = async (req, res) => {
     try {
         const { propertyId } = req.query;
@@ -77,4 +122,4 @@ const getFloors = async (req, res) => {
     }
 };
 
-module.exports = { createFloor, getFloors };
+module.exports = { createFloor, deleteFloor, getFloors };

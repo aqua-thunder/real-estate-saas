@@ -159,10 +159,7 @@ const Property = () => {
             if (response.ok) {
                 toast.success("Property Deleted Successfully");
                 setProperties(prev => prev.filter(p => p._id !== id));
-            } else {
-                const data = await response.json();
-                toast.error(data.message || "Failed to delete");
-            }
+            } (prev => prev.filter(p => p._id !== id));
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong");
