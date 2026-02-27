@@ -30,8 +30,6 @@ const initialState = {
     state: "",
     zipCode: "",
     country: "",
-    totalFloors: 1,
-    totalUnit: "",
     isActive: true
 };
 
@@ -136,8 +134,6 @@ const Property = () => {
             state: property.state || "",
             zipCode: property.zipCode || "",
             country: property.country || "",
-            totalFloors: property.totalFloors || 1,
-            totalUnit: property.totalUnit,
             isActive: property.isActive
         });
         setEditId(property._id);
@@ -385,8 +381,8 @@ const Property = () => {
                                     />
                                 </div>
 
-                                {/* Category + Units + Floors */}
-                                <div className="grid grid-cols-3 gap-4">
+                                {/* Category */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
                                             Category
@@ -403,31 +399,21 @@ const Property = () => {
                                             <option value="INDUSTRIAL">Industrial</option>
                                         </select>
                                     </div>
-
-                                    <Input
-                                        label="Total Units"
-                                        name="totalUnit"
-                                        type="number"
-                                        value={formData.totalUnit}
-                                        onChange={handleChange}
-                                        placeholder="e.g. 24"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        required
-                                        min="1"
-                                    />
-
-                                    <Input
-                                        label="Total Floors"
-                                        name="totalFloors"
-                                        type="number"
-                                        value={formData.totalFloors}
-                                        onChange={handleChange}
-                                        placeholder="e.g. 5"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        min="1"
-                                    />
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
+                                            Status
+                                        </label>
+                                        <div className="flex items-center gap-3 p-3.5 bg-[var(--color-card)] border border-white/10 rounded-2xl">
+                                            <input
+                                                type="checkbox"
+                                                name="isActive"
+                                                checked={formData.isActive}
+                                                onChange={handleChange}
+                                                className="w-5 h-5 rounded-lg accent-[var(--color-primary)]"
+                                            />
+                                            <span className="text-sm font-bold text-[var(--text-secondary)]">Property Active</span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Location & City/State */}

@@ -15,8 +15,6 @@ const createProperty = async (req, res) => {
             state,
             zipCode,
             country,
-            totalFloors,
-            totalUnit,
             isActive
         } = req.body;
 
@@ -53,8 +51,6 @@ const createProperty = async (req, res) => {
             state,
             zipCode,
             country,
-            totalFloors,
-            totalUnit,
             isActive: isActive !== undefined ? isActive : true
         });
 
@@ -138,8 +134,6 @@ const updateProperty = async (req, res) => {
             "state",
             "zipCode",
             "country",
-            "totalFloors",
-            "totalUnit",
             "isActive"
         ];
 

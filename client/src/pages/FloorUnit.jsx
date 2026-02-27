@@ -5,17 +5,10 @@ import {
   Layers,
   Plus,
   X,
-  Search,
-  Filter,
-  ChevronRight,
-  MapPin,
-  DoorOpen,
   Maximize2,
   Bed,
   Bath,
   DollarSign,
-  CheckCircle2,
-  AlertCircle,
   Edit,
   Trash2
 } from "lucide-react";
@@ -29,6 +22,21 @@ const initialFloorData = {
   name: "",
   floorNumber: "",
   description: ""
+};
+
+const initialUnitData = {
+  propertyId: "",
+  floorId: "",
+  unitNumber: "",
+  unitType: "Flat",
+  area: "",
+  bedrooms: "",
+  bathrooms: "",
+  balcony: false,
+  rentAmount: "",
+  securityDeposit: "",
+  maintenanceCharge: "",
+  utilityIncluded: false
 };
 
 const FloorUnit = () => {
@@ -46,26 +54,15 @@ const FloorUnit = () => {
   const [openFloorForm, setOpenFloorForm] = useState(false);
   const [openUnitForm, setOpenUnitForm] = useState(false);
   const [editFloorId, setEditFloorId] = useState(null);
+  const [editUnitId, setEditUnitId] = useState(null);
 
   const [floorData, setFloorData] = useState(initialFloorData);
 
-  const [unitData, setUnitData] = useState({
-    propertyId: "",
-    floorId: "",
-    unitNumber: "",
-    unitType: "Flat",
-    area: "",
-    bedrooms: "",
-    bathrooms: "",
-    balcony: false,
-    rentAmount: "",
-    securityDeposit: "",
-    maintenanceCharge: "",
-    utilityIncluded: false
-  });
+  const [unitData, setUnitData] = useState(initialUnitData);
 
   const [selectedPropertyForUnit, setSelectedPropertyForUnit] = useState("");
   const isEditingFloor = Boolean(editFloorId);
+  const isEditingUnit = Boolean(editUnitId);
 
   // Fetch initial data
   const fetchProperties = async () => {
@@ -120,24 +117,69 @@ const FloorUnit = () => {
   }, []);
 
   // Handlers
+  const getNextUnitNumber = (lastUnitNumber) => {
+    if (!lastUnitNumber) return "";
+    const match = lastUnitNumber.match(/^(.*?)(\d+)$/);
+    if (match) {
+      const prefix = match[1];
+      const number = parseInt(match[2], 10);
+      const nextNumber = number + 1;
+      const paddedNumber = nextNumber.toString().padStart(match[2].length, '0');
+      return prefix + paddedNumber;
+    }
+    return lastUnitNumber;
+  };
+
   const handleFloorChange = (e) => {
     const { name, value } = e.target;
-    setFloorData(prev => ({ ...prev, [name]: value }));
+    setFloorData(prev => {
+      const newData = { ...prev, [name]: value };
+
+      // Auto-suggest floor number when property is selected
+      if (name === "propertyId" && value && !isEditingFloor) {
+        const propertyFloors = floors.filter(f => (f.propertyId?._id || f.propertyId) === value);
+        if (propertyFloors.length > 0) {
+          const numbers = propertyFloors.map(f => parseInt(f.floorNumber)).filter(n => !isNaN(n));
+          const max = Math.max(...numbers);
+          newData.floorNumber = max + 1;
+          newData.name = `Floor ${max + 1}`;
+        } else {
+          newData.floorNumber = 0;
+          newData.name = "Ground Floor";
+        }
+      }
+      return newData;
+    });
   };
 
   const handleUnitChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setUnitData(prev => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
+    setUnitData(prev => {
+      const newData = { ...prev, [name]: type === "checkbox" ? checked : value };
 
-    if (name === "propertyId") {
-      setSelectedPropertyForUnit(value);
-      setUnitData(prev => ({ ...prev, floorId: "" })); // Reset floor when property changes
-    }
+      if (name === "propertyId") {
+        setSelectedPropertyForUnit(value);
+        newData.floorId = ""; // Reset floor when property changes
+      }
+
+      // Auto-suggest unit number when floor is selected
+      if (name === "floorId" && value && !isEditingUnit) {
+        const floorUnits = units.filter(u => (u.floorId?._id || u.floorId) === value);
+        if (floorUnits.length > 0) {
+          // Sort units to find the last one
+          const lastUnit = floorUnits[floorUnits.length - 1];
+          newData.unitNumber = getNextUnitNumber(lastUnit.unitNumber);
+        } else {
+          // Default suggesting based on floor number
+          const selectedFloor = floors.find(f => f._id === value);
+          if (selectedFloor) {
+            newData.unitNumber = `${selectedFloor.floorNumber}01`;
+          }
+        }
+      }
+      return newData;
+    });
   };
-
   const handleFloorSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -147,19 +189,30 @@ const FloorUnit = () => {
           ? `http://localhost:7000/api/owner/floor/${editFloorId}`
           : "http://localhost:7000/api/owner/floor",
         {
-        method: isEditingFloor ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(floorData)
-      });
+          method: isEditingFloor ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(floorData)
+        });
       const data = await response.json();
       if (response.ok) {
         toast.success(isEditingFloor ? "Floor updated successfully" : "Floor created successfully");
-        setOpenFloorForm(false);
-        setEditFloorId(null);
-        setFloorData(initialFloorData);
+        if (isEditingFloor) {
+          setOpenFloorForm(false);
+          setEditFloorId(null);
+          setFloorData(initialFloorData);
+        } else {
+          // Keep propertyId but increment floorNumber
+          const nextFloorNumber = parseInt(floorData.floorNumber) + 1;
+          setFloorData({
+            ...initialFloorData,
+            propertyId: floorData.propertyId,
+            floorNumber: nextFloorNumber,
+            name: `Floor ${nextFloorNumber}`
+          });
+        }
         fetchFloors();
       } else {
         toast.error(data.msg || "Failed to save floor");
@@ -169,33 +222,52 @@ const FloorUnit = () => {
     }
   };
 
+  const resetUnitForm = () => {
+    setEditUnitId(null);
+    setUnitData(initialUnitData);
+    setSelectedPropertyForUnit("");
+  };
+
+
+
   const handleUnitSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:7000/api/owner/unit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(unitData)
-      });
+      const response = await fetch(
+        isEditingUnit
+          ? `http://localhost:7000/api/owner/unit/${editUnitId}`
+          : "http://localhost:7000/api/owner/unit",
+        {
+          method: isEditingUnit ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(unitData)
+        });
       const data = await response.json();
       if (response.ok) {
-        toast.success("Unit created successfully");
-        setOpenUnitForm(false);
-        setUnitData({
-          propertyId: "", floorId: "", unitNumber: "", unitType: "Flat",
-          area: "", bedrooms: "", bathrooms: "", balcony: false,
-          rentAmount: "", securityDeposit: "", maintenanceCharge: "", utilityIncluded: false
-        });
+        toast.success(isEditingUnit ? "Unit updated successfully" : "Unit created successfully");
+        if (isEditingUnit) {
+          setOpenUnitForm(false);
+          resetUnitForm();
+        } else {
+          // Keep property/floor but increment unitNumber
+          const nextUnitNumber = getNextUnitNumber(unitData.unitNumber);
+          setUnitData({
+            ...initialUnitData,
+            propertyId: unitData.propertyId,
+            floorId: unitData.floorId,
+            unitNumber: nextUnitNumber,
+          });
+        }
         fetchUnits();
       } else {
-        toast.error(data.message || "Failed to create unit");
+        toast.error(data.message || "Failed to save unit");
       }
     } catch (error) {
-      toast.error("Error creating unit");
+      toast.error("Error saving unit");
     }
   };
 
@@ -231,6 +303,48 @@ const FloorUnit = () => {
     });
     setEditFloorId(floor._id);
     setOpenFloorForm(true);
+  };
+
+  const handleEditUnit = (unit) => {
+    const propertyId = unit.propertyId?._id || unit.propertyId || "";
+    setUnitData({
+      propertyId,
+      floorId: unit.floorId?._id || unit.floorId || "",
+      unitNumber: unit.unitNumber || "",
+      unitType: unit.unitType || "Flat",
+      area: unit.area ?? "",
+      bedrooms: unit.bedrooms ?? "",
+      bathrooms: unit.bathrooms ?? "",
+      balcony: Boolean(unit.balcony),
+      rentAmount: unit.rentAmount ?? "",
+      securityDeposit: unit.securityDeposit ?? "",
+      maintenanceCharge: unit.maintenanceCharge ?? "",
+      utilityIncluded: Boolean(unit.utilityIncluded)
+    });
+    setSelectedPropertyForUnit(propertyId);
+    setEditUnitId(unit._id);
+    setOpenUnitForm(true);
+  };
+
+  const handleDeleteUnit = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:7000/api/owner/unit/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Unit deleted successfully");
+        setUnits(prev => prev.filter(u => u._id !== id));
+      } else {
+        toast.error(data.message || "Failed to delete unit");
+      }
+    } catch (error) {
+      toast.error("Error deleting unit");
+    }
   };
 
 
@@ -322,6 +436,7 @@ const FloorUnit = () => {
                 setOpenFloorForm(true);
                 return;
               }
+              resetUnitForm();
               setOpenUnitForm(true);
             }}
             className="rounded-2xl px-8 h-12 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-primary)]/20"
@@ -393,11 +508,12 @@ const FloorUnit = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-[var(--color-card)]">
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Unit Info</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Placement</th>
+                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Unit</th>
+                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Property Name</th>
                   <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Type</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Financials</th>
+                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Rent</th>
                   <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Status</th>
+                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--color-card)]/50">
@@ -405,28 +521,18 @@ const FloorUnit = () => {
                   <tr key={unit._id} className="group hover:bg-[var(--color-card)]/20 transition-all">
                     <td className="p-6">
                       <div className="font-black text-[var(--text-secondary)] text-lg">{unit.unitNumber}</div>
-                      <div className="text-[10px] font-bold text-[var(--text-card)] uppercase mt-1 flex items-center gap-1">
-                        <Maximize2 size={10} /> {unit.area} Sq Ft
-                      </div>
+
                     </td>
                     <td className="p-6">
                       <div className="text-sm font-bold text-[var(--text-secondary)]">{unit.propertyId?.propertyName}</div>
-                      <div className="text-xs text-[var(--text-card)] font-medium mt-0.5">Floor: {unit.floorId?.name || "N/A"}</div>
                     </td>
                     <td className="p-6">
                       <span className="px-3 py-1 bg-slate-500/10 text-[var(--text-card)] rounded-lg text-[10px] font-black tracking-widest uppercase border border-white/5">
                         {unit.unitType}
                       </span>
-                      <div className="flex gap-2 mt-2 opacity-60">
-                        {unit.bedrooms && <span className="flex items-center gap-1 text-[10px]"><Bed size={12} /> {unit.bedrooms}</span>}
-                        {unit.bathrooms && <span className="flex items-center gap-1 text-[10px]"><Bath size={12} /> {unit.bathrooms}</span>}
-                      </div>
                     </td>
                     <td className="p-6">
                       <div className="text-lg font-black text-green-500">${unit.rentAmount}</div>
-                      <div className="text-[10px] text-[var(--text-card)] font-bold uppercase tracking-tighter">
-                        +${unit.maintenanceCharge} Maint.
-                      </div>
                     </td>
                     <td className="p-6 text-center">
                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black border ${unit.status === 'Vacant' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
@@ -436,10 +542,16 @@ const FloorUnit = () => {
                         {unit.status?.toUpperCase()}
                       </span>
                     </td>
+                    <td className="p-6 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={() => handleEditUnit(unit)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
+                        <button onClick={() => handleDeleteUnit(unit._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                      </div>
+                    </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="5" className="p-20 text-center">
+                    <td colSpan="6" className="p-20 text-center">
                       <div className="flex flex-col items-center opacity-40">
                         <LayoutGrid size={64} className="mb-4" />
                         <div className="text-xl font-black">No Units Deployed</div>
@@ -477,20 +589,25 @@ const FloorUnit = () => {
             <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-8 mb-6"></div>
             <form onSubmit={handleFloorSubmit} className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
               <div className="space-y-6">
-                <div className="space-y-2">
+                <div className="flex justify-between items-center">
                   <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">Select Property</label>
-                  <select
-                    name="propertyId"
-                    value={floorData.propertyId}
-                    onChange={handleFloorChange}
-                    required
-                    disabled={isEditingFloor}
-                    className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer disabled:opacity-50"
-                  >
-                    <option value="">-- Choose Property --</option>
-                    {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
-                  </select>
+                  {floorData.propertyId && (
+                    <span className="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-500/20">
+                      Current Floors: {floors.filter(f => (f.propertyId?._id || f.propertyId) === floorData.propertyId).length}
+                    </span>
+                  )}
                 </div>
+                <select
+                  name="propertyId"
+                  value={floorData.propertyId}
+                  onChange={handleFloorChange}
+                  required
+                  disabled={isEditingFloor}
+                  className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer disabled:opacity-50"
+                >
+                  <option value="">-- Choose Property --</option>
+                  {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
+                </select>
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     label="Floor Name/ID"
@@ -502,7 +619,7 @@ const FloorUnit = () => {
                     variant="formInput"
                   />
                   <Input
-                    label="Level Number"
+                    label="Floor Number"
                     name="floorNumber"
                     type="number"
                     value={floorData.floorNumber}
@@ -539,14 +656,20 @@ const FloorUnit = () => {
       {/* Unit Modal */}
       {openUnitForm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => setOpenUnitForm(false)}></div>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => {
+            setOpenUnitForm(false);
+            resetUnitForm();
+          }}></div>
           <div className="bg-[var(--bg-card)] w-full max-w-2xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
             <div className="p-8 pb-4 flex justify-between items-center relative z-10">
               <div>
-                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">Establish Unit</h3>
+                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">{isEditingUnit ? "Modify Unit" : "Establish Unit"}</h3>
                 <p className="text-[var(--text-card)] font-medium mt-1">Deploy individual living or commercial spaces</p>
               </div>
-              <button onClick={() => setOpenUnitForm(false)} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+              <button onClick={() => {
+                setOpenUnitForm(false);
+                resetUnitForm();
+              }} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
             </div>
             <div className="h-1 w-24 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full mx-8 mb-6"></div>
             <form onSubmit={handleUnitSubmit} className="p-8 pt-0 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
@@ -563,7 +686,14 @@ const FloorUnit = () => {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-[var(--text-card)] uppercase">Assigned Floor</label>
+                      <div className="flex justify-between items-center">
+                        <label className="text-[10px] font-bold text-[var(--text-card)] uppercase">Assigned Floor</label>
+                        {unitData.floorId && (
+                          <span className="text-[8px] font-black text-purple-500 bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10 uppercase tracking-tighter">
+                            Current Units: {units.filter(u => (u.floorId?._id || u.floorId) === unitData.floorId).length}
+                          </span>
+                        )}
+                      </div>
                       <select name="floorId" value={unitData.floorId} onChange={handleUnitChange} required disabled={!selectedPropertyForUnit} className="w-full bg-[var(--bg-main)] border border-white/5 rounded-xl p-3 text-sm font-bold text-[var(--text-secondary)] disabled:opacity-30">
                         <option value="">-- Choose Floor --</option>
                         {filteredFloorsForUnit.map(f => <option key={f._id} value={f._id}>{f.name} (Lvl {f.floorNumber})</option>)}
@@ -613,8 +743,11 @@ const FloorUnit = () => {
               </div>
 
               <div className="flex gap-4 pt-4 border-t border-white/5">
-                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => setOpenUnitForm(false)}>Discard</Button>
-                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl font-black shadow-xl shadow-purple-500/30 border-none" htmlType="submit">DEPLOY UNIT</Button>
+                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => {
+                  setOpenUnitForm(false);
+                  resetUnitForm();
+                }}>{isEditingUnit ? "Cancel" : "Discard"}</Button>
+                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl font-black shadow-xl shadow-purple-500/30 border-none" htmlType="submit">{isEditingUnit ? "UPDATE UNIT" : "DEPLOY UNIT"}</Button>
               </div>
             </form>
           </div>

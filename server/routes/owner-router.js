@@ -28,6 +28,8 @@ router.get("/floors", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), Fl
 
 // Unit Management
 router.post("/unit", authMiddleware, roleMiddleware("OWNER"), UnitController.createUnit)
+router.put("/unit/:id", authMiddleware, roleMiddleware("OWNER"), UnitController.updateUnit)
+router.delete("/unit/:id", authMiddleware, roleMiddleware("OWNER"), UnitController.deleteUnit)
 router.get("/units", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), UnitController.getUnits)
 
 module.exports = router;

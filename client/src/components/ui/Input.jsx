@@ -7,6 +7,7 @@ export default function Input({
     name,
     value,
     onChange,
+    onWheel,
     placeholder,
     required = false,
     variant = "default",
@@ -47,11 +48,18 @@ export default function Input({
                     name={name}
                     value={value}
                     onChange={onChange}
+                    onWheel={(e) => {
+                        if (type === "number") {
+                            e.currentTarget.blur();
+                        }
+                        if (onWheel) onWheel(e);
+                    }}
                     placeholder={placeholder}
                     required={required}
                     className={`
             ${base}
             ${variants[variant]}
+            ${type === "number" ? "no-spinner" : ""}
             ${isPassword ? "pr-12" : ""}
             ${className}
           `}

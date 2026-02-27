@@ -81,6 +81,115 @@ const createUnit = async (req, res) => {
     }
 };
 
+const updateUnit = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const role = req.user.role;
+        const userId = req.user._id;
+
+        if (role !== "OWNER" && role !== "SUPER_ADMIN") {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const unit = await Unit.findById(id);
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
+
+        const propertyId = req.body.propertyId || unit.propertyId;
+        const floorId = req.body.floorId || unit.floorId;
+
+        const property = await Property.findById(propertyId);
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
+        }
+
+        if (role === "OWNER") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner || property.owner.toString() !== owner._id.toString()) {
+                return res.status(403).json({ message: "Unauthorized to update unit in this property" });
+            }
+        }
+
+        const floor = await Floor.findOne({ _id: floorId, propertyId });
+        if (!floor) {
+            return res.status(404).json({ message: "Floor not found for this property" });
+        }
+
+        const allowedFields = [
+            "propertyId",
+            "floorId",
+            "unitNumber",
+            "unitType",
+            "area",
+            "bedrooms",
+            "bathrooms",
+            "balcony",
+            "rentAmount",
+            "securityDeposit",
+            "maintenanceCharge",
+            "utilityIncluded",
+            "status",
+            "tenantId",
+            "leaseId",
+            "images",
+            "floorPlan",
+            "isActive"
+        ];
+
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                unit[field] = req.body[field];
+            }
+        });
+
+        await unit.save();
+
+        return res.status(200).json({ message: "Unit updated successfully", unit });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ message: "Unit number already exists in this property" });
+        }
+        return res.status(500).json({ message: "Failed to update unit", error: error.message });
+    }
+};
+
+const deleteUnit = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const role = req.user.role;
+        const userId = req.user._id;
+
+        if (role !== "OWNER" && role !== "SUPER_ADMIN") {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const unit = await Unit.findById(id);
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
+
+        const property = await Property.findById(unit.propertyId);
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
+        }
+
+        if (role === "OWNER") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner || property.owner.toString() !== owner._id.toString()) {
+                return res.status(403).json({ message: "Unauthorized to delete unit in this property" });
+            }
+        }
+
+        await unit.deleteOne();
+        await Property.findByIdAndUpdate(unit.propertyId, { $inc: { totalUnit: -1 } });
+
+        return res.status(200).json({ message: "Unit deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to delete unit", error: error.message });
+    }
+};
+
 const getUnits = async (req, res) => {
     try {
         const { propertyId, floorId } = req.query;
@@ -107,4 +216,4 @@ const getUnits = async (req, res) => {
     }
 };
 
-module.exports = { createUnit, getUnits };
+module.exports = { createUnit, updateUnit, deleteUnit, getUnits };
