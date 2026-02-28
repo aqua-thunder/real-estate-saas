@@ -176,7 +176,7 @@ const Property = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
                     { label: "Total Properties", value: properties.length, icon: Building2, color: "bg-blue-500" },
-                    { label: "Total Units", value: properties.reduce((acc, p) => acc + (p.totalUnit || 0), 0), icon: LayoutGrid, color: "bg-purple-500" },
+                    { label: "Total Units", value: properties.reduce((acc, p) => acc + (p.totalUnits || 0), 0), icon: LayoutGrid, color: "bg-purple-500" },
                     { label: "Total Vacant", value: properties.reduce((acc, p) => acc + (p.vacantUnits || 0), 0), icon: Users, color: "bg-green-500" },
                     { label: "Active Revenue", value: `$${properties.reduce((acc, p) => acc + (p.totalRevenue || 0), 0).toLocaleString()}`, icon: DollarSign, color: "bg-orange-500" }
                 ].map((stat, i) => (
@@ -584,7 +584,7 @@ function ViewProperty({ property, onClose }) {
                     <div className="grid grid-cols-3 gap-4">
                         <div className="p-4 bg-[var(--color-card)] rounded-3xl border border-white/5 space-y-1">
                             <div className="text-[10px] font-bold text-[var(--text-card)] uppercase tracking-wider">Total Units</div>
-                            <div className="text-xl font-black text-[var(--text-secondary)]">{property.totalUnit}</div>
+                            <div className="text-xl font-black text-[var(--text-secondary)]">{property.totalUnits}</div>
                         </div>
                         <div className="p-4 bg-green-500/5 rounded-3xl border border-green-500/10 space-y-1">
                             <div className="text-[10px] font-bold text-green-600/70 uppercase tracking-wider">Revenue</div>
@@ -592,7 +592,7 @@ function ViewProperty({ property, onClose }) {
                         </div>
                         <div className="p-4 bg-purple-500/5 rounded-3xl border border-purple-500/10 space-y-1">
                             <div className="text-[10px] font-bold text-purple-600/70 uppercase tracking-wider">Occupancy</div>
-                            <div className="text-xl font-black text-purple-600">{Math.round(((property.totalUnit - property.vacantUnits) / property.totalUnit) * 100) || 0}%</div>
+                            <div className="text-xl font-black text-purple-600">{Math.round(((property.totalUnits - property.vacantUnits) / property.totalUnits) * 100) || 0}%</div>
                         </div>
                     </div>
 

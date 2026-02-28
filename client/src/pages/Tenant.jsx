@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import React from "react";
 import {
     Users,
@@ -16,125 +16,150 @@ import {
     FileText,
     Mail,
     Phone,
-    MapPin
+    MapPin,
+    LayoutGrid,
+    Check
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import { useAuth } from "../store/auth";
+import { useToast } from "../store/ToastContext";
 
 const Tenant = () => {
+    const { user, token } = useAuth();
+    const { toast } = useToast();
     const [selectedTenant, setSelectedTenant] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
+
     const [isAddingTenant, setIsAddingTenant] = useState(false);
+    const [allTenants, setAllTenants] = useState([]);
+    const [properties, setProperties] = useState([]);
+    const [floors, setFloors] = useState([]);
+    const [units, setUnits] = useState([]);
+    const [tenantUsers, setTenantUsers] = useState([]);
+    const [managers, setManagers] = useState([]);
+    const [loading, setLoading] = useState(false);
 
-    const tenants = useMemo(() => [
-        {
-            id: 1,
-            name: "Rahul Sharma",
-            email: "rahul.sharma@example.com",
-            phone: "+91 98765 43210",
-            property: "Skyline Heights",
-            unit: "A-101",
-            floor: "1st Floor",
-            leaseStart: "01 Jan 2025",
-            leaseEnd: "31 Dec 2025",
-            rent: 25000,
-            deposit: 50000,
-            leaseStatus: "Active",
-            paymentStatus: "Paid",
-            manager: "Amit Patel",
-            totalCollected: 150000,
-            pending: 0,
-            maintenanceCost: 5000,
-            lateFees: 0,
-            maintenanceRequests: 3,
-            openRequests: 1,
-            avatar: "RS"
-        },
-        {
-            id: 2,
-            name: "Priya Gupta",
-            email: "priya.g@example.com",
-            phone: "+91 91234 56789",
-            property: "Green Valley",
-            unit: "B-204",
-            floor: "2nd Floor",
-            leaseStart: "15 Mar 2024",
-            leaseEnd: "14 Mar 2025",
-            rent: 18500,
-            deposit: 37000,
-            leaseStatus: "Expiring",
-            paymentStatus: "Pending",
-            manager: "Neha Singh",
-            totalCollected: 185000,
-            pending: 18500,
-            maintenanceCost: 2000,
-            lateFees: 500,
-            maintenanceRequests: 1,
-            openRequests: 0,
-            avatar: "PG"
-        },
-        {
-            id: 3,
-            name: "Vikram Malhotra",
-            email: "vikram.m@example.com",
-            phone: "+91 99887 76655",
-            property: "Skyline Heights",
-            unit: "C-502",
-            floor: "5th Floor",
-            leaseStart: "01 Jun 2024",
-            leaseEnd: "31 May 2025",
-            rent: 32000,
-            deposit: 64000,
-            leaseStatus: "Active",
-            paymentStatus: "Overdue",
-            manager: "Amit Patel",
-            totalCollected: 128000,
-            pending: 64000,
-            maintenanceCost: 0,
-            lateFees: 1200,
-            maintenanceRequests: 5,
-            openRequests: 2,
-            avatar: "VM"
-        },
-        {
-            id: 4,
-            name: "Sanya Roy",
-            email: "sanya.roy@example.com",
-            phone: "+1 234 567 890",
-            property: "Ocean Breeze",
-            unit: "12-F",
-            floor: "12th Floor",
-            leaseStart: "20 Sep 2024",
-            leaseEnd: "19 Sep 2025",
-            rent: 45000,
-            deposit: 90000,
-            leaseStatus: "Active",
-            paymentStatus: "Paid",
-            manager: "Suresh Rao",
-            totalCollected: 225000,
-            pending: 0,
-            maintenanceCost: 8500,
-            lateFees: 0,
-            maintenanceRequests: 2,
-            openRequests: 0,
-            avatar: "SR"
-        }
-    ], []);
-
-    const summary = {
-        totalTenants: { value: 42, color: "text-blue-400", icon: Users, trend: "+4%" },
-        activeLeases: { value: 38, color: "text-emerald-400", icon: CheckCircle2, trend: "+2%" },
-        vacantUnits: { value: 5, color: "text-amber-400", icon: Home, trend: "-1%" },
-        expiringCount: { value: 3, color: "text-rose-400", icon: AlertCircle, trend: "Static" },
-        overduePayments: { value: 2, color: "text-red-500", icon: CreditCard, trend: "+12%" },
-        occupancyRate: { value: "89%", color: "text-purple-400", icon: TrendingUp, trend: "+1.5%" },
+    const initialFormData = {
+        name: "",
+        email: "",
+        phone: "",
+        propertyId: "",
+        unitId: "",
+        floorId: "",
+        managerId: user?.role === "MANAGER" ? user._id : "",
+        leaseStart: "",
+        leaseEnd: "",
+        leaseStatus: "Active",
+        rent: "",
+        deposit: "",
+        paymentStatus: "Pending",
+        avatar: "",
+        isActive: true
     };
 
-    const filteredTenants = tenants.filter(tenant => {
-        const matchesSearch = tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            tenant.property.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            tenant.unit.toLowerCase().includes(searchQuery.toLowerCase());
+    const [formData, setFormData] = useState(initialFormData);
+
+    const isAuthorized = ["SUPER_ADMIN", "OWNER", "MANAGER"].includes(user?.role);
+
+    const fetchTenants = async () => {
+        try {
+            const response = await fetch("http://localhost:7000/api/tenant/tenants", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) setAllTenants(data.tenants);
+        } catch (error) {
+            console.error("Error fetching tenants:", error);
+        }
+    };
+
+    const fetchProperties = async () => {
+        try {
+            const response = await fetch("http://localhost:7000/api/owner/properties", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) setProperties(data.properties);
+        } catch (error) {
+            console.error("Error fetching properties:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (token) {
+            fetchTenants();
+            fetchProperties();
+        }
+    }, [token]);
+
+    const handlePropertyChange = async (propertyId) => {
+        setFormData({ ...formData, propertyId, floorId: "", unitId: "" });
+        try {
+            const floorResponse = await fetch(`http://localhost:7000/api/owner/floors?propertyId=${propertyId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const floorData = await floorResponse.json();
+            if (floorResponse.ok) setFloors(floorData.floors);
+
+            const unitResponse = await fetch(`http://localhost:7000/api/owner/units?propertyId=${propertyId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const unitData = await unitResponse.json();
+            if (unitResponse.ok) setUnits(unitData.units.filter(u => u.status === "Vacant"));
+        } catch (error) {
+            console.error("Error fetching property details:", error);
+        }
+    };
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const response = await fetch("http://localhost:7000/api/tenant/tenant", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            if (response.ok) {
+                toast.success("Tenant added successfully");
+                setIsAddingTenant(false);
+                setFormData(initialFormData);
+                fetchTenants();
+            } else {
+                toast.error(data.message || "Failed to add tenant");
+            }
+        } catch (error) {
+            toast.error("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const summary = useMemo(() => {
+        return {
+            totalTenants: { value: allTenants.length, color: "text-blue-400", icon: Users, trend: "+4%" },
+            activeLeases: { value: allTenants.filter(t => t.leaseStatus === "Active").length, color: "text-emerald-400", icon: CheckCircle2, trend: "+2%" },
+            vacantUnits: { value: properties.reduce((acc, curr) => acc + (curr.totalUnits || 0), 0) - allTenants.length, color: "text-amber-400", icon: Home, trend: "-1%" },
+            expiringCount: { value: allTenants.filter(t => t.leaseStatus === "Expiring").length, color: "text-rose-400", icon: AlertCircle, trend: "Static" },
+            overduePayments: { value: allTenants.filter(t => t.paymentStatus === "Pending").length, color: "text-red-500", icon: CreditCard, trend: "+12%" },
+            occupancyRate: { value: properties.length > 0 ? `${Math.round((allTenants.length / properties.reduce((acc, curr) => acc + (curr.totalUnits || 0), 0)) * 100)}%` : "0%", color: "text-purple-400", icon: TrendingUp, trend: "+1.5%" },
+        };
+    }, [allTenants, properties]);
+
+    const filteredTenants = allTenants.filter(tenant => {
+        const name = tenant.userId?.name || "";
+        const prop = tenant.propertyId?.propertyName || "";
+        const unit = tenant.unitId?.unitNumber || "";
+
+        const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            prop.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            unit.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesStatus = filterStatus === "All" || tenant.paymentStatus === filterStatus || tenant.leaseStatus === filterStatus;
         return matchesSearch && matchesStatus;
     });
@@ -165,9 +190,11 @@ const Tenant = () => {
                     <Button type="secondary" onClick={() => { }} className="mt-0! px-4! py-2! w-full md:w-auto">
                         <Download size={18} /> Export
                     </Button>
-                    <Button type="primary" onClick={() => setIsAddingTenant(true)} className="mt-0! px-4! py-2! w-full md:w-auto">
-                        <Plus size={18} /> Add Tenant
-                    </Button>
+                    {(user?.role === "MANAGER" || user?.role === "OWNER" || user?.role === "SUPER_ADMIN") && (
+                        <Button type="primary" onClick={() => setIsAddingTenant(true)} className="mt-0! px-4! py-2! w-full md:w-auto">
+                            <Plus size={18} /> Add Tenant
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -207,7 +234,7 @@ const Tenant = () => {
                     />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {["All", "Paid", "Pending", "Overdue", "Expiring"].map((status) => (
+                    {["All", "Paid", "Pending", "Expiring"].map((status) => (
                         <button
                             key={status}
                             onClick={() => setFilterStatus(status)}
@@ -247,37 +274,37 @@ const Tenant = () => {
                             {filteredTenants.length > 0 ? (
                                 filteredTenants.map((tenant) => (
                                     <tr
-                                        key={tenant.id}
+                                        key={tenant._id || tenant.id}
                                         className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
                                         onClick={() => setSelectedTenant(tenant)}
                                     >
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                                                    {tenant.avatar}
+                                                    {tenant.avatar || (tenant.userId?.name ? tenant.userId.name.split(' ').map(n => n[0]).join('') : "T")}
                                                 </div>
                                                 <div>
-                                                    <p className="text-white font-semibold text-sm">{tenant.name}</p>
-                                                    <p className="text-[var(--text-card)] text-xs">{tenant.email}</p>
+                                                    <p className="text-white font-semibold text-sm">{tenant.userId?.name || tenant.name}</p>
+                                                    <p className="text-[var(--text-card)] text-xs">{tenant.userId?.email || tenant.email}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <p className="text-white text-sm font-medium">{tenant.property}</p>
+                                            <p className="text-white text-sm font-medium">{tenant.propertyId?.propertyName || tenant.property}</p>
                                             <div className="flex items-center gap-1.5 text-[var(--text-card)] text-xs mt-0.5">
                                                 <Home size={12} />
-                                                <span>Unit {tenant.unit} • {tenant.floor}</span>
+                                                <span>Unit {tenant.unitId?.unitNumber || tenant.unit} • {tenant.floorId?.name || tenant.floor}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-sm">
                                             <div className="flex items-center gap-1 text-white">
                                                 <Calendar size={14} className="text-[var(--color-primary)]" />
-                                                <span>Ends {tenant.leaseEnd}</span>
+                                                <span>Ends {tenant.leaseEnd ? new Date(tenant.leaseEnd).toLocaleDateString() : tenant.leaseEnd}</span>
                                             </div>
-                                            <p className="text-[var(--text-card)] text-xs mt-1">Started {tenant.leaseStart}</p>
+                                            <p className="text-[var(--text-card)] text-xs mt-1">Started {tenant.leaseStart ? new Date(tenant.leaseStart).toLocaleDateString() : tenant.leaseStart}</p>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <p className="text-white font-bold text-sm">₹{tenant.rent.toLocaleString()}</p>
+                                            <p className="text-white font-bold text-sm">₹{tenant.rent?.toLocaleString()}</p>
                                             <div className="flex items-center gap-1 mt-0.5">
                                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tenant.pending > 0 ? 'text-rose-400 bg-rose-500/10' : 'text-emerald-400 bg-emerald-500/10'}`}>
                                                     {tenant.pending > 0 ? `₹${tenant.pending.toLocaleString()} Due` : 'All Paid'}
@@ -333,8 +360,8 @@ const Tenant = () => {
                                             {tenant.avatar}
                                         </div>
                                         <div>
-                                            <h4 className="text-white font-semibold text-sm">{tenant.name}</h4>
-                                            <p className="text-[var(--text-card)] text-xs">{tenant.property} • {tenant.unit}</p>
+                                            <h4 className="text-white font-semibold text-sm">{tenant.userId?.name || tenant.name}</h4>
+                                            <p className="text-[var(--text-card)] text-xs">{tenant.propertyId?.propertyName || tenant.property} • {tenant.unitId?.unitNumber || tenant.unit}</p>
                                         </div>
                                     </div>
                                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border shrink-0 ${getStatusColor(tenant.paymentStatus)}`}>
@@ -399,15 +426,15 @@ const Tenant = () => {
                             {/* Profile Header */}
                             <div className="flex flex-col items-center text-center mb-8">
                                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white text-3xl font-bold shadow-2xl mb-4 border-4 border-white/5">
-                                    {selectedTenant.avatar}
+                                    {selectedTenant.avatar || (selectedTenant.userId?.name ? selectedTenant.userId.name.split(' ').map(n => n[0]).join('') : "T")}
                                 </div>
-                                <h3 className="text-2xl font-bold text-white">{selectedTenant.name}</h3>
+                                <h3 className="text-2xl font-bold text-white">{selectedTenant.userId?.name || selectedTenant.name}</h3>
                                 <div className="flex flex-col gap-1 mt-1">
                                     <p className="text-[var(--text-card)] flex items-center justify-center gap-2">
-                                        <Mail size={14} /> {selectedTenant.email}
+                                        <Mail size={14} /> {selectedTenant.userId?.email || selectedTenant.email}
                                     </p>
                                     <p className="text-[var(--text-card)] flex items-center justify-center gap-2">
-                                        <Phone size={14} /> {selectedTenant.phone}
+                                        <Phone size={14} /> {selectedTenant.userId?.phone || selectedTenant.phone}
                                     </p>
                                 </div>
                                 <p className="text-[var(--text-card)] flex items-center justify-center gap-2 mt-3">
@@ -434,19 +461,19 @@ const Tenant = () => {
                                     <div className="bg-white/5 rounded-2xl p-4 space-y-4">
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm text-[var(--text-card)]">Property</span>
-                                            <span className="text-sm font-medium text-white">{selectedTenant.property}</span>
+                                            <span className="text-sm font-medium text-white">{selectedTenant.propertyId?.propertyName || selectedTenant.property}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm text-[var(--text-card)]">Unit / Floor</span>
-                                            <span className="text-sm font-medium text-white">{selectedTenant.unit} / {selectedTenant.floor}</span>
+                                            <span className="text-sm font-medium text-white">{selectedTenant.unitId?.unitNumber || selectedTenant.unit} / {selectedTenant.floorId?.name || selectedTenant.floor}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-sm text-[var(--text-card)]">Property Manager</span>
-                                            <span className="text-sm font-medium text-white">{selectedTenant.manager}</span>
+                                            <span className="text-sm font-medium text-white">{selectedTenant.managerId?.name || selectedTenant.manager}</span>
                                         </div>
                                         <div className="flex justify-between items-center pt-2 border-t border-white/5">
                                             <span className="text-sm text-[var(--text-card)]">Rent Amount</span>
-                                            <span className="text-base font-bold text-[var(--color-primary)]">₹{selectedTenant.rent.toLocaleString()}</span>
+                                            <span className="text-base font-bold text-[var(--color-primary)]">₹{selectedTenant.rent?.toLocaleString()}</span>
                                         </div>
                                     </div>
                                 </section>
@@ -505,40 +532,172 @@ const Tenant = () => {
                 </div>
             )}
 
-            {/* Modal for Add Tenant - Simulation */}
+
+
+            {/* Modal for Add Tenant */}
             {isAddingTenant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsAddingTenant(false)}></div>
-                    <div className="relative w-full max-w-2xl bg-[var(--bg-card)] md:rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-zoom-in h-full md:h-auto overflow-y-auto">
-                        <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                    <div className="relative w-full max-w-4xl bg-[var(--bg-card)] md:rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-zoom-in h-fit max-h-[90vh] overflow-y-auto custom-scrollbar">
+                        <div className="sticky top-0 z-10 bg-[var(--bg-card)] p-6 border-b border-white/5 flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-white">Add New Tenant</h2>
                             <button onClick={() => setIsAddingTenant(false)} className="p-2 hover:bg-white/5 rounded-full text-[var(--text-card)] transition-colors">
                                 <X size={24} />
                             </button>
                         </div>
                         <div className="p-8">
-                            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddingTenant(false); }}>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <Input label="Full Name" placeholder="e.g. Rahul Sharma" required />
-                                    <Input label="Email Address" type="email" placeholder="rahul@example.com" required />
-                                    <Input label="Phone Number" placeholder="+91 XXXXX XXXXX" required />
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-semibold text-[var(--text-secondary)]">Property Selection</label>
-                                        <select className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none">
-                                            <option>Select Property</option>
-                                            <option>Skyline Heights</option>
-                                            <option>Ocean Breeze</option>
-                                        </select>
+                            <form className="space-y-8" onSubmit={handleFormSubmit}>
+                                {/* 👤 Tenant & Property Selection */}
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                        <Users size={20} className="text-[var(--color-primary)]" />
+                                        Resident Identification
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <Input
+                                            label="Full Name"
+                                            required
+                                            placeholder="Resident's complete name"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                        <Input
+                                            label="Email Address"
+                                            type="email"
+                                            required
+                                            placeholder="resident@example.com"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        />
+                                        <Input
+                                            label="Phone Number"
+                                            required
+                                            placeholder="+91 XXXXX XXXXX"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        />
                                     </div>
-                                    <Input label="Unit Number" placeholder="e.g. A-101" required />
-                                    <Input label="Monthly Rent" type="number" placeholder="Enter amount" required />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Property</label>
+                                            <select
+                                                required
+                                                className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none"
+                                                value={formData.propertyId}
+                                                onChange={(e) => handlePropertyChange(e.target.value)}
+                                            >
+                                                <option value="">Select Property</option>
+                                                {properties.map(p => (
+                                                    <option key={p._id} value={p._id}>{p.propertyName}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Floor</label>
+                                            <select
+                                                required
+                                                disabled={!formData.propertyId}
+                                                className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none disabled:opacity-50"
+                                                value={formData.floorId}
+                                                onChange={(e) => setFormData({ ...formData, floorId: e.target.value })}
+                                            >
+                                                <option value="">Select Floor</option>
+                                                {floors.map(f => (
+                                                    <option key={f._id} value={f._id}>{f.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Unit</label>
+                                            <select
+                                                required
+                                                disabled={!formData.floorId}
+                                                className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none disabled:opacity-50"
+                                                value={formData.unitId}
+                                                onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
+                                            >
+                                                <option value="">Select Unit</option>
+                                                {units.filter(u => (u.floorId?._id || u.floorId) === formData.floorId).map(u => (
+                                                    <option key={u._id} value={u._id}>{u.unitNumber} ({u.unitType})</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="flex gap-4 pt-4">
-                                    <Button type="secondary" onClick={() => setIsAddingTenant(false)} className="flex-1! mt-0!">
-                                        Cancel
+
+                                {/* 📅 Lease & Financials */}
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-bold text-white flex items-center gap-2 pt-4 border-t border-white/5">
+                                        <FileText size={20} className="text-[var(--color-primary)]" />
+                                        Lease & Financial Framework
+                                    </h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        <Input
+                                            label="Lease Start"
+                                            type="date"
+                                            required
+                                            value={formData.leaseStart}
+                                            onChange={(e) => setFormData({ ...formData, leaseStart: e.target.value })}
+                                        />
+                                        <Input
+                                            label="Lease End"
+                                            type="date"
+                                            required
+                                            value={formData.leaseEnd}
+                                            onChange={(e) => setFormData({ ...formData, leaseEnd: e.target.value })}
+                                        />
+                                        <Input
+                                            label="Monthly Rent (₹)"
+                                            type="number"
+                                            required
+                                            placeholder="25000"
+                                            value={formData.rent}
+                                            onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
+                                        />
+                                        <Input
+                                            label="Security Deposit (₹)"
+                                            type="number"
+                                            placeholder="50000"
+                                            value={formData.deposit}
+                                            onChange={(e) => setFormData({ ...formData, deposit: e.target.value })}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Lease Status</label>
+                                            <select
+                                                className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none"
+                                                value={formData.leaseStatus}
+                                                onChange={(e) => setFormData({ ...formData, leaseStatus: e.target.value })}
+                                            >
+                                                <option value="Active">Active</option>
+                                                <option value="Expiring">Expiring</option>
+                                                <option value="Expired">Expired</option>
+                                                <option value="Terminated">Terminated</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-[var(--text-secondary)]">Initial Payment Status</label>
+                                            <select
+                                                className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none"
+                                                value={formData.paymentStatus}
+                                                onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}
+                                            >
+                                                <option value="Pending">Pending</option>
+                                                <option value="Paid">Paid</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-4 pt-6 border-t border-white/5">
+                                    <Button type="secondary" onClick={() => setIsAddingTenant(false)} className="flex-1! mt-0! py-4! text-base">
+                                        Discard Changes
                                     </Button>
-                                    <Button type="primary" htmlType="submit" className="flex-1! mt-0!">
-                                        Save Tenant
+                                    <Button type="primary" htmlType="submit" disabled={loading} className="flex-1! mt-0! py-4! text-base">
+                                        {loading ? "Registering..." : "Finalize Tenant Registration"}
                                     </Button>
                                 </div>
                             </form>
@@ -546,6 +705,7 @@ const Tenant = () => {
                     </div>
                 </div>
             )}
+
 
             <style>{`
                 @keyframes slide-in {
@@ -562,7 +722,18 @@ const Tenant = () => {
                 .animate-zoom-in {
                     animation: zoom-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
                 }
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                }
             `}</style>
+
         </div>
     );
 };

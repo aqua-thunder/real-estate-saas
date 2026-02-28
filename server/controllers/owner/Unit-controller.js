@@ -53,7 +53,6 @@ const createUnit = async (req, res) => {
         const unit = await Unit.create({
             propertyId,
             floorId,
-            ownerId: ownerUserId,
             unitNumber,
             unitType,
             area,
@@ -65,15 +64,13 @@ const createUnit = async (req, res) => {
             maintenanceCharge,
             utilityIncluded,
             status,
-            tenantId,
-            leaseId,
             images,
             floorPlan,
             isActive
         });
 
-        // Update Property totalUnit
-        await Property.findByIdAndUpdate(propertyId, { $inc: { totalUnit: 1 } });
+        // Update Property totalUnits
+        await Property.findByIdAndUpdate(propertyId, { $inc: { totalUnits: 1 } });
 
         res.status(201).json({ message: "Unit created successfully", unit });
     } catch (error) {
@@ -130,8 +127,6 @@ const updateUnit = async (req, res) => {
             "maintenanceCharge",
             "utilityIncluded",
             "status",
-            "tenantId",
-            "leaseId",
             "images",
             "floorPlan",
             "isActive"
@@ -182,7 +177,7 @@ const deleteUnit = async (req, res) => {
         }
 
         await unit.deleteOne();
-        await Property.findByIdAndUpdate(unit.propertyId, { $inc: { totalUnit: -1 } });
+        await Property.findByIdAndUpdate(unit.propertyId, { $inc: { totalUnits: -1 } });
 
         return res.status(200).json({ message: "Unit deleted successfully" });
     } catch (error) {
@@ -201,8 +196,22 @@ const getUnits = async (req, res) => {
         if (floorId) query.floorId = floorId;
 
         if (role === "OWNER") {
-            query.ownerId = userId;
-        } else if (role !== "SUPER_ADMIN") {
+            const owner = await Owner.findOne({ user: userId });
+            if (!owner) return res.status(403).json({ message: "Owner profile not found" });
+
+            // Filter units through properties owned by this owner
+            const properties = await Property.find({ owner: owner._id }).select("_id");
+            const propertyIds = properties.map(p => p._id);
+            query.propertyId = { $in: propertyIds };
+
+            // If propertyId was in query, ensure it belongs to this owner
+            if (propertyId) {
+                if (!propertyIds.map(id => id.toString()).includes(propertyId)) {
+                    return res.status(403).json({ message: "Access denied to this property" });
+                }
+                query.propertyId = propertyId;
+            }
+        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 

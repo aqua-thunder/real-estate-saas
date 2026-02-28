@@ -77,7 +77,7 @@ function App() {
               </Route>
 
               {/* Roles: Super Admin */}
-              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN" , "OWNER"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
                 <Route path="/admin/tenant" element={<Tenant />} />
               </Route>
 

@@ -45,7 +45,7 @@ const propertySchema = new mongoose.Schema({
         default: 0
     },
 
-    totalUnit: {
+    totalUnits: {
         type: Number,
         default: 0
     },

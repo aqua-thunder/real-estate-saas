@@ -14,12 +14,12 @@ const UnitSchema = new mongoose.Schema({
         required: true
     },
 
-    ownerId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-        index: true
-    },
+    // ownerId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: true,
+    //     index: true
+    // },
 
     unitNumber: {
         type: String, // A-101, Shop-3
@@ -71,16 +71,7 @@ const UnitSchema = new mongoose.Schema({
         default: "Vacant"
     },
 
-    // Relationships
-    tenantId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    },
 
-    leaseId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Lease"
-    },
 
     // Media
     images: [

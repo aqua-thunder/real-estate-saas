@@ -11,6 +11,7 @@ import {
     FileSearch,
     UserCog,
     X,
+    Layers,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
@@ -27,7 +28,7 @@ const menuItems = [
     // { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
     { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
-    { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN" , "OWNER"] },
+    { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
 ];
 
 const AdminSidebar = ({ isOpen, onClose }) => {
@@ -55,7 +56,17 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             >
                 {/* Header  */}
                 <div className="flex items-center justify-between px-6 py-6 border-b border-slate-700/50">
-                    <h2 className="text-2xl font-bold text-[var(--text-secondary)] font-[var(--font-heading)]">Admin Panel</h2>
+                    <div className="hidden md:flex items-center gap-2.5 px-4 py-2 bg-gradient-to-r from-[var(--color-primary)]/20 to-transparent rounded-xl border-l-4 border-[var(--color-primary)] shadow-sm">
+                        <Layers size={18} className="text-[var(--color-primary)]" />
+                        <span className="text-white text-sm font-extrabold uppercase tracking-widest whitespace-nowrap">
+                            {user?.role === "OWNER" && "Owner Panel"}
+                            {user?.role === "MANAGER" && "Manager Panel"}
+                            {user?.role === "SUPER_ADMIN" && "Super Admin Panel"}
+                            {user?.role === "TENANT" && "Tenant Panel"}
+                            {user?.role === "TECHNICIAN" && "Tech Panel"}
+                            {!["OWNER", "MANAGER", "SUPER_ADMIN", "TENANT", "TECHNICIAN"].includes(user?.role) && "User Panel"}
+                        </span>
+                    </div>
                     <button
                         className="lg:hidden p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition-colors"
                         onClick={onClose}

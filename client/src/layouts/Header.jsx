@@ -13,7 +13,7 @@ const Header = ({ onToggleSidebar }) => {
         <header className="w-full bg-[var(--bg-card)] border-b border-[var(--color-card)] px-4 md:px-8 py-4 flex items-center justify-between">
 
             {/* LEFT SIDE — Hamburger + Search */}
-            <div className="flex items-center gap-3 flex-1">
+            <div className="flex items-center gap-4 flex-1">
                 {/* Hamburger Menu (Mobile Only) */}
                 <button
                     onClick={onToggleSidebar}
@@ -22,8 +22,10 @@ const Header = ({ onToggleSidebar }) => {
                     <Menu size={24} className="text-[var(--text-secondary)]" />
                 </button>
 
+
+
                 {/* 🔍 SEARCH */}
-                <div className="relative w-full max-w-xs md:max-w-md">
+                <div className="relative w-full max-w-xs md:max-w-sm ml-2">
                     <Search
                         size={18}
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
@@ -58,7 +60,7 @@ const Header = ({ onToggleSidebar }) => {
 
                 {/* Account Dropdown */}
                 <div className="relative">
-                    <button onMouseEnter={() => setOpenAccount(!openAccount)}   className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-card)] transition-all cursor-pointer">
+                    <button onMouseEnter={() => setOpenAccount(!openAccount)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-card)] transition-all cursor-pointer">
                         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--text-secondary)]">
                             <User size={16} />
                         </div>
@@ -77,7 +79,7 @@ const Header = ({ onToggleSidebar }) => {
                             {/* User Info */}
                             <div className="flex items-center gap-4 mt-5">
                                 <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[var(--color-primary)]  text-white shrink-0">
-                                    <User/>
+                                    <User />
                                 </div>
 
                                 <div className="flex flex-col overflow-hidden space-y-1">

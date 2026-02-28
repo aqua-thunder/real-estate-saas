@@ -82,7 +82,7 @@ const getProperties = async (req, res) => {
                 });
             }
             query = { owner: owner._id };
-        } else if (role === "SUPER_ADMIN") {
+        } else if (role === "SUPER_ADMIN" || role === "MANAGER") {
             query = {};
         } else {
             return res.status(403).json({ message: "Unauthorized access" });

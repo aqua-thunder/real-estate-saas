@@ -99,7 +99,7 @@ const updateFloor = async (req, res) => {
     }
 };
 
-const deleteFloor = async (req, res)=>{
+const deleteFloor = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user._id;
@@ -156,7 +156,7 @@ const getFloors = async (req, res) => {
 
         if (role === "OWNER") {
             query.ownerId = userId;
-        } else if (role !== "SUPER_ADMIN") {
+        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
             return res.status(403).json({ msg: "Unauthorized access" });
         }
 
