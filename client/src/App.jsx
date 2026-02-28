@@ -72,12 +72,12 @@ function App() {
               </Route>
 
               {/* Roles: Super Admin, Owner */}
-              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={[]} />}>
                 <Route path="/admin/subscriptions" element={<Subscriptions />} />
               </Route>
 
               {/* Roles: Super Admin */}
-              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN" , "OWNER"]} />}>
                 <Route path="/admin/tenant" element={<Tenant />} />
               </Route>
 

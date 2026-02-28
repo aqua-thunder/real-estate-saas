@@ -58,7 +58,7 @@ const Header = ({ onToggleSidebar }) => {
 
                 {/* Account Dropdown */}
                 <div className="relative">
-                    <button onClick={() => setOpenAccount(!openAccount)} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-card)] transition-all cursor-pointer">
+                    <button onMouseEnter={() => setOpenAccount(!openAccount)}   className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-card)] transition-all cursor-pointer">
                         <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--text-secondary)]">
                             <User size={16} />
                         </div>
@@ -67,7 +67,7 @@ const Header = ({ onToggleSidebar }) => {
 
                     {/* Dropdown Menu */}
                     {openAccount && (
-                        <div className="absolute right-2 sm:right-0 mt-3 w-[90vw] sm:w-72 max-w-sm  bg-[var(--bg-main)] border border-[var(--color-main)]  rounded-2xl shadow-xl z-50 p-5  transition-all duration-200 ease-out shadow shadow-gray-700 space-y-5">
+                        <div className="absolute right-2 sm:right-0 mt-3 w-[90vw] sm:w-72 max-w-sm  bg-[var(--bg-main)] border border-[var(--color-main)]  rounded-2xl shadow-xl z-50 p-5  transition-all duration-200 ease-out shadow shadow-gray-700 space-y-5" onMouseLeave={() => { setOpenAccount(!openAccount) }}>
 
                             {/* Title */}
                             <h2 className="text-[var(--text-secondary)] text-lg font-semibold">
@@ -76,8 +76,8 @@ const Header = ({ onToggleSidebar }) => {
 
                             {/* User Info */}
                             <div className="flex items-center gap-4 mt-5">
-                                <div className="w-16 h-16 flex items-center justify-center rounded-full bg-[var(--color-primary)]  text-white shrink-0">
-                                    <User size={28} />
+                                <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[var(--color-primary)]  text-white shrink-0">
+                                    <User/>
                                 </div>
 
                                 <div className="flex flex-col overflow-hidden space-y-1">
