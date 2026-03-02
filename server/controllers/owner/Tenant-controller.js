@@ -34,7 +34,7 @@ const createTenant = async (req, res) => {
         const loggedInUserId = req.user._id;
         const role = req.user.role;
 
-        if (role !== "OWNER" && role !== "SUPER_ADMIN" && role !== "MANAGER") {
+        if (role !== "OWNER" && role !== "MANAGER") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
@@ -206,8 +206,44 @@ const updateTenant = async (req, res) => {
             if (!owner || tenant.propertyId.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "Unauthorized to update this tenant" });
             }
-        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
+        } else if (role !== "MANAGER") {
             return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const { name, email, phone, propertyId, unitId, floorId } = req.body;
+
+        // Update User info if changed
+        if (name || email || phone) {
+            const userUpdate = {};
+            if (name) userUpdate.name = name;
+            if (email) userUpdate.email = email;
+            if (phone) userUpdate.phone = phone;
+            await User.findByIdAndUpdate(tenant.userId, userUpdate);
+        }
+
+        // Handle property/unit change
+        if (unitId && unitId.toString() !== tenant.unitId.toString()) {
+            // Check if new unit exists and is vacant
+            const newUnit = await Unit.findById(unitId);
+            if (!newUnit) {
+                return res.status(404).json({ message: "New unit not found" });
+            }
+            if (newUnit.status !== "Vacant") {
+                return res.status(400).json({ message: "New unit is already occupied" });
+            }
+
+            // Update old unit to Vacant
+            await Unit.findByIdAndUpdate(tenant.unitId, { status: "Vacant" });
+            // Update new unit to Occupied
+            await Unit.findByIdAndUpdate(unitId, { status: "Occupied" });
+
+            tenant.unitId = unitId;
+            if (propertyId) tenant.propertyId = propertyId;
+            if (floorId) tenant.floorId = floorId;
+        } else {
+            // Even if unitId hasn't changed, we might want to update property/floor for accuracy if they were passed
+            if (propertyId) tenant.propertyId = propertyId;
+            if (floorId) tenant.floorId = floorId;
         }
 
         const allowedFields = [
@@ -256,7 +292,7 @@ const deleteTenant = async (req, res) => {
             if (!owner || tenant.propertyId.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "Unauthorized to delete this tenant" });
             }
-        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
+        } else if (role !== "MANAGER") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 

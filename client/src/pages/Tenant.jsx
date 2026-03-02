@@ -40,6 +40,7 @@ const Tenant = () => {
     const [tenantUsers, setTenantUsers] = useState([]);
     const [managers, setManagers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [editId, setEditId] = useState(null);
 
     const initialFormData = {
         name: "",
@@ -61,7 +62,7 @@ const Tenant = () => {
 
     const [formData, setFormData] = useState(initialFormData);
 
-    const isAuthorized = ["SUPER_ADMIN", "OWNER", "MANAGER"].includes(user?.role);
+    const isAuthorized = ["OWNER", "MANAGER"].includes(user?.role);
 
     const fetchTenants = async () => {
         try {
@@ -94,8 +95,11 @@ const Tenant = () => {
         }
     }, [token]);
 
-    const handlePropertyChange = async (propertyId) => {
-        setFormData({ ...formData, propertyId, floorId: "", unitId: "" });
+    const handlePropertyChange = async (propertyId, existingUnitId = null) => {
+        if (!existingUnitId) {
+            setFormData(prev => ({ ...prev, propertyId, floorId: "", unitId: "", rent: "", deposit: "" }));
+        }
+
         try {
             const floorResponse = await fetch(`http://localhost:7000/api/owner/floors?propertyId=${propertyId}`, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -107,9 +111,58 @@ const Tenant = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const unitData = await unitResponse.json();
-            if (unitResponse.ok) setUnits(unitData.units.filter(u => u.status === "Vacant"));
+            if (unitResponse.ok) {
+                // Keep units that are vacant OR the one already assigned to this tenant
+                const filteredUnits = unitData.units.filter(u =>
+                    u.status === "Vacant" || u._id === existingUnitId
+                );
+                setUnits(filteredUnits);
+            }
         } catch (error) {
             console.error("Error fetching property details:", error);
+        }
+    };
+
+    const handleUnitChange = (unitId) => {
+        const selectedUnit = units.find(u => u._id === unitId);
+        if (selectedUnit) {
+            setFormData(prev => ({
+                ...prev,
+                unitId,
+                rent: selectedUnit.rentAmount || "",
+                deposit: selectedUnit.securityDeposit || ""
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, unitId, rent: "", deposit: "" }));
+        }
+    };
+
+    const handleEdit = (tenant) => {
+        const tenantPropId = tenant.propertyId?._id || tenant.propertyId || "";
+        const tenantUnitId = tenant.unitId?._id || tenant.unitId || "";
+
+        setFormData({
+            name: tenant.userId?.name || tenant.name || "",
+            email: tenant.userId?.email || tenant.email || "",
+            phone: tenant.userId?.phone || tenant.phone || "",
+            propertyId: tenantPropId,
+            floorId: tenant.floorId?._id || tenant.floorId || "",
+            unitId: tenantUnitId,
+            managerId: tenant.managerId?._id || tenant.managerId || (user?.role === "MANAGER" ? user._id : ""),
+            leaseStart: tenant.leaseStart ? new Date(tenant.leaseStart).toISOString().split('T')[0] : "",
+            leaseEnd: tenant.leaseEnd ? new Date(tenant.leaseEnd).toISOString().split('T')[0] : "",
+            leaseStatus: tenant.leaseStatus || "Active",
+            rent: tenant.rent || "",
+            deposit: tenant.deposit || "",
+            paymentStatus: tenant.paymentStatus || "Pending",
+            avatar: tenant.avatar || "",
+            isActive: tenant.isActive ?? true
+        });
+        setEditId(tenant._id);
+        setIsAddingTenant(true);
+
+        if (tenantPropId) {
+            handlePropertyChange(tenantPropId, tenantUnitId);
         }
     };
 
@@ -117,8 +170,13 @@ const Tenant = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await fetch("http://localhost:7000/api/tenant/tenant", {
-                method: "POST",
+            const url = editId
+                ? `http://localhost:7000/api/tenant/tenant/${editId}`
+                : "http://localhost:7000/api/tenant/tenant";
+            const method = editId ? "PUT" : "POST";
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
@@ -127,12 +185,13 @@ const Tenant = () => {
             });
             const data = await response.json();
             if (response.ok) {
-                toast.success("Tenant added successfully");
+                toast.success(editId ? "Tenant updated successfully" : "Tenant added successfully");
                 setIsAddingTenant(false);
+                setEditId(null);
                 setFormData(initialFormData);
                 fetchTenants();
             } else {
-                toast.error(data.message || "Failed to add tenant");
+                toast.error(data.message || `Failed to ${editId ? "update" : "add"} tenant`);
             }
         } catch (error) {
             toast.error("Something went wrong");
@@ -190,7 +249,7 @@ const Tenant = () => {
                     <Button type="secondary" onClick={() => { }} className="mt-0! px-4! py-2! w-full md:w-auto">
                         <Download size={18} /> Export
                     </Button>
-                    {(user?.role === "MANAGER" || user?.role === "OWNER" || user?.role === "SUPER_ADMIN") && (
+                    {(user?.role === "MANAGER" || user?.role === "OWNER") && (
                         <Button type="primary" onClick={() => setIsAddingTenant(true)} className="mt-0! px-4! py-2! w-full md:w-auto">
                             <Plus size={18} /> Add Tenant
                         </Button>
@@ -265,7 +324,7 @@ const Tenant = () => {
                                 <th className="px-6 py-4">Tenant</th>
                                 <th className="px-6 py-4">Property & Unit</th>
                                 <th className="px-6 py-4">Lease Period</th>
-                                <th className="px-6 py-4">Financials</th>
+                                <th className="px-6 py-4">Rent (m)</th>
                                 <th className="px-6 py-4">Status</th>
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
@@ -305,11 +364,7 @@ const Tenant = () => {
                                         </td>
                                         <td className="px-6 py-5">
                                             <p className="text-white font-bold text-sm">₹{tenant.rent?.toLocaleString()}</p>
-                                            <div className="flex items-center gap-1 mt-0.5">
-                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${tenant.pending > 0 ? 'text-rose-400 bg-rose-500/10' : 'text-emerald-400 bg-emerald-500/10'}`}>
-                                                    {tenant.pending > 0 ? `₹${tenant.pending.toLocaleString()} Due` : 'All Paid'}
-                                                </span>
-                                            </div>
+
                                         </td>
                                         <td className="px-6 py-5">
                                             <span className={`px-3 py-1 rounded-full text-[10px] font-bold border ${getStatusColor(tenant.paymentStatus)}`}>
@@ -521,12 +576,18 @@ const Tenant = () => {
                                 </section>
                             </div>
 
-                            <div className="mt-12 mb-8">
-                                <Button type="primary" className="w-full! rounded-2xl! py-4! font-bold text-base">
-                                    Edit Tenant Profile
-                                </Button>
-                                <p className="text-center text-xs text-[var(--text-card)] mt-4">Last update: 2 hours ago by System</p>
-                            </div>
+                            {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                                <div className="mt-12 mb-8">
+                                    <Button
+                                        type="primary"
+                                        className="w-full! rounded-2xl! py-4! font-bold text-base"
+                                        onClick={() => handleEdit(selectedTenant)}
+                                    >
+                                        Edit Tenant Profile
+                                    </Button>
+                                    <p className="text-center text-xs text-[var(--text-card)] mt-4">Last update: 2 hours ago by System</p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -537,11 +598,24 @@ const Tenant = () => {
             {/* Modal for Add Tenant */}
             {isAddingTenant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsAddingTenant(false)}></div>
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => {
+                        setIsAddingTenant(false);
+                        setEditId(null);
+                        setFormData(initialFormData);
+                    }}></div>
                     <div className="relative w-full max-w-4xl bg-[var(--bg-card)] md:rounded-3xl shadow-2xl border border-white/10 overflow-hidden animate-zoom-in h-fit max-h-[90vh] overflow-y-auto custom-scrollbar">
                         <div className="sticky top-0 z-10 bg-[var(--bg-card)] p-6 border-b border-white/5 flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-white">Add New Tenant</h2>
-                            <button onClick={() => setIsAddingTenant(false)} className="p-2 hover:bg-white/5 rounded-full text-[var(--text-card)] transition-colors">
+                            <h2 className="text-2xl font-bold text-white">
+                                {editId ? "Edit Tenant Profile" : "Add New Tenant"}
+                            </h2>
+                            <button
+                                onClick={() => {
+                                    setIsAddingTenant(false);
+                                    setEditId(null);
+                                    setFormData(initialFormData);
+                                }}
+                                className="p-2 hover:bg-white/5 rounded-full text-[var(--text-card)] transition-colors"
+                            >
                                 <X size={24} />
                             </button>
                         </div>
@@ -600,7 +674,7 @@ const Tenant = () => {
                                                 disabled={!formData.propertyId}
                                                 className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none disabled:opacity-50"
                                                 value={formData.floorId}
-                                                onChange={(e) => setFormData({ ...formData, floorId: e.target.value })}
+                                                onChange={(e) => setFormData({ ...formData, floorId: e.target.value, unitId: "", rent: "", deposit: "" })}
                                             >
                                                 <option value="">Select Floor</option>
                                                 {floors.map(f => (
@@ -615,7 +689,7 @@ const Tenant = () => {
                                                 disabled={!formData.floorId}
                                                 className="w-full bg-[var(--bg-main)] border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl px-4 py-3 outline-none disabled:opacity-50"
                                                 value={formData.unitId}
-                                                onChange={(e) => setFormData({ ...formData, unitId: e.target.value })}
+                                                onChange={(e) => handleUnitChange(e.target.value)}
                                             >
                                                 <option value="">Select Unit</option>
                                                 {units.filter(u => (u.floorId?._id || u.floorId) === formData.floorId).map(u => (
@@ -693,18 +767,27 @@ const Tenant = () => {
                                 </div>
 
                                 <div className="flex gap-4 pt-6 border-t border-white/5">
-                                    <Button type="secondary" onClick={() => setIsAddingTenant(false)} className="flex-1! mt-0! py-4! text-base">
+                                    <Button
+                                        type="secondary"
+                                        onClick={() => {
+                                            setIsAddingTenant(false);
+                                            setEditId(null);
+                                            setFormData(initialFormData);
+                                        }}
+                                        className="flex-1! mt-0! py-4! text-base"
+                                    >
                                         Discard Changes
                                     </Button>
                                     <Button type="primary" htmlType="submit" disabled={loading} className="flex-1! mt-0! py-4! text-base">
-                                        {loading ? "Registering..." : "Finalize Tenant Registration"}
+                                        {loading ? (editId ? "Updating..." : "Registering...") : (editId ? "Update Tenant Profile" : "Finalize Tenant Registration")}
                                     </Button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
 
             <style>{`
@@ -734,7 +817,7 @@ const Tenant = () => {
                 }
             `}</style>
 
-        </div>
+        </div >
     );
 };
 

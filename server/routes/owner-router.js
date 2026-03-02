@@ -12,11 +12,11 @@ const UnitController = require("../controllers/owner/unit-controller.js")
 // Owner registration
 router.post("/register", authMiddleware, roleMiddleware("OWNER"), registerOwner);
 
-// Property Management (Allow OWNER and SUPER_ADMIN for testing/management)
-router.post("/properties", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), PropertyController.createProperty);
+// Property Management (Allow OWNER and MANAGER only for create/update/delete)
+router.post("/properties", authMiddleware, roleMiddleware("OWNER", "MANAGER"), PropertyController.createProperty);
 router.get("/properties", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN", "MANAGER"), PropertyController.getProperties);
-router.put("/property/:id", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), PropertyController.updateProperty);
-router.delete("/property/:id", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN"), PropertyController.deleteProperty);
+router.put("/property/:id", authMiddleware, roleMiddleware("OWNER", "MANAGER"), PropertyController.updateProperty);
+router.delete("/property/:id", authMiddleware, roleMiddleware("OWNER", "MANAGER"), PropertyController.deleteProperty);
 
 
 // Floore Management

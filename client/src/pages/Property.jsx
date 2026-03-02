@@ -42,6 +42,7 @@ const Property = () => {
     const [editId, setEditId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [filterType, setFilterType] = useState("All");
 
     const [openViewProperty, setOpenViewProperty] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
@@ -162,10 +163,12 @@ const Property = () => {
         }
     };
 
-    const filteredProperties = properties.filter(p =>
-        p.propertyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.location.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredProperties = properties.filter(p => {
+        const matchesSearch = p.propertyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.location.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesType = filterType === "All" || p.propertyType === filterType;
+        return matchesSearch && matchesType;
+    });
 
     return (
         <div className="space-y-6 animate-fadeIn">
@@ -212,21 +215,28 @@ const Property = () => {
                     </div>
 
                     <div className="grid grid-cols-2 sm:flex gap-2 w-full xl:w-auto">
-                        <button className="h-12 px-4 flex items-center justify-center gap-2 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] transition-all">
-                            <Filter size={17} />
-                            Filter
-                        </button>
-                        <button className="h-12 px-4 flex items-center justify-center gap-2 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] transition-all">
-                            <LayoutGrid size={17} />
-                            View
-                        </button>
-                        <Button
-                            onClick={() => { resetForm(); setOpenForm(true); }}
-                            className="col-span-2 sm:col-span-1 h-12 px-5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 border-none shadow-lg shadow-[var(--color-primary)]/30"
-                        >
-                            <Plus size={19} className="mr-2" />
-                            <span className="font-bold">Add Property</span>
-                        </Button>
+                        <div className="relative">
+                            <select
+                                className="h-12 px-4 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] focus:outline-none transition-all appearance-none pr-10"
+                                value={filterType}
+                                onChange={(e) => setFilterType(e.target.value)}
+                            >
+                                <option value="All">All Categories</option>
+                                <option value="RESIDENTIAL">Residential</option>
+                                <option value="COMMERCIAL">Commercial</option>
+                                <option value="INDUSTRIAL">Industrial</option>
+                            </select>
+                            <Filter size={17} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none" />
+                        </div>
+                        {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                            <Button
+                                onClick={() => { resetForm(); setOpenForm(true); }}
+                                className="col-span-2 sm:col-span-1 h-12 px-5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 border-none shadow-lg shadow-[var(--color-primary)]/30"
+                            >
+                                <Plus size={19} className="mr-2" />
+                                <span className="font-bold">Add Property</span>
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -302,8 +312,12 @@ const Property = () => {
                                                         setSelectedProperty(property);
                                                         setOpenViewProperty(true);
                                                     }} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Eye size={18} /></button>
-                                                <button onClick={() => handleEdit(property)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete(property._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                                                {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                                                    <>
+                                                        <button onClick={() => handleEdit(property)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
+                                                        <button onClick={() => handleDelete(property._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -317,7 +331,9 @@ const Property = () => {
                                             </div>
                                             <div className="text-xl font-black text-[var(--text-secondary)] mt-4 tracking-tight">No Estates Found</div>
                                             <p className="text-[var(--text-card)] text-sm max-w-xs">Your portfolio is currently empty. Start building your real estate empire today.</p>
-                                            <Button onClick={() => setOpenForm(true)} className="mt-4 rounded-2xl px-10">Add Your First Property</Button>
+                                            {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                                                <Button onClick={() => setOpenForm(true)} className="mt-4 rounded-2xl px-10">Add Your First Property</Button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

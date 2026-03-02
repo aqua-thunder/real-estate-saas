@@ -21,7 +21,7 @@ const createProperty = async (req, res) => {
         let owner = await Owner.findOne({ user: userId });
 
         if (!owner) {
-            if (req.user.role === "OWNER" || req.user.role === "SUPER_ADMIN") {
+            if (req.user.role === "OWNER" || req.user.role === "MANAGER") {
                 owner = await Owner.create({
                     user: userId,
                     ownerType: "INDIVIDUAL",
@@ -117,11 +117,13 @@ const updateProperty = async (req, res) => {
             return res.status(404).json({ message: "Property not found" });
         }
 
-        if (role === "OWNER") {
+        if (role === "OWNER" || role === "MANAGER") {
             const owner = await Owner.findOne({ user: userId });
             if (!owner || property.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "You are not allowed to update this property" });
             }
+        } else if (role === "SUPER_ADMIN") {
+            return res.status(403).json({ message: "Super Admin can only see properties" });
         }
 
         const allowedFields = [
@@ -165,11 +167,13 @@ const deleteProperty = async (req, res) => {
             return res.status(404).json({ message: "Property not found" });
         }
 
-        if (role === "OWNER") {
+        if (role === "OWNER" || role === "MANAGER") {
             const owner = await Owner.findOne({ user: userId });
             if (!owner || property.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "You are not allowed to delete this property" });
             }
+        } else if (role === "SUPER_ADMIN") {
+            return res.status(403).json({ message: "Super Admin can only see properties" });
         }
 
         await property.deleteOne();
