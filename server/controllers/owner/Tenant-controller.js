@@ -147,7 +147,7 @@ const getTenants = async (req, res) => {
 
         const tenants = await Tenant.find(query)
             .populate("userId", "name email phone")
-            .populate("propertyId", "propertyName")
+            .populate("propertyId", "propertyName address")
             .populate("unitId", "unitNumber")
             .populate("floorId", "name floorNumber")
             .populate("managerId", "name email");
@@ -166,7 +166,7 @@ const getTenantById = async (req, res) => {
 
         const tenant = await Tenant.findById(id)
             .populate("userId", "name email phone")
-            .populate("propertyId", "propertyName owner")
+            .populate("propertyId", "propertyName owner address")
             .populate("unitId", "unitNumber")
             .populate("floorId", "name floorNumber")
             .populate("managerId", "name email");

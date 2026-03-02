@@ -59,17 +59,6 @@ const propertySchema = new mongoose.Schema({
         }
     ],
 
-    // 📂 Documents
-    documents: [
-        {
-            name: String,
-            fileUrl: String,
-            uploadedAt: {
-                type: Date,
-                default: Date.now
-            }
-        }
-    ],
 
     // ⚙ Status
     isActive: {

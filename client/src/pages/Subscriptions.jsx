@@ -420,18 +420,6 @@ const Subscriptions = () => {
                 </div>
             )}
 
-            <style jsx>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: var(--color-card);
-                    border-radius: 10px;
-                }
-            `}</style>
         </div>
     );
 };

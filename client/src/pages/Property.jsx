@@ -7,9 +7,6 @@ import {
     Trash2,
     X,
     Plus,
-    DollarSign,
-    Users,
-    ChevronRight,
     LayoutGrid,
     Search,
     Filter,
@@ -171,78 +168,69 @@ const Property = () => {
     });
 
     return (
-        <div className="space-y-6 animate-fadeIn">
-            {/* Header Section */}
+        <div className="space-y-6 animate-fadeIn pt-4 px-4 sm:px-0">
 
-
-            {/* Stats Overview (Optional placeholders) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                    { label: "Total Properties", value: properties.length, icon: Building2, color: "bg-blue-500" },
-                    { label: "Total Units", value: properties.reduce((acc, p) => acc + (p.totalUnits || 0), 0), icon: LayoutGrid, color: "bg-purple-500" },
-                    { label: "Total Vacant", value: properties.reduce((acc, p) => acc + (p.vacantUnits || 0), 0), icon: Users, color: "bg-green-500" },
-                    { label: "Active Revenue", value: `$${properties.reduce((acc, p) => acc + (p.totalRevenue || 0), 0).toLocaleString()}`, icon: DollarSign, color: "bg-orange-500" }
-                ].map((stat, i) => (
-                    <div key={i} className="p-6 bg-[var(--bg-card)] rounded-3xl border border-[var(--color-card)] shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
-                        <div className={`absolute top-0 right-0 w-24 h-24 ${stat.color}/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500`}></div>
-                        <div className="flex justify-between items-start mb-4 relative z-10">
-                            <div className={`p-3 rounded-2xl ${stat.color}/20 text-${stat.color.replace('bg-', '')}`}>
-                                <stat.icon size={20} />
-                            </div>
-                        </div>
-                        <div className="relative z-10">
-                            <div className="text-2xl font-black text-[var(--text-secondary)]">{stat.value}</div>
-                            <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-card)] mt-1">{stat.label}</div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Controls Bar */}
-            <div className="relative overflow-hidden bg-[var(--bg-card)] p-4 sm:p-5 rounded-3xl border border-[var(--color-card)] shadow-sm">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-primary)]/40 to-transparent"></div>
-
-                <div className="flex flex-col xl:flex-row gap-3 xl:gap-4 xl:items-center xl:justify-between">
-                    <div className="relative w-full xl:max-w-xl">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" />
-                        <input
-                            type="text"
-                            placeholder="Search properties by name or location..."
-                            className="w-full h-12 bg-[var(--color-card)]/90 border border-transparent rounded-2xl pl-12 pr-4 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/70 focus:border-[var(--color-primary)]/20 transition-all"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:flex gap-2 w-full xl:w-auto">
-                        <div className="relative">
-                            <select
-                                className="h-12 px-4 bg-[var(--color-card)]/85 rounded-2xl border border-[var(--color-card)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-card)] text-sm font-semibold text-[var(--text-secondary)] focus:outline-none transition-all appearance-none pr-10"
-                                value={filterType}
-                                onChange={(e) => setFilterType(e.target.value)}
-                            >
-                                <option value="All">All Categories</option>
-                                <option value="RESIDENTIAL">Residential</option>
-                                <option value="COMMERCIAL">Commercial</option>
-                                <option value="INDUSTRIAL">Industrial</option>
-                            </select>
-                            <Filter size={17} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none" />
-                        </div>
-                        {(user?.role === "OWNER" || user?.role === "MANAGER") && (
-                            <Button
-                                onClick={() => { resetForm(); setOpenForm(true); }}
-                                className="col-span-2 sm:col-span-1 h-12 px-5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 border-none shadow-lg shadow-[var(--color-primary)]/30"
-                            >
-                                <Plus size={19} className="mr-2" />
-                                <span className="font-bold">Add Property</span>
-                            </Button>
-                        )}
-                    </div>
+            {/* Page Header Area */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                        <Building2 className="text-[var(--color-primary)] opacity-80" size={32} />
+                        Property <span className="text-[var(--color-primary)]">Assets</span>
+                    </h1>
                 </div>
             </div>
 
-            {/* List Table */}
-            <div className="bg-[var(--bg-card)] rounded-[2rem] border border-[var(--color-card)] shadow-2xl overflow-hidden relative">
+            {/* Simplified Controls Bar */}
+            <div className="w-full flex flex-col lg:flex-row items-center gap-4 px-4 sm:px-0">
+
+                {/* 🔍 Search Input */}
+                <div className="relative flex-1 w-full lg:w-auto">
+                    <Search
+                        size={18}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Search properties by name..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full h-12 pl-12 pr-4 bg-[var(--bg-card)] border border-[var(--color-card)] rounded-2xl text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+                    />
+                </div>
+
+                {/* Filters & Actions */}
+                <div className="flex items-center gap-3 w-full lg:w-auto">
+
+                    {/* Category Selector */}
+                    <div className="relative min-w-[200px] flex-1 sm:flex-initial">
+                        <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value)}
+                            className="w-full h-12 px-4 pr-10 bg-[var(--bg-card)] border border-[var(--color-card)] rounded-2xl text-sm font-semibold text-[var(--text-secondary)] appearance-none focus:outline-none transition-all"
+                        >
+                            <option value="All">All Categories</option>
+                            <option value="RESIDENTIAL">Residential</option>
+                            <option value="COMMERCIAL">Commercial</option>
+                            <option value="INDUSTRIAL">Industrial</option>
+                        </select>
+                        <Filter size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none" />
+                    </div>
+
+                    {/* Add Property Button */}
+                    {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                        <Button
+                            onClick={() => { resetForm(); setOpenForm(true); }}
+                            className="h-12 px-6 rounded-2xl bg-[var(--color-primary)] text-white font-bold hover:scale-[1.02] active:scale-[0.98] transition-all border-none shadow-lg shadow-[var(--color-primary)]/20 whitespace-nowrap mt-[-3px]"
+                        >
+                            <Plus size={18} className="mr-2" />
+                            Add Property
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {/* List Table container */}
+            <div className="bg-[var(--bg-card)]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -345,190 +333,192 @@ const Property = () => {
             </div>
 
             {/* Modal - Modern & Slick */}
-            {openForm && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                    <div className="absolute inset-0  backdrop-blur-xl animate-fadeIn" onClick={resetForm}></div>
+            {
+                openForm && (
+                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+                        <div className="absolute inset-0  backdrop-blur-xl animate-fadeIn" onClick={resetForm}></div>
 
-                    <div className="bg-[var(--bg-card)] w-full max-w-xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-                        {/* Modal Header */}
-                        <div className="p-8 pb-4 flex justify-between items-center relative z-10">
-                            <div>
-                                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
-                                    {isEditing ? "Modify Property" : "Establish Property"}
-                                </h3>
-                                <p className="text-[var(--text-card)] font-medium mt-1">Configure your real estate asset details</p>
-                            </div>
-                            <button onClick={resetForm} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
-                        </div>
-
-                        {/* Decoration Line */}
-                        <div className="h-1 w-24 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-full mx-8 mb-6"></div>
-
-                        <form
-                            onSubmit={handleSubmit}
-                            className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto relative z-10 custom-scrollbar"
-                        >
-                            <div className="space-y-6">
-
-                                {/* Property Name */}
-                                <Input
-                                    label="Property Name"
-                                    name="propertyName"
-                                    value={formData.propertyName}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Skyline Residency"
-                                    variant="formInput"
-                                    className="text-sm py-4 rounded-2xl bg-[var(--color-card)] border border-white/10 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition"
-                                    required
-                                />
-
-                                {/* Description */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                        Property Description
-                                    </label>
-                                    <textarea
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleChange}
-                                        rows="2"
-                                        placeholder="Brief description of the property..."
-                                        className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
-                                    />
+                        <div className="bg-[var(--bg-card)] w-full max-w-xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
+                            {/* Modal Header */}
+                            <div className="p-8 pb-4 flex justify-between items-center relative z-10">
+                                <div>
+                                    <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
+                                        {isEditing ? "Modify Property" : "Establish Property"}
+                                    </h3>
+                                    <p className="text-[var(--text-card)] font-medium mt-1">Configure your real estate asset details</p>
                                 </div>
+                                <button onClick={resetForm} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+                            </div>
 
-                                {/* Category */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Decoration Line */}
+                            <div className="h-1 w-24 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-full mx-8 mb-6"></div>
+
+                            <form
+                                onSubmit={handleSubmit}
+                                className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto relative z-10 custom-scrollbar"
+                            >
+                                <div className="space-y-6">
+
+                                    {/* Property Name */}
+                                    <Input
+                                        label="Property Name"
+                                        name="propertyName"
+                                        value={formData.propertyName}
+                                        onChange={handleChange}
+                                        placeholder="e.g. Skyline Residency"
+                                        variant="formInput"
+                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)] border border-white/10 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition"
+                                        required
+                                    />
+
+                                    {/* Description */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                            Category
+                                            Property Description
                                         </label>
-                                        <select
-                                            name="propertyType"
-                                            value={formData.propertyType}
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
                                             onChange={handleChange}
-                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
-                                            required
-                                        >
-                                            <option value="RESIDENTIAL">Residential</option>
-                                            <option value="COMMERCIAL">Commercial</option>
-                                            <option value="INDUSTRIAL">Industrial</option>
-                                        </select>
+                                            rows="2"
+                                            placeholder="Brief description of the property..."
+                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
+                                        />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                            Status
-                                        </label>
-                                        <div className="flex items-center gap-3 p-3.5 bg-[var(--color-card)] border border-white/10 rounded-2xl">
-                                            <input
-                                                type="checkbox"
-                                                name="isActive"
-                                                checked={formData.isActive}
+
+                                    {/* Category */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
+                                                Category
+                                            </label>
+                                            <select
+                                                name="propertyType"
+                                                value={formData.propertyType}
                                                 onChange={handleChange}
-                                                className="w-5 h-5 rounded-lg accent-[var(--color-primary)]"
-                                            />
-                                            <span className="text-sm font-bold text-[var(--text-secondary)]">Property Active</span>
+                                                className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
+                                                required
+                                            >
+                                                <option value="RESIDENTIAL">Residential</option>
+                                                <option value="COMMERCIAL">Commercial</option>
+                                                <option value="INDUSTRIAL">Industrial</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
+                                                Status
+                                            </label>
+                                            <div className="flex items-center gap-3 p-3.5 bg-[var(--color-card)] border border-white/10 rounded-2xl">
+                                                <input
+                                                    type="checkbox"
+                                                    name="isActive"
+                                                    checked={formData.isActive}
+                                                    onChange={handleChange}
+                                                    className="w-5 h-5 rounded-lg accent-[var(--color-primary)]"
+                                                />
+                                                <span className="text-sm font-bold text-[var(--text-secondary)]">Property Active</span>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {/* Location & City/State */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Input
+                                            label="Location"
+                                            name="location"
+                                            value={formData.location}
+                                            onChange={handleChange}
+                                            placeholder="e.g. Manhattan"
+                                            variant="formInput"
+                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                            required
+                                        />
+                                        <Input
+                                            label="City"
+                                            name="city"
+                                            value={formData.city}
+                                            onChange={handleChange}
+                                            placeholder="e.g. New York"
+                                            variant="formInput"
+                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <Input
+                                            label="State"
+                                            name="state"
+                                            value={formData.state}
+                                            onChange={handleChange}
+                                            placeholder="e.g. NY"
+                                            variant="formInput"
+                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        />
+                                        <Input
+                                            label="Zip Code"
+                                            name="zipCode"
+                                            value={formData.zipCode}
+                                            onChange={handleChange}
+                                            placeholder="10001"
+                                            variant="formInput"
+                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        />
+                                        <Input
+                                            label="Country"
+                                            name="country"
+                                            value={formData.country}
+                                            onChange={handleChange}
+                                            placeholder="USA"
+                                            variant="formInput"
+                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
+                                        />
+                                    </div>
+
+                                    {/* Address */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
+                                            Full Address
+                                        </label>
+
+                                        <textarea
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            rows="2"
+                                            placeholder="Enter precise location coordinates..."
+                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
+                                            required
+                                        />
+                                    </div>
+
                                 </div>
 
-                                {/* Location & City/State */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        label="Location"
-                                        name="location"
-                                        value={formData.location}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Manhattan"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        required
-                                    />
-                                    <Input
-                                        label="City"
-                                        name="city"
-                                        value={formData.city}
-                                        onChange={handleChange}
-                                        placeholder="e.g. New York"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                    />
+                                {/* Buttons */}
+                                <div className="flex gap-4 pt-4 sticky  bg-[var(--bg-card)] mt-4 border-t border-white/5">
+
+                                    <Button
+                                        type="button"
+                                        className="flex-1 py-4 bg-[var(--color-card)] hover:bg-white/10 text-[var(--text-secondary)] rounded-2xl font-bold border border-white/10"
+                                        onClick={resetForm}
+                                    >
+                                        Discard
+                                    </Button>
+
+                                    <Button
+                                        type="primary"
+                                        className="flex-1 py-4 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-2xl font-black text-white border-none shadow-xl shadow-[var(--color-primary)]/40"
+                                        htmlType="submit"
+                                    >
+                                        {isEditing ? "Update Asset" : "Deploy Property"}
+                                    </Button>
+
                                 </div>
+                            </form>
 
-                                <div className="grid grid-cols-3 gap-4">
-                                    <Input
-                                        label="State"
-                                        name="state"
-                                        value={formData.state}
-                                        onChange={handleChange}
-                                        placeholder="e.g. NY"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                    />
-                                    <Input
-                                        label="Zip Code"
-                                        name="zipCode"
-                                        value={formData.zipCode}
-                                        onChange={handleChange}
-                                        placeholder="10001"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                    />
-                                    <Input
-                                        label="Country"
-                                        name="country"
-                                        value={formData.country}
-                                        onChange={handleChange}
-                                        placeholder="USA"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                    />
-                                </div>
-
-                                {/* Address */}
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                        Full Address
-                                    </label>
-
-                                    <textarea
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        rows="2"
-                                        placeholder="Enter precise location coordinates..."
-                                        className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
-                                        required
-                                    />
-                                </div>
-
-                            </div>
-
-                            {/* Buttons */}
-                            <div className="flex gap-4 pt-4 sticky  bg-[var(--bg-card)] mt-4 border-t border-white/5">
-
-                                <Button
-                                    type="button"
-                                    className="flex-1 py-4 bg-[var(--color-card)] hover:bg-white/10 text-[var(--text-secondary)] rounded-2xl font-bold border border-white/10"
-                                    onClick={resetForm}
-                                >
-                                    Discard
-                                </Button>
-
-                                <Button
-                                    type="primary"
-                                    className="flex-1 py-4 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-2xl font-black text-white border-none shadow-xl shadow-[var(--color-primary)]/40"
-                                    htmlType="submit"
-                                >
-                                    {isEditing ? "Update Asset" : "Deploy Property"}
-                                </Button>
-
-                            </div>
-                        </form>
-
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
 
 
@@ -555,13 +545,15 @@ const Property = () => {
                 }
             `}</style>
 
-            {openViewProperty && selectedProperty && (
-                <ViewProperty
-                    property={selectedProperty}
-                    onClose={() => setOpenViewProperty(false)}
-                />
-            )}
-        </div>
+            {
+                openViewProperty && selectedProperty && (
+                    <ViewProperty
+                        property={selectedProperty}
+                        onClose={() => setOpenViewProperty(false)}
+                    />
+                )
+            }
+        </div >
     );
 };
 

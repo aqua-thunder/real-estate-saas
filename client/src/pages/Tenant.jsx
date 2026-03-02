@@ -24,6 +24,8 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Tenant = () => {
     const { user, token } = useAuth();
@@ -198,6 +200,117 @@ const Tenant = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const downloadLeasePDF = (tenant) => {
+        const doc = new jsPDF();
+
+        // Header styling
+        doc.setFillColor(30, 41, 59); // Dark slate
+        doc.rect(0, 0, 210, 40, 'F');
+
+        doc.setFontSize(24);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("LEASE AGREEMENT", 105, 20, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(`REFERENCE ID: LA-${tenant._id.substring(0, 8).toUpperCase()}`, 105, 30, { align: "center" });
+
+        // Content
+        let currentY = 55;
+
+        const drawSectionHeader = (title, y) => {
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.setFont("helvetica", "bold");
+            doc.text(title.toUpperCase(), 20, y);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(20, y + 2, 190, y + 2);
+            return y + 12;
+        };
+
+        // 1. Tenant Info
+        currentY = drawSectionHeader("Tenant Information", currentY);
+        autoTable(doc, {
+            startY: currentY,
+            body: [
+                ["Full Legal Name", tenant.userId?.name || "N/A"],
+                ["Email Address", tenant.userId?.email || "N/A"],
+                ["Contact Number", tenant.userId?.phone || "N/A"],
+            ],
+            theme: 'plain',
+            styles: { fontSize: 10, cellPadding: 3 },
+            columnStyles: { 0: { fontStyle: 'bold', width: 60 } },
+            margin: { left: 20 }
+        });
+
+        // 2. Property Info
+        currentY = doc.lastAutoTable.finalY + 15;
+        currentY = drawSectionHeader("Lease Property Asset", currentY);
+        autoTable(doc, {
+            startY: currentY,
+            body: [
+                ["Property Name", tenant.propertyId?.propertyName || "N/A"],
+                ["Floor Level", tenant.floorId?.name || "N/A"],
+                ["Unit Number", tenant.unitId?.unitNumber || "N/A"],
+                ["Property Address", tenant.propertyId?.address || "Available on portal"],
+            ],
+            theme: 'plain',
+            styles: { fontSize: 10, cellPadding: 3 },
+            columnStyles: { 0: { fontStyle: 'bold', width: 60 } },
+            margin: { left: 20 }
+        });
+
+        // 3. Lease & Financials
+        currentY = doc.lastAutoTable.finalY + 15;
+        currentY = drawSectionHeader("Lease Schedule & Financials", currentY);
+        autoTable(doc, {
+            startY: currentY,
+            body: [
+                ["Lease Term Start", new Date(tenant.leaseStart).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
+                ["Lease Term End", new Date(tenant.leaseEnd).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
+                ["Monthly Installment", `INR ${tenant.rent?.toLocaleString()}`],
+                ["Initial Security Deposit", `INR ${tenant.deposit?.toLocaleString()}`],
+                ["Current Payment Status", tenant.paymentStatus],
+            ],
+            theme: 'plain',
+            styles: { fontSize: 10, cellPadding: 3 },
+            columnStyles: { 0: { fontStyle: 'bold', width: 60 } },
+            margin: { left: 20 }
+        });
+
+        // Declaration
+        currentY = doc.lastAutoTable.finalY + 20;
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "italic");
+        doc.setTextColor(100, 116, 139);
+        const declaration = "This document confirms that the above-mentioned tenant is officially registered at the specified property under current management. All terms are subject to the master agreement signed digitally and stored in our database records.";
+        const splitText = doc.splitTextToSize(declaration, 170);
+        doc.text(splitText, 20, currentY);
+
+        // Signature area
+        currentY += 25;
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(30, 41, 59);
+        doc.text("Authorised Signatory", 20, currentY);
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
+        doc.text("Digital Verification Enabled", 20, currentY + 5);
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
+            doc.text(`Downloaded on ${new Date().toLocaleString()} | Real Estate SaaS Management Platform`, 105, 290, { align: "center" });
+        }
+
+        doc.save(`Lease_Agreement_${tenant.userId?.name?.replace(/\s+/g, '_')}_2025.pdf`);
+        toast.success("Lease agreement generated and downloaded");
     };
 
     const summary = useMemo(() => {
@@ -561,17 +674,22 @@ const Tenant = () => {
                                     <h4 className="text-[var(--text-card)] text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2">
                                         <FileText size={14} /> Lease Documents
                                     </h4>
-                                    <div className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white/[0.08] transition-colors">
+                                    <div
+                                        onClick={() => downloadLeasePDF(selectedTenant)}
+                                        className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white/[0.08] transition-colors border border-white/5 hover:border-[var(--color-primary)]/30"
+                                    >
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-rose-500/10 text-rose-400 rounded-lg">
+                                            <div className="p-2 bg-rose-500/10 text-rose-400 rounded-lg group-hover:bg-rose-500/20 transition-colors">
                                                 <FileText size={18} />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium text-white">Lease_Agreement_2025.pdf</p>
-                                                <p className="text-[10px] text-[var(--text-card)]">Signed on 24 Dec 2024</p>
+                                                <p className="text-sm font-medium text-white group-hover:text-[var(--color-primary)] transition-colors">Lease_Agreement_2025.pdf</p>
+                                                <p className="text-[10px] text-[var(--text-card)]">Ready to download • Signed</p>
                                             </div>
                                         </div>
-                                        <Download size={16} className="text-[var(--text-card)] group-hover:text-white" />
+                                        <div className="p-2 rounded-full bg-white/5 group-hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] group-hover:text-[var(--color-primary)] transition-all">
+                                            <Download size={16} />
+                                        </div>
                                     </div>
                                 </section>
                             </div>
@@ -804,16 +922,6 @@ const Tenant = () => {
                 }
                 .animate-zoom-in {
                     animation: zoom-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                }
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 10px;
                 }
             `}</style>
 
