@@ -8,9 +8,13 @@ const { registerOwner } = require("../controllers/owner/owner-controller.js");
 const PropertyController = require("../controllers/owner/property-controller.js");
 const FloorController = require("../controllers/owner/floore-controller.js")
 const UnitController = require("../controllers/owner/unit-controller.js")
+const RevenueController = require("../controllers/owner/revenue-controller.js")
 
 // Owner registration
 router.post("/register", authMiddleware, roleMiddleware("OWNER"), registerOwner);
+
+// Revenue Analytics
+router.get("/revenue-stats", authMiddleware, roleMiddleware("OWNER"), RevenueController.getRevenueStats);
 
 // Property Management (Allow OWNER and MANAGER only for create/update/delete)
 router.post("/properties", authMiddleware, roleMiddleware("OWNER", "MANAGER"), PropertyController.createProperty);

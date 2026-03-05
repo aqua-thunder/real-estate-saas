@@ -15,19 +15,62 @@ import {
     ArrowUpRight,
     ArrowDownRight
 } from "lucide-react";
+import { useAuth } from "../store/auth";
 
 const RevenueReport = () => {
-    const stats = [
-        { title: "Total Revenue", value: "₹2,45,000", change: "+12.5%", trending: "up", icon: DollarSign, color: "from-blue-500 to-cyan-400" },
-        { title: "Monthly Revenue", value: "₹45,000", change: "+4.2%", trending: "up", icon: Calendar, color: "from-indigo-500 to-purple-400" },
-        { title: "Occupancy Rate", value: "82%", change: "+2.1%", trending: "up", icon: BarChart3, color: "from-emerald-500 to-teal-400" },
-        { title: "Pending Rent", value: "₹18,000", change: "-1.5%", trending: "down", icon: Receipt, color: "from-rose-500 to-orange-400" },
-    ];
+    const { token } = useAuth();
+    const [data, setData] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
 
-    const transactions = [
-        { date: "12 May", tenant: "John Smith", unit: "A-102", invoice: "INV-234", amount: "₹2,500", fee: "₹50", status: "Paid" },
-        { date: "14 May", tenant: "Emily Clark", unit: "B-204", invoice: "INV-241", amount: "₹2,500", fee: "₹0", status: "Pending" },
-        { date: "15 May", tenant: "Michael Ross", unit: "C-105", invoice: "INV-245", amount: "₹3,200", fee: "₹100", status: "Paid" },
+    React.useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await fetch("http://localhost:7000/api/owner/revenue-stats", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    setData(result);
+                }
+            } catch (error) {
+                console.error("Error fetching revenue stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (token) {
+            fetchStats();
+        }
+    }, [token]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[var(--color-primary)]"></div>
+            </div>
+        );
+    }
+
+    const { stats, transactions, efficiency, breakdown } = data || {
+        stats: { totalRevenue: "₹0", monthlyRevenue: "₹0", occupancyRate: "0%", pendingRent: "₹0", netProfit: "₹0" },
+        transactions: [],
+        efficiency: 0,
+        breakdown: {
+            rent: { collected: "₹0", pending: "₹0", lateFees: "₹0" },
+            other: { parking: "₹0", utilities: "₹0", services: "₹0" },
+            expenses: { maintenance: "₹0", repairs: "₹0", utilities: "₹0" }
+        }
+    };
+
+    const statsConfig = [
+        { title: "Total Revenue", value: stats.totalRevenue, change: "+0%", trending: "up", icon: DollarSign, color: "from-blue-500 to-cyan-400" },
+        { title: "Monthly Revenue", value: stats.monthlyRevenue, change: "+0%", trending: "up", icon: Calendar, color: "from-indigo-500 to-purple-400" },
+        { title: "Occupancy Rate", value: stats.occupancyRate, change: "+0%", trending: "up", icon: BarChart3, color: "from-emerald-500 to-teal-400" },
+        { title: "Pending Rent", value: stats.pendingRent, change: "+0%", trending: "down", icon: Receipt, color: "from-rose-500 to-orange-400" },
     ];
 
     return (
@@ -56,7 +99,7 @@ const RevenueReport = () => {
 
             {/* --- MAIN KPI GRID --- */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, idx) => (
+                {statsConfig.map((stat, idx) => (
                     <StatCard key={idx} {...stat} />
                 ))}
             </section>
@@ -75,19 +118,19 @@ const RevenueReport = () => {
                             <div>
                                 <h2 className="text-xl font-medium text-[var(--text-card)] mb-2">Total Net Profit</h2>
                                 <div className="flex items-baseline gap-4">
-                                    <span className="text-6xl font-black text-white tracking-tighter">₹1,98,500</span>
+                                    <span className="text-6xl font-black text-white tracking-tighter">{stats.netProfit}</span>
                                     <div className="flex items-center gap-1 text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full text-sm font-bold">
-                                        <TrendingUp size={16} /> 12.5%
+                                        <TrendingUp size={16} /> 0%
                                     </div>
                                 </div>
-                                <p className="text-white/40 mt-4 text-sm max-w-md">Your revenue has increased by 15.2% compared to the last quarter. Looking good!</p>
+                                <p className="text-white/40 mt-4 text-sm max-w-md">Your net profit is calculated AFTER maintenance and expenses. Keep track of your overheads!</p>
                             </div>
 
                             <div className="flex flex-col items-center gap-3">
                                 <div className="relative w-32 h-32 flex items-center justify-center">
                                     <svg className="w-full h-full -rotate-90">
                                         <circle cx="64" cy="64" r="58" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-white/5" />
-                                        <circle cx="64" cy="64" r="58" fill="transparent" stroke="url(#gradient)" strokeWidth="8" strokeDasharray="364" strokeDashoffset="72.8" strokeLinecap="round" />
+                                        <circle cx="64" cy="64" r="58" fill="transparent" stroke="url(#gradient)" strokeWidth="8" strokeDasharray="364" strokeDashoffset={364 * (1 - (efficiency || 0) / 100)} strokeLinecap="round" />
                                         <defs>
                                             <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                                 <stop offset="0%" stopColor="#00a1ff" />
@@ -96,8 +139,8 @@ const RevenueReport = () => {
                                         </defs>
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-2xl font-bold text-white leading-none">80%</span>
-                                        <span className="text-[10px] uppercase font-bold text-white/40 mt-1 tracking-widest text-center px-4">Efficiency</span>
+                                        <span className="text-2xl font-bold text-white leading-none">{efficiency}%</span>
+                                        <span className="text-[10px] uppercase font-bold text-white/40 mt-1 tracking-widest text-center px-4">Occupancy</span>
                                     </div>
                                 </div>
                             </div>
@@ -110,27 +153,27 @@ const RevenueReport = () => {
                             title="Rent Income"
                             icon={Receipt}
                             items={[
-                                { label: "Collected", value: "₹1,80,000", color: "text-emerald-400" },
-                                { label: "Pending", value: "₹25,000", color: "text-rose-400" },
-                                { label: "Late Fees", value: "₹2,500" }
+                                { label: "Collected", value: breakdown.rent.collected, color: "text-emerald-400" },
+                                { label: "Pending", value: breakdown.rent.pending, color: "text-rose-400" },
+                                { label: "Late Fees", value: breakdown.rent.lateFees }
                             ]}
                         />
                         <SummaryCard
                             title="Other Income"
                             icon={DollarSign}
                             items={[
-                                { label: "Parking", value: "₹8,000" },
-                                { label: "Utilities", value: "₹6,500" },
-                                { label: "Services", value: "₹3,000" }
+                                { label: "Parking", value: breakdown.other.parking },
+                                { label: "Utilities", value: breakdown.other.utilities },
+                                { label: "Services", value: breakdown.other.services }
                             ]}
                         />
                         <SummaryCard
                             title="Expenses"
                             icon={Wrench}
                             items={[
-                                { label: "Property Maint.", value: "₹5,500" },
-                                { label: "Pending Fixes", value: "₹1,700", color: "text-amber-400" },
-                                { label: "Utilities", value: "₹2,400" }
+                                { label: "Property Maint.", value: breakdown.expenses.maintenance },
+                                { label: "Repairs", value: breakdown.expenses.repairs, color: "text-amber-400" },
+                                { label: "Utilities", value: breakdown.expenses.utilities }
                             ]}
                         />
                     </div>
