@@ -21,6 +21,7 @@ import Profile from './pages/Profile.jsx'
 import Logout from './auth/Logout.jsx'
 import FloorUnit from './pages/FloorUnit.jsx'
 import Tenant from './pages/Tenant.jsx'
+import RevenueReport from './pages/RevenueReport.jsx'
 
 function App() {
   return (
@@ -81,6 +82,10 @@ function App() {
                 <Route path="/admin/tenant" element={<Tenant />} />
               </Route>
 
+              {/* Roles: Super Admin, Owner */}
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
+                <Route path="/admin/revenue-report" element={<RevenueReport />} />
+              </Route>
 
               {/* Roles: Owner */}
               <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>

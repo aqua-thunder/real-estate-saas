@@ -27,8 +27,9 @@ const menuItems = [
     { name: "Reports", icon: BarChart3, path: "/admin/reports", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
     // { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
-    { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
     { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
+    { name: "Revenue Report", icon: CreditCard, path: "/admin/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
+    { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
 ];
 
 const AdminSidebar = ({ isOpen, onClose }) => {
