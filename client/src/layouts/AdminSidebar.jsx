@@ -29,6 +29,7 @@ const menuItems = [
     { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
     { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
     { name: "Revenue Report", icon: CreditCard, path: "/admin/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
+    { name: "Lease", icon: CreditCard, path: "/tenant/lease", roles: ["TENANT"] },
     { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
 ];
 

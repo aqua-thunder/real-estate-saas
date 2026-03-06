@@ -12,5 +12,6 @@ router.get("/tenants", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN", "M
 router.get("/tenant/:id", authMiddleware, roleMiddleware("OWNER", "SUPER_ADMIN", "MANAGER"), TenantController.getTenantById);
 router.put("/tenant/:id", authMiddleware, roleMiddleware("OWNER", "MANAGER"), TenantController.updateTenant);
 router.delete("/tenant/:id", authMiddleware, roleMiddleware("OWNER", "MANAGER"), TenantController.deleteTenant);
+router.get("/getmy-lease", authMiddleware, roleMiddleware("TENANT"), TenantController.getLeaseByTenant);
 
 module.exports = router;

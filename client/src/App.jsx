@@ -22,6 +22,7 @@ import Logout from './auth/Logout.jsx'
 import FloorUnit from './pages/FloorUnit.jsx'
 import Tenant from './pages/Tenant.jsx'
 import RevenueReport from './pages/RevenueReport.jsx'
+import Lease from './pages/Lease.jsx'
 
 function App() {
   return (
@@ -91,6 +92,13 @@ function App() {
               <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
                 <Route path="/owner/floor" element={<FloorUnit />} />
               </Route>
+
+              {/* Roles: Tenant */}
+              <Route element={<ProtectedRoute allowedRoles={["TENANT"]} />}>
+                <Route path="/tenant/lease" element={<Lease />} />
+              </Route>
+
+
             </Route>
           </Route>
 

@@ -308,10 +308,32 @@ const deleteTenant = async (req, res) => {
     }
 };
 
+const getLeaseByTenant = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const tenant = await Tenant.findOne({ userId })
+            .populate("userId", "name email phone")
+            .populate("propertyId", "propertyName address")
+            .populate("unitId", "unitNumber")
+            .populate("floorId", "name floorNumber")
+            .populate("managerId", "name email");
+
+        if (!tenant) {
+            return res.status(404).json({ message: "Lease not found for this user" });
+        }
+
+        res.status(200).json({ message: "Lease details fetched successfully", lease: tenant });
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch lease details", error: error.message });
+    }
+};
+
 module.exports = {
     createTenant,
     getTenants,
     getTenantById,
     updateTenant,
-    deleteTenant
+    deleteTenant,
+    getLeaseByTenant
 };
