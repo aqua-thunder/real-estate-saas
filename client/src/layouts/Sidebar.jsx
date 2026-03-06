@@ -12,28 +12,30 @@ import {
     UserCog,
     X,
     Layers,
+    Wrench,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 
 const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
-    { name: "Users", icon: Users, path: "/admin/users", roles: ["SUPER_ADMIN", "MANAGER"] },
-    { name: "Role", icon: ShieldCheck, path: "/admin/roles", roles: ["SUPER_ADMIN"] },
-    { name: "Location", icon: MapPin, path: "/admin/locations", roles: ["SUPER_ADMIN", "MANAGER", "TECHNICIAN"] },
-    { name: "Property", icon: Building2, path: "/admin/properties", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"] },
-    { name: "Floor & Unit", icon: Building2, path: "/owner/floor", roles: ["OWNER"] },
-    { name: "Settings", icon: Settings, path: "/admin/settings", roles: ["SUPER_ADMIN"] },
-    { name: "Reports", icon: BarChart3, path: "/admin/reports", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
-    // { name: "Subscriptions", icon: CreditCard, path: "/admin/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
-    { name: "Audit Logs", icon: FileSearch, path: "/admin/audit-logs", roles: ["SUPER_ADMIN"] },
-    { name: "Tenant", icon: UserCog, path: "/admin/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
-    { name: "Revenue Report", icon: CreditCard, path: "/admin/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
-    { name: "Lease", icon: CreditCard, path: "/tenant/lease", roles: ["TENANT"] },
-    { name: "Profile & Security", icon: UserCog, path: "/admin/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Users", icon: Users, path: "/users", roles: ["SUPER_ADMIN", "MANAGER"] },
+    { name: "Role", icon: ShieldCheck, path: "/roles", roles: ["SUPER_ADMIN"] },
+    { name: "Location", icon: MapPin, path: "/locations", roles: ["SUPER_ADMIN", "MANAGER", "TECHNICIAN"] },
+    { name: "Property", icon: Building2, path: "/properties", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"] },
+    { name: "Floor & Unit", icon: Building2, path: "/floor", roles: ["OWNER"] },
+    { name: "Settings", icon: Settings, path: "/settings", roles: ["SUPER_ADMIN"] },
+    { name: "Reports", icon: BarChart3, path: "/reports", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
+    // { name: "Subscriptions", icon: CreditCard, path: "/subscriptions", roles: ["SUPER_ADMIN", "OWNER"] },
+    { name: "Audit Logs", icon: FileSearch, path: "/audit-logs", roles: ["SUPER_ADMIN"] },
+    { name: "Tenant", icon: UserCog, path: "/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
+    { name: "Revenue Report", icon: CreditCard, path: "/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
+    { name: "Lease", icon: CreditCard, path: "/lease", roles: ["TENANT"] },
+    { name: "Profile & Security", icon: UserCog, path: "/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Maintenance", icon: Wrench, path: "/maintenance", roles: ["TENANT", "MANAGER"] },
 ];
 
-const AdminSidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose }) => {
     const { user } = useAuth();
     const userRole = user?.role || "TENANT";
 
@@ -115,4 +117,4 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     );
 };
 
-export default AdminSidebar;
+export default Sidebar;

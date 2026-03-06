@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth-router");
 const adminRoutes = require("./routes/admin-router.js");
 const ownerRoutes = require("./routes/owner-router.js");
 const tenantRoutes = require("./routes/tenant-router.js");
+const maintenanceRoutes = require("./routes/maintenance-router.js");
 
 
 const corsOptions = {
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api/tenant", tenantRoutes);
+app.use("/api/maintenance", maintenanceRoutes);
 
 
 const PORT = 7000

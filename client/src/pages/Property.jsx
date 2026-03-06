@@ -174,8 +174,7 @@ const Property = () => {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                        <Building2 className="text-[var(--color-primary)] opacity-80" size={32} />
-                        Property <span className="text-[var(--color-primary)]">Assets</span>
+                        Property Assets
                     </h1>
                 </div>
             </div>

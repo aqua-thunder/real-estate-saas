@@ -7,7 +7,8 @@ import PublicRoute from './store/PubliRoute.jsx'
 import SignInPage from './auth/SignInPage.jsx'
 import SignUpPage from './auth/SignUpPage.jsx'
 import ProtectedRoute from './store/ProtectedRoute.jsx'
-import AdminLayout from './layouts/AdminLayout.jsx'
+import Sidebar from './layouts/Sidebar.jsx'
+import Layout from './layouts/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import User from './pages/User.jsx'
 import Role from './pages/Role.jsx'
@@ -23,6 +24,7 @@ import FloorUnit from './pages/FloorUnit.jsx'
 import Tenant from './pages/Tenant.jsx'
 import RevenueReport from './pages/RevenueReport.jsx'
 import Lease from './pages/Lease.jsx'
+import Maintenance from './pages/Maintenance.jsx'
 
 function App() {
   return (
@@ -37,68 +39,71 @@ function App() {
             <Route path="/logout" element={<Logout />} />
           </Route>
 
-          {/* Admin Layout Wrapper */}
+          {/* App Layout Wrapper */}
           <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"]} />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+            <Route element={<Layout />}>
+              <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
 
               {/* All logged in users can access these */}
-              <Route path="/admin/dashboard" element={<Dashboard />} />
-              <Route path="/admin/profile" element={<Profile />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<Profile />} />
 
               {/* Roles: Super Admin Only */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
-                <Route path="/admin/roles" element={<Role />} />
-                <Route path="/admin/settings" element={<Settings />} />
-                <Route path="/admin/audit-logs" element={<AuditLogs />} />
+                <Route path="/roles" element={<Role />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/audit-logs" element={<AuditLogs />} />
               </Route>
 
               {/* Roles: Super Admin & Manager */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "MANAGER"]} />}>
-                <Route path="/admin/users" element={<User />} />
+                <Route path="/users" element={<User />} />
               </Route>
 
               {/* Roles: Super Admin, Owner, Manager, Technician */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TECHNICIAN"]} />}>
-                <Route path="/admin/locations" element={<Location />} />
+                <Route path="/locations" element={<Location />} />
               </Route>
 
               {/* Roles: Super Admin, Owner, Manager, Tenant */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT"]} />}>
-                <Route path="/admin/properties" element={<Property />} />
+                <Route path="/properties" element={<Property />} />
               </Route>
 
               {/* Roles: Super Admin, Owner, Manager */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
-                <Route path="/admin/reports" element={<Reports />} />
+                <Route path="/reports" element={<Reports />} />
               </Route>
 
               {/* Roles: Super Admin, Owner */}
               <Route element={<ProtectedRoute allowedRoles={[]} />}>
-                <Route path="/admin/subscriptions" element={<Subscriptions />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
               </Route>
 
               {/* Roles: Super Admin */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
-                <Route path="/admin/tenant" element={<Tenant />} />
+                <Route path="/tenant" element={<Tenant />} />
               </Route>
 
               {/* Roles: Super Admin, Owner */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
-                <Route path="/admin/revenue-report" element={<RevenueReport />} />
+                <Route path="/revenue-report" element={<RevenueReport />} />
               </Route>
 
               {/* Roles: Owner */}
               <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
-                <Route path="/owner/floor" element={<FloorUnit />} />
+                <Route path="/floor" element={<FloorUnit />} />
               </Route>
 
               {/* Roles: Tenant */}
               <Route element={<ProtectedRoute allowedRoles={["TENANT"]} />}>
-                <Route path="/tenant/lease" element={<Lease />} />
+                <Route path="/lease" element={<Lease />} />
               </Route>
 
-
+              {/* Roles: Tenant, Manager */}
+              <Route element={<ProtectedRoute allowedRoles={["TENANT", "MANAGER"]} />}>
+                <Route path="/maintenance" element={<Maintenance />} />
+              </Route>
             </Route>
           </Route>
 

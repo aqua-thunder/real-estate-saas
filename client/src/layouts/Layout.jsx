@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
-import AdminSidebar from "./AdminSidebar.jsx";
+import Sidebar from "./Sidebar.jsx";
 import Header from "./Header.jsx";
 
-const AdminLayout = () => {
+const Layout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -18,7 +18,7 @@ const AdminLayout = () => {
         <div className="h-screen flex bg-slate-100 overflow-hidden">
 
             {/* Sidebar */}
-            <AdminSidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+            <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
             {/* Right Section */}
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -36,4 +36,4 @@ const AdminLayout = () => {
     );
 };
 
-export default AdminLayout;
+export default Layout;

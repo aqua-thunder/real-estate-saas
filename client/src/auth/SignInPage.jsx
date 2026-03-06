@@ -40,7 +40,7 @@ const SignInPage = () => {
             if (response.ok) {
                 storetokenInLS(res_data.token);
                 setUser({ email: "", password: "" });
-                navigate("/admin/dashboard")
+                navigate("/dashboard")
             } else {
                 toast.error(res_data.message)
             }
@@ -73,7 +73,7 @@ const SignInPage = () => {
                 <div className="w-full max-w-sm sm:max-w-md rounded-2xl p-6 sm:p-8 shadow-lg">
                     <h2 className="text-xl sm:text-2xl font-semibold mb-1">Sign In</h2>
                     <p className="text-[var(--text-secondary)] mb-6">
-                        Your Admin Dashboard
+                        Access your property portal
                     </p>
 
                     {/* FORM START */}

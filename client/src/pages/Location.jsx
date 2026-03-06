@@ -172,14 +172,14 @@ const Location = () => {
         <div className="space-y-6">
 
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[var(--bg-card)] p-6 rounded-2xl shadow-sm border border-[var(--color-card)]">
-                <div>
-                    <h2 className="text-2xl font-bold text-[var(--text-secondary)] font-[var(--font-heading)]">
-                        Location Management
-                    </h2>
-                    <p className="text-[var(--text-card)] text-sm mt-1">
-                        Manage operating regions and cities
-                    </p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                {/* Page Header Area */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                            Location Management
+                        </h1>
+                    </div>
                 </div>
 
 

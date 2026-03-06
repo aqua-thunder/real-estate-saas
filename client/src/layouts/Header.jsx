@@ -98,7 +98,7 @@ const Header = ({ onToggleSidebar }) => {
                             {/* Divider */}
                             <div className="my-5 h-[1px] bg-gray-600"></div>
 
-                            <NavLink to="/admin/profile" className="flex items-center space-x-5 cursor-pointer">
+                            <NavLink to="/profile" className="flex items-center space-x-5 cursor-pointer">
                                 <div className="p-3 bg-[var(--color-primary)]/10 rounded-2xl text-[var(--color-primary)] group-hover:scale-110 transition-transform">
                                     <Layers size={22} />
                                 </div>

@@ -18,7 +18,14 @@ const recentActivities = [
 const Dashboard = () => {
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-slate-800">Dashboard Overview</h2>
+      {/* Page Header Area */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+            Dashboard Overview
+          </h1>
+        </div>
+      </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

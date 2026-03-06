@@ -128,12 +128,19 @@ const Profile = () => {
 
 
     return (
-        <div className="min-h-screen bg-[var(--bg-card)] p-4 md:p-8">
-            <div className="max-w-6xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 md:p-2">
+            {/* Page Header Area */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                        Profile Information
+                    </h1>
+                </div>
+            </div>
+            <div className="space-y-8">
 
                 {/* ================= PROFILE INFORMATION ================= */}
-                <div className=" rounded-2xl shadow-sm p-6 md:p-8">
-                    <h2 className="text-2xl font-semibold mb-6 text-[var(--text-secondary)]">Profile Information</h2>
+                <div className=" rounded-xl shadow-sm p-6 md:p-8 bg-[var(--bg-card)]">
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -214,7 +221,7 @@ const Profile = () => {
                 </div>
 
                 {/* ================= ACCOUNT SECURITY ================= */}
-                <div className=" rounded-2xl shadow-sm p-6 md:p-8 text-[var(--text-secondary)]">
+                <div className=" rounded-2xl shadow-sm p-6 md:p-8 text-[var(--text-secondary)] bg-[var(--bg-card)]">
                     <h2 className="text-2xl font-semibold mb-6">Account Security</h2>
 
                     {/* Change Password */}

@@ -74,13 +74,12 @@ const RevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-6 md:p-10 space-y-10 selection:bg-[var(--color-primary)]/30">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-6 md:p-2 space-y-10 selection:bg-[var(--color-primary)]/30">
 
             {/* --- HEADER --- */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-2">
-                    <span className="text-[var(--color-primary)] font-bold tracking-[0.2em] text-xs uppercase">Financial Overview</span>
-                    <h1 className="text-4xl font-extrabold font-[var(--font-heading)] tracking-tight text-white">
+                    <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
                         Revenue Analytics
                     </h1>
                 </div>
