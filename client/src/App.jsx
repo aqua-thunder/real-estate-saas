@@ -25,6 +25,7 @@ import Tenant from './pages/Tenant.jsx'
 import RevenueReport from './pages/RevenueReport.jsx'
 import Lease from './pages/Lease.jsx'
 import Maintenance from './pages/Maintenance.jsx'
+import Invoice from './pages/Invoice.jsx'
 
 function App() {
   return (
@@ -66,7 +67,7 @@ function App() {
               </Route>
 
               {/* Roles: Super Admin, Owner, Manager, Tenant */}
-              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
                 <Route path="/properties" element={<Property />} />
               </Route>
 
@@ -103,6 +104,11 @@ function App() {
               {/* Roles: Tenant, Manager */}
               <Route element={<ProtectedRoute allowedRoles={["TENANT", "MANAGER"]} />}>
                 <Route path="/maintenance" element={<Maintenance />} />
+              </Route>
+
+              {/* Roles: Tenant , Manager */}
+              <Route element={<ProtectedRoute allowedRoles={["TENANT", "MANAGER"]} />}>
+                <Route path="/invoice" element={<Invoice />} />
               </Route>
             </Route>
           </Route>

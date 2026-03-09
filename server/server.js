@@ -8,7 +8,7 @@ const adminRoutes = require("./routes/admin-router.js");
 const ownerRoutes = require("./routes/owner-router.js");
 const tenantRoutes = require("./routes/tenant-router.js");
 const maintenanceRoutes = require("./routes/maintenance-router.js");
-
+const invoiceRoutes = require("./routes/invoice-router.js")
 
 const corsOptions = {
   origin: [
@@ -25,6 +25,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api/tenant", tenantRoutes);
 app.use("/api/maintenance", maintenanceRoutes);
+app.use("/api/invoice", invoiceRoutes)
 
 
 const PORT = 7000

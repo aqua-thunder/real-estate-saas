@@ -22,7 +22,7 @@ const menuItems = [
     { name: "Users", icon: Users, path: "/users", roles: ["SUPER_ADMIN", "MANAGER"] },
     { name: "Role", icon: ShieldCheck, path: "/roles", roles: ["SUPER_ADMIN"] },
     { name: "Location", icon: MapPin, path: "/locations", roles: ["SUPER_ADMIN", "MANAGER", "TECHNICIAN"] },
-    { name: "Property", icon: Building2, path: "/properties", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
+    { name: "Property", icon: Building2, path: "/properties", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Floor & Unit", icon: Building2, path: "/floor", roles: ["OWNER"] },
     { name: "Settings", icon: Settings, path: "/settings", roles: ["SUPER_ADMIN"] },
     { name: "Reports", icon: BarChart3, path: "/reports", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
@@ -32,6 +32,7 @@ const menuItems = [
     { name: "Revenue Report", icon: CreditCard, path: "/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Lease", icon: CreditCard, path: "/lease", roles: ["TENANT"] },
     { name: "Maintenance", icon: Wrench, path: "/maintenance", roles: ["TENANT", "MANAGER"] },
+    { name: "Invoice", icon: CreditCard, path: "/invoice", roles: ["TENANT", "MANAGER"] },
     { name: "Profile & Security", icon: UserCog, path: "/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
 ];
 
