@@ -249,19 +249,20 @@ const Property = () => {
             </div>
 
             {/* List Table container */}
-            <div className="bg-[var(--bg-card)]/40 backdrop-blur-md rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative">
-                <div className="overflow-x-auto">
+            <div className="bg-[var(--bg-card)]/40 backdrop-blur-md rounded-[2rem] lg:rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative">
+                {/* Desktop View */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Property Details</th>
+                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Property Details</th>
                                 {user?.role === "SUPER_ADMIN" && (
-                                    <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Owner</th>
+                                    <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Owner</th>
                                 )}
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Category</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Location</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Total Revenue</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
+                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Category</th>
+                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Location</th>
+                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Total Revenue</th>
+                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[var(--color-card)]">
@@ -270,17 +271,16 @@ const Property = () => {
                             ) : filteredProperties.length > 0 ? (
                                 filteredProperties.map((property) => (
                                     <tr key={property._id} className="group hover:bg-[var(--color-card)]/20 transition-all duration-300">
-                                        <td className="p-6">
+                                        <td className="p-4 lg:p-6">
                                             <div className="flex items-center gap-4">
-
                                                 <div>
                                                     <div className="font-bold text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</div>
-                                                    <div className="text-xs text-[var(--text-card)] font-medium mt-1 truncate max-w-[200px]">{property.address}</div>
+                                                    <div className="text-xs text-[var(--text-card)] font-medium mt-1 truncate max-w-[150px] lg:max-w-[200px]">{property.address}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         {user?.role === "SUPER_ADMIN" && (
-                                            <td className="p-6">
+                                            <td className="p-4 lg:p-6">
                                                 <div className="flex items-center gap-2">
                                                     <div className="text-sm font-bold text-[var(--text-secondary)]">
                                                         {property.owner?.user?.name || "N/A"}
@@ -293,7 +293,7 @@ const Property = () => {
                                                 </div>
                                             </td>
                                         )}
-                                        <td className="p-6">
+                                        <td className="p-4 lg:p-6">
                                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${property.propertyType === 'RESIDENTIAL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                                                 property.propertyType === 'COMMERCIAL' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
                                                     'bg-purple-500/10 text-purple-500 border-purple-500/20'
@@ -301,28 +301,26 @@ const Property = () => {
                                                 {property.propertyType}
                                             </span>
                                         </td>
-                                        <td className="p-6">
+                                        <td className="p-4 lg:p-6">
                                             <div className="flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-sm">
                                                 {property.location}
                                             </div>
                                         </td>
 
-                                        <td className="p-6">
-                                            <div className="p-3 rounded-2xl">
-                                                <div className="text-lg font-black text-green-600 dark:text-green-400 mt-1">${property.totalRevenue?.toLocaleString() || 0}</div>
-                                            </div>
+                                        <td className="p-4 lg:p-6">
+                                            <div className="text-lg font-black text-green-600 dark:text-green-400">${property.totalRevenue?.toLocaleString() || 0}</div>
                                         </td>
-                                        <td className="p-6">
-                                            <div className="flex items-center justify-center gap-1 transition-opacity duration-300">
+                                        <td className="p-4 lg:p-6">
+                                            <div className="flex items-center justify-center gap-1">
                                                 <button
                                                     onClick={() => {
                                                         setSelectedProperty(property);
                                                         setOpenViewProperty(true);
-                                                    }} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Eye size={18} /></button>
+                                                    }} className="p-2 lg:p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Eye size={18} /></button>
                                                 {(user?.role === "OWNER" || user?.role === "MANAGER") && (
                                                     <>
-                                                        <button onClick={() => handleEdit(property)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                                                        <button onClick={() => handleDelete(property._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                                                        <button onClick={() => handleEdit(property)} className="p-2 lg:p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
+                                                        <button onClick={() => handleDelete(property._id)} className="p-2 lg:p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
                                                     </>
                                                 )}
                                             </div>
@@ -349,6 +347,78 @@ const Property = () => {
                     </table>
                 </div>
 
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden divide-y divide-[var(--color-card)]">
+                    {loading ? (
+                        <div className="p-10 text-center text-[var(--text-card)] animate-pulse">Synchronizing database...</div>
+                    ) : filteredProperties.length > 0 ? (
+                        filteredProperties.map((property) => (
+                            <div key={property._id} className="p-5 space-y-4 hover:bg-[var(--color-card)]/10 transition-all">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <h4 className="font-bold text-white text-lg group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</h4>
+                                        <div className="flex items-center gap-2 text-xs text-[var(--text-card)] font-medium">
+                                            <MapPin size={12} />
+                                            {property.location}
+                                        </div>
+                                    </div>
+                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border ${property.propertyType === 'RESIDENTIAL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                                        property.propertyType === 'COMMERCIAL' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
+                                            'bg-purple-500/10 text-purple-500 border-purple-500/20'
+                                        }`}>
+                                        {property.propertyType}
+                                    </span>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Total Revenue</p>
+                                        <p className="text-lg font-black text-green-500">${property.totalRevenue?.toLocaleString() || 0}</p>
+                                    </div>
+                                    {user?.role === "SUPER_ADMIN" && (
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Owner</p>
+                                            <p className="text-sm font-bold text-[var(--text-secondary)]">{property.owner?.user?.name || "N/A"}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex items-center justify-between gap-3 pt-2">
+                                    <p className="text-[10px] text-[var(--text-card)] font-medium truncate max-w-[150px]">{property.address}</p>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedProperty(property);
+                                                setOpenViewProperty(true);
+                                            }}
+                                            className="p-2 bg-blue-500/10 text-blue-500 rounded-xl transition-all active:scale-95"
+                                        >
+                                            <Eye size={16} />
+                                        </button>
+                                        {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEdit(property)}
+                                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-xl transition-all active:scale-95"
+                                                >
+                                                    <Edit size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(property._id)}
+                                                    className="p-2 bg-red-500/10 text-red-500 rounded-xl transition-all active:scale-95"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-10 text-center text-[var(--text-card)]">No Estates Found</div>
+                    )}
+                </div>
             </div>
 
             {/* Modal - Modern & Slick */}

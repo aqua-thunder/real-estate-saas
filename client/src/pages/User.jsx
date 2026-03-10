@@ -137,9 +137,10 @@ const User = () => {
                 </Button>
             </div>
 
-            {/* User Table */}
+            {/* User Table / Cards */}
             <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--color-card)] shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+                {/* Desktop view */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-[var(--color-card)] bg-[var(--color-card)]/50">
@@ -196,6 +197,56 @@ const User = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden divide-y divide-[var(--color-card)]">
+                    {Array.isArray(userList) && userList.map((user, index) => (
+                        <div key={user._id} className={`p-4 space-y-4 hover:bg-[var(--color-card)]/30 transition-colors ${!user.isActive ? "opacity-60 grayscale" : ""}`}>
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <h4 className="font-bold text-white text-lg">{user.name}</h4>
+                                    <p className="text-sm text-[var(--text-card)]">{user.email}</p>
+                                </div>
+                                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${user.isBlocked
+                                    ? "bg-red-500/20 text-red-400"
+                                    : user.isActive
+                                        ? "bg-green-500/20 text-green-400"
+                                        : "bg-yellow-500/20 text-yellow-400"
+                                    }`}>
+                                    {user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Phone</p>
+                                    <p className="text-sm text-[var(--text-secondary)]">{user.phone || "—"}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Role</p>
+                                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)]">
+                                        {user.role}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 pt-2">
+                                <button
+                                    onClick={() => handleEdit(user)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl text-xs font-bold transition-all active:scale-95"
+                                >
+                                    <Edit size={14} /> Edit
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(user._id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-xs font-bold transition-all active:scale-95"
+                                >
+                                    <Trash2 size={14} /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 

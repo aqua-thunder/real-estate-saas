@@ -138,4 +138,44 @@ const getAllInvoices = async (req, res) => {
     }
 };
 
-module.exports = { createInvoice, getAllInvoices };
+// ────────────────────────────────────────────────────────────
+// GET /api/invoice/invoice/:id
+// Delete specific invoice
+// ────────────────────────────────────────────────────────────
+
+const deleteInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        const role = req.user.role;
+
+        if (role !== "MANAGER") {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const invoice = await Invoice.findById(id);
+        if (!invoice) {
+            return res.status(404).json({ message: "Invoice not found" });
+        }
+
+        const property = await Property.findById(invoice.propertyId);
+        if (!property) {
+            return res.status(404).json({ message: "Property not found" });
+        }
+
+        if (property.manager?.toString() !== userId.toString()) {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        await invoice.deleteOne();
+        return res.status(200).json({ message: "Invoice deleted successfully" });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Failed to delete invoice",
+            error: error.message,
+        });
+    }
+}
+
+
+module.exports = { createInvoice, getAllInvoices, deleteInvoice };

@@ -20,11 +20,14 @@ import {
     Wrench,
     Tag,
     Loader2,
+    Trash,
 } from "lucide-react";
 import Button from "../components/ui/button";
 import Input from "../components/ui/Input";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Invoice = () => {
     const { user, token } = useAuth();
@@ -39,18 +42,45 @@ const Invoice = () => {
     const [submitting, setSubmitting] = useState(false);
     const [tenants, setTenants] = useState([]);
 
+    // Helper to get default month and due date
+    const getDefaultMonth = () => {
+        return new Date().toLocaleString("en-IN", { month: "long", year: "numeric" });
+    };
+
+    const getDefaultDueDate = () => {
+        const d = new Date();
+        d.setDate(5);
+        return d.toISOString().split("T")[0];
+    };
+
     // Form state for creating invoice
     const initialFormData = {
         tenantId: "",
-        month: "",
+        month: getDefaultMonth(),
         rent: "",
         utilityCharges: "",
         maintenanceCharges: "",
-        lateFee: "",
-        dueDate: "",
+        lateFee: "0",
+        dueDate: getDefaultDueDate(),
         notes: "",
     };
     const [formData, setFormData] = useState(initialFormData);
+
+    // ── Handle tenant change (auto-fill) ───────────
+    const handleTenantChange = (tenantId) => {
+        const tenant = tenants.find((t) => (t.userId?._id || t._id) === tenantId);
+        if (tenant) {
+            setFormData((prev) => ({
+                ...prev,
+                tenantId,
+                rent: tenant.rent || "",
+                maintenanceCharges: tenant.maintenanceCost || "",
+                lateFee: tenant.lateFees || 0,
+            }));
+        } else {
+            setFormData((prev) => ({ ...prev, tenantId }));
+        }
+    };
 
     // ── Fetch invoices ─────────────────────────────
     const fetchInvoices = async () => {
@@ -149,7 +179,121 @@ const Invoice = () => {
         }
     };
 
-    // ── Helper values ──────────────────────────────
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:7000/api/invoice/invoice/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log(response);
+
+            if (response.ok) {
+                toast.success("Invoice deleted successfully");
+                fetchInvoices();
+            } else {
+                toast.error("Failed to delete invoice");
+            }
+        } catch (error) {
+            toast.error("Something went wrong while deleting the invoice");
+            console.error("Error deleting invoice:", error);
+        }
+    };
+
+    const downloadInvoicePDF = (inv) => {
+        const doc = new jsPDF();
+        const tenantName = getTenantName(inv);
+        const unitNumber = getUnitNumber(inv);
+        const total = getTotal(inv);
+
+        // Header
+        doc.setFillColor(30, 41, 59); // Dark slate
+        doc.rect(0, 0, 210, 40, "F");
+
+        doc.setFontSize(24);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont("helvetica", "bold");
+        doc.text("INVOICE", 105, 20, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(inv.invoiceNumber || "PROVISIONAL INVOICE", 105, 30, { align: "center" });
+
+        let currentY = 55;
+
+        // Section Helper
+        const drawSectionHeader = (title, y) => {
+            doc.setFontSize(12);
+            doc.setTextColor(30, 41, 59);
+            doc.setFont("helvetica", "bold");
+            doc.text(title.toUpperCase(), 20, y);
+            doc.setDrawColor(226, 232, 240);
+            doc.line(20, y + 2, 190, y + 2);
+            return y + 10;
+        };
+
+        // 1. Details
+        currentY = drawSectionHeader("Invoice Details", currentY);
+        autoTable(doc, {
+            startY: currentY,
+            body: [
+                ["Tenant Name", tenantName],
+                ["Property", inv.propertyId?.propertyName || "N/A"],
+                ["Unit / Floor", `${unitNumber} / ${inv.unitId?.floorId?.name || "N/A"}`],
+                ["Billing Month", inv.month],
+                ["Due Date", formatDate(inv.dueDate)],
+                ["Status", inv.status],
+            ],
+            theme: "plain",
+            styles: { fontSize: 10, cellPadding: 3 },
+            columnStyles: { 0: { fontStyle: "bold", width: 50 } },
+            margin: { left: 20 },
+        });
+
+        // 2. Charges Breakdown
+        currentY = doc.lastAutoTable.finalY + 15;
+        currentY = drawSectionHeader("Charges Breakdown", currentY);
+        autoTable(doc, {
+            startY: currentY,
+            head: [["Description", "Amount (INR)"]],
+            body: [
+                ["Monthly Rent", `INR ${inv.rent?.toLocaleString()}`],
+                ["Maintenance Charges", `INR ${inv.maintenanceCharges?.toLocaleString()}`],
+                ["Utility Charges", `INR ${inv.utilityCharges?.toLocaleString()}`],
+                ["Late Fee", `INR ${inv.lateFee?.toLocaleString()}`],
+            ],
+            foot: [["Total Payable", `INR ${total?.toLocaleString()}`]],
+            theme: "striped",
+            headStyles: { fillColor: [30, 41, 59], textColor: 255 },
+            footStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: "bold" },
+            styles: { fontSize: 10, cellPadding: 4 },
+            margin: { left: 20 },
+        });
+
+        // Notes
+        if (inv.notes) {
+            currentY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("Notes:", 20, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(inv.notes, 20, currentY + 5);
+        }
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
+            doc.text(`Generated on ${new Date().toLocaleString()} | Real Estate SaaS`, 105, 290, { align: "center" });
+        }
+
+        doc.save(`${inv.invoiceNumber || "Invoice"}_${tenantName.replace(/\s+/g, "_")}.pdf`);
+        toast.success("Invoice downloaded successfully");
+    };
     const paidCount = invoices.filter((i) => i.status === "Paid").length;
     const unpaidCount = invoices.filter((i) => i.status === "Unpaid").length;
     const overdueCount = invoices.filter((i) => i.status === "Overdue").length;
@@ -348,14 +492,11 @@ const Invoice = () => {
                                             >
                                                 <td className="px-5 py-4">
                                                     <span className="font-mono text-xs font-semibold text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2.5 py-1 rounded-lg">
-                                                        {inv.invoiceNumber || `INV-${String(index + 1).padStart(3, "0")}`}
+                                                        {`INV-${String(index + 1).padStart(3, "0")}`}
                                                     </span>
                                                 </td>
                                                 <td className="px-5 py-4">
                                                     <div className="flex items-center gap-2.5">
-                                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white text-xs font-bold shadow">
-                                                            {tenantName[0]}
-                                                        </div>
                                                         <span className="text-sm font-medium text-white">
                                                             {tenantName}
                                                         </span>
@@ -400,11 +541,21 @@ const Invoice = () => {
                                                             <Eye size={16} />
                                                         </button>
                                                         <button
+                                                            onClick={() => downloadInvoicePDF(inv)}
                                                             title="Download"
                                                             className="p-2 rounded-lg text-[var(--text-card)] hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-150"
                                                         >
                                                             <Download size={16} />
                                                         </button>
+                                                        {role === "manager" && (
+                                                            <button
+                                                                title="Delete"
+                                                                onClick={() => handleDelete(inv._id)}
+                                                                className="p-2 rounded-lg text-[var(--text-card)] hover:text-violet-400 hover:bg-violet-500/10 transition-all duration-150"
+                                                            >
+                                                                <Trash size={16} />
+                                                            </button>
+                                                        )}
                                                         {role === "tenant" && !isPaid && (
                                                             <button
                                                                 title="Pay"
@@ -497,7 +648,10 @@ const Invoice = () => {
                                         >
                                             <Eye size={14} /> View
                                         </button>
-                                        <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-[var(--text-card)] hover:text-emerald-400 transition-all text-xs font-medium border border-white/5 hover:border-emerald-500/20">
+                                        <button
+                                            onClick={() => downloadInvoicePDF(inv)}
+                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-[var(--text-card)] hover:text-emerald-400 transition-all text-xs font-medium border border-white/5 hover:border-emerald-500/20"
+                                        >
                                             <Download size={14} /> Download
                                         </button>
                                         {role === "tenant" && !isPaid && (
@@ -550,7 +704,7 @@ const Invoice = () => {
                                         <select
                                             required
                                             value={formData.tenantId}
-                                            onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
+                                            onChange={(e) => handleTenantChange(e.target.value)}
                                             className="w-full bg-[var(--bg-main)] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--text-secondary)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors appearance-none"
                                         >
                                             <option value="">Select Tenant</option>
@@ -637,6 +791,22 @@ const Invoice = () => {
                                         rows={2}
                                         className="w-full bg-[var(--bg-main)] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors resize-none"
                                     />
+                                </div>
+
+                                {/* Total Preview */}
+                                <div className="sm:col-span-2 pt-2">
+                                    <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/10">
+                                        <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                                            <Banknote size={16} className="text-[var(--color-primary)]" />
+                                            <span className="text-sm font-semibold">Total Amount</span>
+                                        </div>
+                                        <span className="text-xl font-bold text-[var(--color-primary)]">
+                                            ₹{((Number(formData.rent) || 0) +
+                                                (Number(formData.utilityCharges) || 0) +
+                                                (Number(formData.maintenanceCharges) || 0) +
+                                                (Number(formData.lateFee) || 0)).toLocaleString()}
+                                        </span>
+                                    </div>
                                 </div>
 
                             </div>
@@ -767,7 +937,10 @@ const Invoice = () => {
                                 Close
                             </button>
 
-                            <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/10">
+                            <button
+                                onClick={() => downloadInvoicePDF(selectedInvoice)}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+                            >
                                 <Download size={15} />
                                 Download
                             </button>

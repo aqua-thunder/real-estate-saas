@@ -202,7 +202,9 @@ const RevenueReport = () => {
                     </div>
                     <button className="px-4 py-2 hover:bg-white/5 rounded-xl transition-colors text-sm font-semibold">See All</button>
                 </div>
-                <div className="overflow-x-auto">
+
+                {/* Desktop view */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="text-[10px] uppercase tracking-[0.2em] font-black text-white/30">
                             <tr>
@@ -231,6 +233,25 @@ const RevenueReport = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile / Tablet view */}
+                <div className="lg:hidden divide-y divide-white/[0.05]">
+                    {transactions.map((t, i) => (
+                        <div key={i} className="p-6 space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <div className="font-bold text-white text-lg">{t.tenant}</div>
+                                    <div className="text-xs text-white/40 mt-1">{t.date} • Unit {t.unit}</div>
+                                </div>
+                                <StatusPill status={t.status} />
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <div className="text-[10px] font-mono text-white/30 bg-white/5 px-2 py-1 rounded">{t.invoice}</div>
+                                <div className="font-black text-xl text-white">{t.amount}</div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
         </div>

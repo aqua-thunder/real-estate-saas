@@ -193,9 +193,10 @@ const Location = () => {
                 </Button>
             </div>
 
-            {/* Location Table */}
+            {/* Location Table / Cards */}
             <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--color-card)] shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
+                {/* Desktop View */}
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-[var(--color-card)] bg-[var(--color-card)]/50">
@@ -246,6 +247,46 @@ const Location = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden divide-y divide-[var(--color-card)]">
+                    {Array.isArray(locations) && locations.map((item, index) => (
+                        <div key={item._id} className={`p-4 space-y-4 hover:bg-[var(--color-card)]/30 transition-colors ${!item.isActive ? "opacity-60 grayscale" : ""}`}>
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <h4 className="font-bold text-white text-lg flex items-center gap-2">
+                                        <MapPin size={16} className="text-[var(--color-primary)]" />
+                                        {item.city}
+                                    </h4>
+                                    <p className="text-sm text-[var(--text-card)]">{item.state}, {item.country}</p>
+                                </div>
+                                <select
+                                    value={item.isActive ? "active" : "disabled"}
+                                    onChange={(e) => handleStatusChange(item._id, e.target.value)}
+                                    className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] cursor-pointer ${item.isActive ? "text-green-400" : "text-red-400"}`}
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="disabled">Disable</option>
+                                </select>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 pt-2">
+                                <button
+                                    onClick={() => handleEdit(item)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl text-xs font-bold transition-all active:scale-95"
+                                >
+                                    <Edit size={14} /> Edit
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item._id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-xs font-bold transition-all active:scale-95"
+                                >
+                                    <Trash2 size={14} /> Delete
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 

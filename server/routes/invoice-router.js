@@ -11,4 +11,7 @@ router.post("/", authMiddleware, roleMiddleware("MANAGER"), invoiceController.cr
 // Get Invoices (MANAGER sees all they manage, TENANT sees their own)
 router.get("/invoices", authMiddleware, roleMiddleware("MANAGER", "TENANT"), invoiceController.getAllInvoices);
 
+// Delete specific invoice (MANAGER only)
+router.delete("/invoice/:id", authMiddleware, roleMiddleware("MANAGER"), invoiceController.deleteInvoice);
+
 module.exports = router;
