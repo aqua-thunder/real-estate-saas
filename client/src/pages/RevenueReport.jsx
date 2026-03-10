@@ -74,7 +74,7 @@ const RevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-6 md:p-2 space-y-10 selection:bg-[var(--color-primary)]/30">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-6 md:p-0 space-y-10 selection:bg-[var(--color-primary)]/30">
 
             {/* --- HEADER --- */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">

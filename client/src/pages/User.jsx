@@ -14,19 +14,35 @@ const initialState = {
 };
 
 const User = () => {
-    const { users } = useAuth();
+    const { users, user: currentUser } = useAuth();
     const { toast } = useToast();
 
     const [userList, setUserList] = useState([]);
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState({
+        ...initialState,
+        role: currentUser?.role === "MANAGER" ? "TENANT" : "TENANT"
+    });
     const [openForm, setOpenForm] = useState(false);
     const [editId, setEditId] = useState(null);
 
     const isEditing = Boolean(editId);
 
     useEffect(() => {
-        if (Array.isArray(users)) setUserList(users);
-    }, [users]);
+        if (Array.isArray(users)) {
+            if (currentUser?.role === "MANAGER") {
+                setUserList(users.filter(u => u.role === "TENANT"));
+            } else {
+                setUserList(users);
+            }
+        }
+    }, [users, currentUser]);
+
+    // Update role if currentUser is Manager
+    useEffect(() => {
+        if (currentUser?.role === "MANAGER" && !isEditing) {
+            setFormData(prev => ({ ...prev, role: "TENANT" }));
+        }
+    }, [currentUser, isEditing]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -326,14 +342,21 @@ const User = () => {
                                     name="role"
                                     value={formData.role}
                                     onChange={handleChange}
-                                    className="w-full bg-[var(--bg-card)] border border-[var(--color-card)] rounded-lg px-4 py-2.5 text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"
+                                    className={`w-full bg-[var(--bg-card)] border border-[var(--color-card)] rounded-lg px-4 py-2.5 text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition ${currentUser?.role === "MANAGER" ? "opacity-70 cursor-not-allowed" : ""}`}
                                     required
+                                    disabled={currentUser?.role === "MANAGER"}
                                 >
-                                    <option value="TENANT">Tenant</option>
-                                    <option value="OWNER">Owner</option>
-                                    <option value="MANAGER">Manager</option>
-                                    <option value="MAINTENANCE_STAFF">Maintenance Staff</option>
-                                    <option value="SUPER_ADMIN">Super Admin</option>
+                                    {currentUser?.role === "MANAGER" ? (
+                                        <option value="TENANT">Tenant</option>
+                                    ) : (
+                                        <>
+                                            <option value="TENANT">Tenant</option>
+                                            <option value="OWNER">Owner</option>
+                                            <option value="MANAGER">Manager</option>
+                                            <option value="MAINTENANCE_STAFF">Maintenance Staff</option>
+                                            <option value="SUPER_ADMIN">Super Admin</option>
+                                        </>
+                                    )}
                                 </select>
                             </div>
 

@@ -356,8 +356,7 @@ const FloorUnit = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-[var(--text-secondary)] tracking-tight">Floor & Unit Management</h1>
-          <p className="text-[var(--text-card)] font-medium mt-1">Organize your property structure and individual units</p>
+          <h1 className="text-2xl font-black text-[var(--text-secondary)] tracking-tight">Floor & Unit Management</h1>
         </div>
         <div className="flex gap-2 p-1 bg-[var(--color-card)]/50 rounded-2xl w-fit">
           <button

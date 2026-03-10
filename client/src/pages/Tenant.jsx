@@ -423,7 +423,7 @@ const Tenant = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-2 font-[var(--font-body)] relative">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-0 font-[var(--font-body)] relative">
 
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -606,37 +606,44 @@ const Tenant = () => {
                 {/* Mobile View (Card Layout) */}
                 <div className="md:hidden p-4 space-y-4">
                     {loading ? (
-                        <div className="p-20 text-center animate-pulse text-[var(--text-card)]">Syncing records...</div>
+                        <div className="p-20 text-center animate-pulse text-[var(--text-card)] font-black uppercase tracking-widest text-[10px]">Syncing database...</div>
                     ) : filteredTenants.length > 0 ? (
                         filteredTenants.map((tenant) => (
-                            <div key={tenant._id} className="bg-[var(--color-card)]/20 rounded-2xl border border-[var(--color-card)] p-6 space-y-4 hover:bg-[var(--color-card)]/30 transition-colors">
+                            <div key={tenant._id} className="bg-[var(--bg-card)]/40 border border-white/5 rounded-3xl p-6 space-y-5 backdrop-blur-sm shadow-xl hover:bg-white/[0.03] transition-all">
                                 <div className="flex justify-between items-start">
-                                    <div>
-                                        <h4 className="font-bold text-white text-lg">{tenant.userId?.name || tenant.name}</h4>
-                                        <div className="flex items-center gap-2 text-xs text-[var(--text-card)] mt-1">
-                                            <MapPin size={12} />
-                                            Unit {tenant.unitId?.unitNumber || "N/A"} • {tenant.propertyId?.propertyName}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-black text-lg shadow-lg">
+                                            {tenant.userId?.name ? tenant.userId.name[0] : (tenant.name ? tenant.name[0] : "T")}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-white text-lg tracking-tight leading-tight">{tenant.userId?.name || tenant.name}</h4>
+                                            <div className="flex items-center gap-2 text-[10px] text-[var(--text-card)] font-black uppercase tracking-widest mt-1">
+                                                <Home size={10} className="text-[var(--color-primary)]" />
+                                                Unit {tenant.unitId?.unitNumber || "N/A"}
+                                            </div>
                                         </div>
                                     </div>
                                     <StatusPill status={tenant.leaseStatus || tenant.status} />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 py-3 border-y border-[var(--color-card)]">
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Monthly Rent</p>
-                                        <p className="text-lg font-black text-white">₹{tenant.rent?.toLocaleString()}</p>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Dues/Balance</p>
-                                        <p className={`text-lg font-black ${tenant.pending > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                            ₹{tenant.pending?.toLocaleString() || 0}
-                                        </p>
+                                <div className="p-4 bg-white/5 rounded-2xl">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Monthly Rent</p>
+                                            <p className="text-base font-black text-white">₹{tenant.rent?.toLocaleString()}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Outstanding</p>
+                                            <p className={`text-base font-black ${tenant.pending > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                                                ₹{tenant.pending?.toLocaleString() || 0}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+                                <div className="flex items-center justify-between gap-4 pt-1">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Lease End</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Lease Expires</p>
                                         <p className="text-xs font-bold text-[var(--text-secondary)]">{formatDate(tenant.leaseEnd)}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -645,19 +652,19 @@ const Tenant = () => {
                                                 setSelectedTenant(tenant);
                                                 setOpenViewDetails(true);
                                             }}
-                                            className="p-3 bg-blue-500/10 text-blue-500 rounded-2xl transition-all active:scale-95"
+                                            className="p-3 bg-white/5 text-[var(--text-card)] hover:text-white rounded-2xl transition-all border border-white/5"
                                         >
                                             <Eye size={18} />
                                         </button>
                                         <button
                                             onClick={() => handleEdit(tenant)}
-                                            className="p-3 bg-blue-500/10 text-blue-500 rounded-2xl transition-all active:scale-95"
+                                            className="p-3 bg-blue-500/10 text-blue-500 rounded-2xl transition-all border border-blue-500/10"
                                         >
                                             <Edit size={18} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(tenant._id)}
-                                            className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all active:scale-95"
+                                            className="p-3 bg-red-500/10 text-red-500 rounded-2xl transition-all border border-red-500/10"
                                         >
                                             <Trash2 size={18} />
                                         </button>
@@ -666,9 +673,9 @@ const Tenant = () => {
                             </div>
                         ))
                     ) : (
-                        <div className="p-20 text-center text-[var(--text-card)]">
-                            <Users size={40} className="mx-auto text-white/10 mb-3" />
-                            <p className="text-[var(--text-card)] text-sm">No tenants identified.</p>
+                        <div className="p-20 text-center text-[var(--text-card)] flex flex-col items-center justify-center space-y-4">
+                            <Users size={48} className="text-white/10" />
+                            <p className="text-xs font-black uppercase tracking-widest text-[var(--text-card)]">No tenants identified</p>
                         </div>
                     )}
                 </div>

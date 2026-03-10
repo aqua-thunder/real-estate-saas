@@ -139,11 +139,15 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (token && user) {
-            // Only fetch admin data if user is SUPER_ADMIN
-            if (user.role === "SUPER_ADMIN") {
+            // Fetch relevant data based on user role
+            if (user.role === "SUPER_ADMIN" || user.role === "MANAGER" || user.role === "OWNER") {
                 getLocation();
-                getOwners();
                 getUsers();
+            }
+
+            // Only fetch owners for SUPER_ADMIN
+            if (user.role === "SUPER_ADMIN") {
+                getOwners();
             }
         }
     }, [token, user])

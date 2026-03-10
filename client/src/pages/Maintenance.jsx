@@ -174,10 +174,10 @@ export default function Maintenance() {
     );
 
     return (
-        <div className="p-4 md:p-2 bg-[var(--bg-main)] min-h-screen text-[var(--text-secondary)] font-[var(--font-body)]">
+        <div className="p-4 md:p-0 bg-[var(--bg-main)] min-h-screen text-[var(--text-secondary)] font-[var(--font-body)]">
 
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-5">
                 {/* Page Header Area */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="space-y-1">
@@ -202,13 +202,13 @@ export default function Maintenance() {
                 ].map((stat, i) => (
                     <div key={i} className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--color-main)]/30">
                         <p className="text-xs font-bold text-[var(--text-card)] uppercase tracking-wider">{stat.label}</p>
-                        <p className="text-2xl font-bold text-[var(--text-primary)] mt-1">{stat.value}</p>
+                        <p className="text-2xl font-bold text-[var(--text-secondary)] mt-1">{stat.value}</p>
                     </div>
                 ))}
             </div>
 
             {/* Filters */}
-            <div className="bg-[var(--bg-card)] p-4 rounded-2xl border border-[var(--color-main)]/30 shadow-md mb-8 flex flex-col md:flex-row gap-4 items-center">
+            <div className="bg-[var(--bg-card)] p-2 rounded-2xl border border-[var(--color-main)]/30 shadow-md mb-8 flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-1 w-full">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" size={18} />
                     <input
@@ -252,41 +252,36 @@ export default function Maintenance() {
                     <p className="text-[var(--text-card)]">Try adjusting your filters or create a new request.</p>
                 </div>
             ) : (
-                <div className="grid gap-4">
+                <div className="grid gap-4 md:gap-6">
                     {filteredRequests.map((req) => (
-                        <div key={req._id} className="bg-[var(--bg-card)] hover:bg-[var(--bg-card)]/80 p-5 rounded-2xl border border-[var(--color-main)]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all group">
+                        <div key={req._id} className="bg-[var(--bg-card)] hover:bg-[var(--bg-card)]/80 p-5 rounded-[2rem] border border-[var(--color-main)]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all group shadow-sm">
 
                             <div className="flex items-start gap-4 flex-1">
-                                <div className={`p-3 rounded-xl border ${getStatusStyle(req.status)}`}>
-                                    {req.status === "Pending" ? <Clock size={24} /> :
-                                        req.status === "In Progress" ? <Clock className="animate-pulse" size={24} /> :
-                                            req.status === "Completed" ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
-                                </div>
-                                <div className="space-y-1">
-                                    <h4 className="font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--color-primary)] transition-colors">{req.title}</h4>
-                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-card)]">
-                                        <span className="flex items-center gap-1.5"><Calendar size={14} /> {new Date(req.createdAt).toLocaleDateString()}</span>
-                                        <span className="flex items-center gap-1.5"><Building2 size={14} /> {req.propertyId?.propertyName || "Common Area"}</span>
-                                        <span className="flex items-center gap-1.5"><User size={14} /> Unit: {req.unitId?.unitNumber || "N/A"}</span>
-                                        <span className={`font-bold ${getPriorityStyle(req.priority)}`}>• {req.priority} Priority</span>
+                                <div className="space-y-1 overflow-hidden">
+                                    <h4 className="font-bold text-lg text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors truncate">{req.title}</h4>
+                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">
+                                        <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(req.createdAt).toLocaleDateString()}</span>
+                                        <span className="flex items-center gap-1.5"><Building2 size={12} /> {req.propertyId?.propertyName || "Common Area"}</span>
+                                        <span className="flex items-center gap-1.5"><User size={12} /> Unit: {req.unitId?.unitNumber || "N/A"}</span>
+                                        <span className={`font-black ${getPriorityStyle(req.priority)}`}>• {req.priority} Priority</span>
                                     </div>
-                                    <p className="text-sm line-clamp-1 text-[var(--text-card)]/80 mt-2">{req.description}</p>
+                                    <p className="text-sm line-clamp-2 text-[var(--text-card)]/80 mt-2 font-medium leading-relaxed">{req.description}</p>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col md:items-end gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--color-main)]/20">
+                            <div className="flex flex-col md:items-end gap-3 w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--color-main)]/20">
                                 <div className="flex items-center gap-3">
                                     {role === "MANAGER" && req.status !== "Completed" && (
                                         <>
-                                            <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "In Progress")} icon={<Plus size={20} />} >Start Fixing</Button>
-                                            <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "Completed")} icon={<Plus size={20} />} >Finish</Button>
+                                            <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "In Progress")} className="text-xs py-2 px-4 h-auto" >Start Fixing</Button>
+                                            <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "Completed")} className="text-xs py-2 px-4 h-auto" >Finish</Button>
                                         </>
                                     )}
-                                    <button className="p-2.5 rounded-xl hover:bg-[var(--bg-main)] text-[var(--text-card)] transition-colors border border-transparent hover:border-[var(--color-main)]/20">
-                                        <Eye size={20} />
+                                    <button className="p-3 rounded-xl bg-white/5 text-[var(--text-card)] hover:text-white transition-colors border border-white/5 hover:border-[var(--color-main)]/20">
+                                        <Eye size={18} />
                                     </button>
                                 </div>
-                                <div className={`text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full border ${getStatusStyle(req.status)}`}>
+                                <div className={`inline-block self-start md:self-auto text-[10px] uppercase font-black tracking-[0.15em] px-4 py-1.5 rounded-full border ${getStatusStyle(req.status)}`}>
                                     {req.status}
                                 </div>
                             </div>

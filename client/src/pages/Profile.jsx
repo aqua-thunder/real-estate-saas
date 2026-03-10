@@ -128,9 +128,9 @@ const Profile = () => {
 
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 md:p-2">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 md:p-0">
             {/* Page Header Area */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
                         Profile Information

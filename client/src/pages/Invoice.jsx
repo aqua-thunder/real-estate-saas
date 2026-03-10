@@ -22,7 +22,7 @@ import {
     Loader2,
     Trash,
 } from "lucide-react";
-import Button from "../components/ui/button";
+import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
@@ -348,24 +348,18 @@ const Invoice = () => {
         (inv.rent || 0) + (inv.utilityCharges || 0) + (inv.maintenanceCharges || 0) + (inv.lateFee || 0);
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2">
 
             {/* ── HEADER ─────────────────────────────────── */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
-                        <FileText size={22} className="text-[var(--color-primary)]" />
-                    </div>
                     <div>
                         <h1
                             className="text-2xl font-bold text-white"
                             style={{ fontFamily: "var(--font-heading)" }}
                         >
-                            Invoices
+                            Invoice Management
                         </h1>
-                        <p className="text-xs text-[var(--text-card)] mt-0.5">
-                            Manage and track all billing records
-                        </p>
                     </div>
                 </div>
 
@@ -575,7 +569,7 @@ const Invoice = () => {
                     </div>
 
                     {/* Mobile Invoice Cards */}
-                    <div className="md:hidden flex flex-col gap-4">
+                    <div className="md:hidden flex flex-col gap-4 p-1">
                         {invoices.map((inv, index) => {
                             const total = getTotal(inv);
                             const isPaid = inv.status === "Paid";
@@ -584,79 +578,79 @@ const Invoice = () => {
                             return (
                                 <div
                                     key={inv._id || index}
-                                    className="bg-[var(--color-card)] border border-white/5 rounded-2xl p-4 shadow-lg"
+                                    className="bg-[var(--color-card)]/40 border border-white/5 rounded-3xl p-6 shadow-xl backdrop-blur-sm hover:bg-white/[0.03] transition-all"
                                 >
                                     {/* Card Top */}
-                                    <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-start justify-between mb-5">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-black text-lg shadow-lg">
                                                 {tenantName[0]}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-semibold text-white">{tenantName}</p>
-                                                <p className="text-xs text-[var(--text-card)]">Unit {getUnitNumber(inv)}</p>
+                                                <p className="text-base font-bold text-white tracking-tight">{tenantName}</p>
+                                                <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-card)] font-black uppercase tracking-widest mt-0.5">
+                                                    <Home size={10} /> unit {getUnitNumber(inv)}
+                                                </div>
                                             </div>
                                         </div>
                                         <span
-                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${isPaid
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isPaid
                                                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                                 : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
                                                 }`}
                                         >
-                                            <span className={`w-1.5 h-1.5 rounded-full ${isPaid ? "bg-emerald-400" : "bg-amber-400"}`} />
+                                            <span className={`w-1.5 h-1.5 rounded-full ${isPaid ? "bg-emerald-400" : "bg-amber-400"} animate-pulse`} />
                                             {inv.status}
                                         </span>
                                     </div>
 
-                                    {/* Card Info */}
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="font-mono text-xs font-semibold text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-1 rounded-lg">
+                                    {/* Card Info Bar */}
+                                    <div className="flex items-center justify-between mb-5 bg-white/5 p-3 rounded-2xl">
+                                        <span className="font-mono text-[10px] font-black text-[var(--color-primary)] tracking-wider">
                                             {inv.invoiceNumber || `INV-${String(index + 1).padStart(3, "0")}`}
                                         </span>
-                                        <div className="flex items-center gap-1.5 text-xs text-[var(--text-card)]">
-                                            <Calendar size={13} />
+                                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--text-card)] uppercase">
+                                            <Calendar size={12} className="text-[var(--color-primary)]" />
                                             {inv.month}
                                         </div>
                                     </div>
 
-                                    <div className="h-px bg-white/5 mb-3" />
-
-                                    <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-[var(--text-card)]">Rent</span>
-                                            <span className="font-medium text-white">₹{(inv.rent || 0).toLocaleString()}</span>
+                                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 mb-6">
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Rent</span>
+                                            <p className="text-sm font-bold text-white">₹{(inv.rent || 0).toLocaleString()}</p>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-[var(--text-card)]">Utility</span>
-                                            <span className="font-medium text-white">₹{(inv.utilityCharges || 0).toLocaleString()}</span>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Utility</span>
+                                            <p className="text-sm font-bold text-white">₹{(inv.utilityCharges || 0).toLocaleString()}</p>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-[var(--text-card)]">Due Date</span>
-                                            <span className="font-medium text-white">{formatDate(inv.dueDate)}</span>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Due Date</span>
+                                            <p className="text-sm font-bold text-[var(--text-secondary)]">{formatDate(inv.dueDate)}</p>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-[var(--text-card)]">Total</span>
-                                            <span className="font-bold text-[var(--color-primary)]">₹{total.toLocaleString()}</span>
+                                        <div className="space-y-1">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-primary)]">Total</span>
+                                            <p className="text-lg font-black text-white">₹{total.toLocaleString()}</p>
                                         </div>
                                     </div>
 
                                     {/* Card Actions */}
-                                    <div className="flex gap-2">
+                                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
                                         <button
                                             onClick={() => setSelectedInvoice(inv)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] hover:text-[var(--color-primary)] transition-all text-xs font-medium border border-white/5 hover:border-[var(--color-primary)]/20"
+                                            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] hover:text-white transition-all text-xs font-bold border border-white/5"
                                         >
-                                            <Eye size={14} /> View
+                                            <Eye size={14} /> View Details
                                         </button>
                                         <button
                                             onClick={() => downloadInvoicePDF(inv)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/5 hover:bg-emerald-500/10 text-[var(--text-card)] hover:text-emerald-400 transition-all text-xs font-medium border border-white/5 hover:border-emerald-500/20"
+                                            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 text-[var(--color-primary)] transition-all text-xs font-bold border border-[var(--color-primary)]/20 shadow-lg shadow-[var(--color-primary)]/5"
                                         >
-                                            <Download size={14} /> Download
+                                            <Download size={14} /> Get PDF
                                         </button>
                                         {role === "tenant" && !isPaid && (
-                                            <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-violet-500/10 text-violet-400 transition-all text-xs font-medium border border-violet-500/20">
-                                                <CreditCard size={14} /> Pay
+                                            <button className="col-span-2 flex items-center justify-center gap-2 py-3 mt-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 hover:from-violet-600/30 hover:to-purple-600/30 text-violet-400 transition-all text-xs font-black uppercase tracking-widest border border-violet-500/30">
+                                                <CreditCard size={14} /> Pay Balance
                                             </button>
                                         )}
                                     </div>
