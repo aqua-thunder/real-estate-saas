@@ -250,8 +250,8 @@ const Property = () => {
 
             {/* List Table container */}
             <div className="bg-[var(--bg-card)]/40 backdrop-blur-md rounded-[2rem] lg:rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative">
-                {/* Desktop View */}
-                <div className="hidden lg:block overflow-x-auto">
+                {/* Desktop/Tablet View */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
@@ -347,13 +347,13 @@ const Property = () => {
                     </table>
                 </div>
 
-                {/* Mobile/Tablet Card View */}
-                <div className="lg:hidden divide-y divide-[var(--color-card)]">
+                {/* Mobile Card View */}
+                <div className="md:hidden p-4 space-y-4">
                     {loading ? (
                         <div className="p-10 text-center text-[var(--text-card)] animate-pulse">Synchronizing database...</div>
                     ) : filteredProperties.length > 0 ? (
                         filteredProperties.map((property) => (
-                            <div key={property._id} className="p-5 space-y-4 hover:bg-[var(--color-card)]/10 transition-all">
+                            <div key={property._id} className="p-5 space-y-4 bg-[var(--color-card)]/10 border border-[var(--color-card)] rounded-[1.5rem] hover:bg-[var(--color-card)]/20 transition-all shadow-sm">
                                 <div className="flex justify-between items-start">
                                     <div className="space-y-1">
                                         <h4 className="font-bold text-white text-lg group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</h4>

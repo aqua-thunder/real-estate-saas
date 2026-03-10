@@ -507,7 +507,7 @@ const Tenant = () => {
             {/* Tenants Data Display */}
             <div className="bg-[var(--bg-card)] rounded-[2rem] border border-[var(--color-card)] shadow-xl overflow-hidden min-h-[400px]">
                 {/* Desktop & Tablet View (Standard Table) */}
-                <div className="hidden lg:block overflow-x-auto">
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
@@ -532,12 +532,12 @@ const Tenant = () => {
                                 filteredTenants.map((tenant) => (
                                     <tr key={tenant._id} className="group hover:bg-[var(--color-card)]/20 transition-all duration-300">
                                         <td className="p-6">
-                                            <div className="font-bold text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors">{tenant.name}</div>
+                                            <div className="font-bold text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors">{tenant.userId?.name || tenant.name}</div>
                                             <div className="text-[10px] text-[var(--text-card)] font-black uppercase mt-1">ID: ...{tenant._id.slice(-6)}</div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-sm font-medium text-[var(--text-secondary)]">{tenant.email}</div>
-                                            <div className="text-xs text-[var(--text-card)] mt-0.5">{tenant.phone}</div>
+                                            <div className="text-sm font-medium text-[var(--text-secondary)]">{tenant.userId?.email || tenant.email}</div>
+                                            <div className="text-xs text-[var(--text-card)] mt-0.5">{tenant.userId?.phone || tenant.phone}</div>
                                         </td>
                                         <td className="p-6">
                                             <div className="flex items-center gap-2">
@@ -547,19 +547,19 @@ const Tenant = () => {
                                             <div className="text-xs text-[var(--text-card)] mt-1">{tenant.propertyId?.propertyName}</div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-sm font-bold text-[var(--text-secondary)]">{formatDate(tenant.leaseStartDate)}</div>
-                                            <div className="text-[10px] text-[var(--text-card)] font-medium mt-1 uppercase">to {formatDate(tenant.leaseEndDate)}</div>
+                                            <div className="text-sm font-bold text-[var(--text-secondary)]">{formatDate(tenant.leaseStart)}</div>
+                                            <div className="text-[10px] text-[var(--text-card)] font-medium mt-1 uppercase">to {formatDate(tenant.leaseEnd)}</div>
                                         </td>
                                         <td className="p-6">
-                                            <div className="text-lg font-black text-[var(--text-secondary)] tracking-tight">₹{tenant.rentAmount?.toLocaleString()}</div>
+                                            <div className="text-lg font-black text-[var(--text-secondary)] tracking-tight">₹{tenant.rent?.toLocaleString()}</div>
                                             <div className="text-[10px] text-[var(--text-card)] font-bold uppercase">Monthly</div>
                                         </td>
                                         <td className="p-6">
-                                            <StatusPill status={tenant.status} />
+                                            <StatusPill status={tenant.leaseStatus || tenant.status} />
                                         </td>
                                         <td className="p-6">
-                                            <div className={`text-sm font-black ${tenant.balance > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                ₹{tenant.balance?.toLocaleString() || 0}
+                                            <div className={`text-sm font-black ${tenant.pending > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                                ₹{tenant.pending?.toLocaleString() || 0}
                                             </div>
                                         </td>
                                         <td className="p-6">
@@ -604,7 +604,7 @@ const Tenant = () => {
                 </div>
 
                 {/* Mobile View (Card Layout) */}
-                <div className="lg:hidden p-4 space-y-4">
+                <div className="md:hidden p-4 space-y-4">
                     {loading ? (
                         <div className="p-20 text-center animate-pulse text-[var(--text-card)]">Syncing records...</div>
                     ) : filteredTenants.length > 0 ? (
@@ -612,24 +612,24 @@ const Tenant = () => {
                             <div key={tenant._id} className="bg-[var(--color-card)]/20 rounded-2xl border border-[var(--color-card)] p-6 space-y-4 hover:bg-[var(--color-card)]/30 transition-colors">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h4 className="font-bold text-white text-lg">{tenant.name}</h4>
+                                        <h4 className="font-bold text-white text-lg">{tenant.userId?.name || tenant.name}</h4>
                                         <div className="flex items-center gap-2 text-xs text-[var(--text-card)] mt-1">
                                             <MapPin size={12} />
-                                            Unit {tenant.unitId?.unitNumber} • {tenant.propertyId?.propertyName}
+                                            Unit {tenant.unitId?.unitNumber || "N/A"} • {tenant.propertyId?.propertyName}
                                         </div>
                                     </div>
-                                    <StatusPill status={tenant.status} />
+                                    <StatusPill status={tenant.leaseStatus || tenant.status} />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4 py-3 border-y border-[var(--color-card)]">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Monthly Rent</p>
-                                        <p className="text-lg font-black text-white">₹{tenant.rentAmount?.toLocaleString()}</p>
+                                        <p className="text-lg font-black text-white">₹{tenant.rent?.toLocaleString()}</p>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Dues/Balance</p>
-                                        <p className={`text-lg font-black ${tenant.balance > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                            ₹{tenant.balance?.toLocaleString() || 0}
+                                        <p className={`text-lg font-black ${tenant.pending > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                            ₹{tenant.pending?.toLocaleString() || 0}
                                         </p>
                                     </div>
                                 </div>
@@ -637,7 +637,7 @@ const Tenant = () => {
                                 <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Lease End</p>
-                                        <p className="text-xs font-bold text-[var(--text-secondary)]">{formatDate(tenant.leaseEndDate)}</p>
+                                        <p className="text-xs font-bold text-[var(--text-secondary)]">{formatDate(tenant.leaseEnd)}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button

@@ -203,8 +203,8 @@ const RevenueReport = () => {
                     <button className="px-4 py-2 hover:bg-white/5 rounded-xl transition-colors text-sm font-semibold">See All</button>
                 </div>
 
-                {/* Desktop view */}
-                <div className="hidden lg:block overflow-x-auto">
+                {/* Desktop/Tablet view */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="text-[10px] uppercase tracking-[0.2em] font-black text-white/30">
                             <tr>
@@ -236,9 +236,9 @@ const RevenueReport = () => {
                 </div>
 
                 {/* Mobile / Tablet view */}
-                <div className="lg:hidden divide-y divide-white/[0.05]">
+                <div className="md:hidden p-4 space-y-4">
                     {transactions.map((t, i) => (
-                        <div key={i} className="p-6 space-y-4">
+                        <div key={i} className="p-6 space-y-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/[0.08] transition-colors shadow-sm">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <div className="font-bold text-white text-lg">{t.tenant}</div>

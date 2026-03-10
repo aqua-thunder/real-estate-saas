@@ -195,8 +195,8 @@ const Location = () => {
 
             {/* Location Table / Cards */}
             <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--color-card)] shadow-sm overflow-hidden">
-                {/* Desktop View */}
-                <div className="hidden lg:block overflow-x-auto">
+                {/* Desktop/Tablet View */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-[var(--color-card)] bg-[var(--color-card)]/50">
@@ -249,10 +249,10 @@ const Location = () => {
                     </table>
                 </div>
 
-                {/* Mobile/Tablet Card View */}
-                <div className="lg:hidden divide-y divide-[var(--color-card)]">
+                {/* Mobile Card View */}
+                <div className="md:hidden p-4 space-y-4">
                     {Array.isArray(locations) && locations.map((item, index) => (
-                        <div key={item._id} className={`p-4 space-y-4 hover:bg-[var(--color-card)]/30 transition-colors ${!item.isActive ? "opacity-60 grayscale" : ""}`}>
+                        <div key={item._id} className={`p-4 space-y-4 bg-[var(--color-card)]/10 border border-[var(--color-card)] rounded-xl shadow-sm hover:bg-[var(--color-card)]/20 transition-colors ${!item.isActive ? "opacity-60 grayscale" : ""}`}>
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">
                                     <h4 className="font-bold text-white text-lg flex items-center gap-2">
