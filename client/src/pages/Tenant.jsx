@@ -223,6 +223,33 @@ const Tenant = () => {
         }
     };
 
+    // Auto-update lease status in form based on dates
+    useEffect(() => {
+        if (!formData.leaseStart || !formData.leaseEnd || formData.leaseStatus === "Terminated") return;
+
+        const currentDate = new Date();
+        const start = new Date(formData.leaseStart);
+        const end = new Date(formData.leaseEnd);
+        const thirtyDaysFromNow = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        let newStatus = formData.leaseStatus;
+
+        if (currentDate > end) {
+            newStatus = "Expired";
+        } else if (currentDate >= new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000)) {
+            newStatus = "Expiring";
+        } else if (currentDate >= start) {
+            newStatus = "Active";
+        } else {
+            // If it's in the future
+            newStatus = "Active"; // Defaulting to Active as per your existing logic, but logically could be "Upcoming"
+        }
+
+        if (newStatus !== formData.leaseStatus) {
+            setFormData(prev => ({ ...prev, leaseStatus: newStatus }));
+        }
+    }, [formData.leaseStart, formData.leaseEnd, formData.leaseStatus]);
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -995,9 +1022,9 @@ const Tenant = () => {
                                                     value={formData.leaseStatus}
                                                     onChange={(e) => setFormData({ ...formData, leaseStatus: e.target.value })}
                                                 >
-                                                    <option value="Active">Active</option>
-                                                    <option value="Expiring">Expiring</option>
-                                                    <option value="Expired">Expired</option>
+                                                    <option value="Active" disabled={formData.leaseStatus !== "Active"}>Active</option>
+                                                    <option value="Expiring" disabled={formData.leaseStatus !== "Expiring"}>Expiring</option>
+                                                    <option value="Expired" disabled={formData.leaseStatus !== "Expired"}>Expired</option>
                                                     <option value="Terminated">Terminated</option>
                                                 </select>
                                             </div>

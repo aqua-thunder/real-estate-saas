@@ -103,6 +103,72 @@ const TenantSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Pre-validate hook to automatically set lease status based on dates
+TenantSchema.pre("validate", async function () {
+    try {
+        // Only auto-update if status is not already manually changed to "Terminated"
+        if (this.leaseStatus === "Terminated") {
+            return;
+        }
+
+        if (!this.leaseStart || !this.leaseEnd) {
+            return;
+        }
+
+        const currentDate = new Date();
+        const start = new Date(this.leaseStart);
+        const end = new Date(this.leaseEnd);
+
+        // Basic check for invalid dates
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            return;
+        }
+
+        if (currentDate > end) {
+            this.leaseStatus = "Expired";
+        } else if (currentDate >= new Date(end.getTime() - 30 * 24 * 60 * 60 * 1000)) {
+            this.leaseStatus = "Expiring";
+        } else if (currentDate >= start) {
+            this.leaseStatus = "Active";
+        }
+    } catch (error) {
+        console.error("Error in Tenant pre-validate hook:", error);
+    }
+});
+
+// Static method to bulk update lease statuses for all tenants
+TenantSchema.statics.autoUpdateStatuses = async function () {
+    const currentDate = new Date();
+    const thirtyDaysFromNow = new Date(currentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    // Note: We avoid updating "Terminated" leases automatically
+
+    // 1. Update to Expired
+    await this.updateMany(
+        { leaseEnd: { $lt: currentDate }, leaseStatus: { $ne: "Expired", $ne: "Terminated" } },
+        { $set: { leaseStatus: "Expired" } }
+    );
+
+    // 2. Update to Expiring (within 30 days)
+    await this.updateMany(
+        {
+            leaseEnd: { $gte: currentDate, $lte: thirtyDaysFromNow },
+            leaseStatus: { $nin: ["Expiring", "Expired", "Terminated"] }
+        },
+        { $set: { leaseStatus: "Expiring" } }
+    );
+
+    // 3. Update to Active (if it was upcoming/anything else and is now in range)
+    await this.updateMany(
+        {
+            leaseStart: { $lte: currentDate },
+            leaseEnd: { $gte: currentDate },
+            leaseStatus: { $nin: ["Active", "Expiring", "Terminated"] }
+        },
+        { $set: { leaseStatus: "Active" } }
+    );
+};
+
 // Prevent duplicate tenant record for same user - property - unit combination
 TenantSchema.index(
     { userId: 1, propertyId: 1, unitId: 1 },

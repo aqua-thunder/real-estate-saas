@@ -111,6 +111,7 @@ const createTenant = async (req, res) => {
 
         res.status(201).json({ message: "Tenant created successfully", tenant });
     } catch (error) {
+        console.error("Error in createTenant:", error);
         if (error.code === 11000) {
             return res.status(400).json({ message: "Duplicate tenant record for this unit/user" });
         }
@@ -120,6 +121,9 @@ const createTenant = async (req, res) => {
 
 const getTenants = async (req, res) => {
     try {
+        // Auto-update statuses based on dates before fetching
+        await Tenant.autoUpdateStatuses();
+
         const { propertyId, leaseStatus, paymentStatus } = req.query;
         const role = req.user.role;
         const userId = req.user._id;
@@ -167,6 +171,9 @@ const getTenantById = async (req, res) => {
         const { id } = req.params;
         const role = req.user.role;
         const userId = req.user._id;
+
+        // Auto-update statuses based on dates before fetching
+        await Tenant.autoUpdateStatuses();
 
         const tenant = await Tenant.findById(id)
             .populate("userId", "name email phone")
@@ -315,6 +322,9 @@ const deleteTenant = async (req, res) => {
 const getLeaseByTenant = async (req, res) => {
     try {
         const userId = req.user._id;
+
+        // Auto-update statuses based on dates before fetching
+        await Tenant.autoUpdateStatuses();
 
         const tenant = await Tenant.findOne({ userId })
             .populate("userId", "name email phone")
