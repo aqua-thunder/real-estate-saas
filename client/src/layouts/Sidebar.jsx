@@ -21,7 +21,6 @@ const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
     { name: "Users", icon: Users, path: "/users", roles: ["SUPER_ADMIN", "MANAGER"] },
     { name: "Role", icon: ShieldCheck, path: "/roles", roles: ["SUPER_ADMIN"] },
-    { name: "Location", icon: MapPin, path: "/locations", roles: ["SUPER_ADMIN", "MANAGER", "TECHNICIAN"] },
     { name: "Property", icon: Building2, path: "/properties", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Floor & Unit", icon: Building2, path: "/floor", roles: ["OWNER"] },
     { name: "Settings", icon: Settings, path: "/settings", roles: ["SUPER_ADMIN"] },

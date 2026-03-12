@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
     const [users, setUsers] = useState([]);
 
     const [isLoading, setIsLoading] = useState(true)
-    const [location, setLocation] = useState([])
     const [owners, setOwners] = useState([])
 
 
@@ -60,27 +59,7 @@ export const AuthProvider = ({ children }) => {
     };
 
 
-    // Get all locations
-    const getLocation = async () => {
-        try {
-            const response = await fetch("http://localhost:7000/api/admin/locations", {
-                method: "GET",
-                headers: {
-                    Authorization: authorizationToken
-                },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setLocation(data.msg);
-            } else if (response.status === 403) {
-                console.log("Access denied: You don't have permission to view locations");
-                setLocation([]);
-            }
-        } catch (error) {
-            console.log("Error fetching locations:", error);
-            setLocation([]);
-        }
-    }
+
 
     // Get all owners
     const getOwners = async () => {
@@ -141,7 +120,6 @@ export const AuthProvider = ({ children }) => {
         if (token && user) {
             // Fetch relevant data based on user role
             if (user.role === "SUPER_ADMIN" || user.role === "MANAGER" || user.role === "OWNER") {
-                getLocation();
                 getUsers();
             }
 
@@ -153,7 +131,7 @@ export const AuthProvider = ({ children }) => {
     }, [token, user])
 
     return (
-        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, users, setUser, location, owners, storetokenInLS, logoutUser }}>
+        <AuthContext.Provider value={{ token, isLoggedIn, isLoading, user, users, setUser, owners, storetokenInLS, logoutUser }}>
             {children}
         </AuthContext.Provider>
     );

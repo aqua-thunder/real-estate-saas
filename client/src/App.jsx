@@ -12,7 +12,6 @@ import Layout from './layouts/Layout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import User from './pages/User.jsx'
 import Role from './pages/Role.jsx'
-import Location from './pages/Location.jsx'
 import Property from './pages/Property.jsx'
 import Settings from './pages/Settings.jsx'
 import Reports from './pages/Reports.jsx'
@@ -61,10 +60,7 @@ function App() {
                 <Route path="/users" element={<User />} />
               </Route>
 
-              {/* Roles: Super Admin, Owner, Manager, Technician */}
-              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER", "TECHNICIAN"]} />}>
-                <Route path="/locations" element={<Location />} />
-              </Route>
+
 
               {/* Roles: Super Admin, Owner, Manager, Tenant */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER"]} />}>
