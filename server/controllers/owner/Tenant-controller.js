@@ -75,7 +75,8 @@ const createTenant = async (req, res) => {
                 phone,
                 password: hashedPassword,
                 role: "TENANT",
-                isActive: true
+                isActive: true,
+                createdBy: loggedInUserId
             });
         } else {
             // If user exists, ensure they are marked as TENANT (optional update) or just use them
@@ -149,7 +150,9 @@ const getTenants = async (req, res) => {
                 const propertyIds = properties.map(p => p._id);
                 query.propertyId = { $in: propertyIds };
             }
-        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
+        } else if (role === "MANAGER") {
+            query.managerId = userId;
+        } else if (role !== "SUPER_ADMIN") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
@@ -191,7 +194,11 @@ const getTenantById = async (req, res) => {
             if (!owner || tenant.propertyId.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "Access denied" });
             }
-        } else if (role !== "SUPER_ADMIN" && role !== "MANAGER") {
+        } else if (role === "MANAGER") {
+            if (tenant.managerId?.toString() !== userId.toString()) {
+                return res.status(403).json({ message: "Access denied" });
+            }
+        } else if (role !== "SUPER_ADMIN") {
             return res.status(403).json({ message: "Access denied" });
         }
 
@@ -217,7 +224,11 @@ const updateTenant = async (req, res) => {
             if (!owner || tenant.propertyId.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "Unauthorized to update this tenant" });
             }
-        } else if (role !== "MANAGER") {
+        } else if (role === "MANAGER") {
+            if (tenant.managerId?.toString() !== userId.toString()) {
+                return res.status(403).json({ message: "Unauthorized to update this tenant" });
+            }
+        } else if (role !== "SUPER_ADMIN") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
@@ -303,7 +314,11 @@ const deleteTenant = async (req, res) => {
             if (!owner || tenant.propertyId.owner.toString() !== owner._id.toString()) {
                 return res.status(403).json({ message: "Unauthorized to delete this tenant" });
             }
-        } else if (role !== "MANAGER") {
+        } else if (role === "MANAGER") {
+            if (tenant.managerId?.toString() !== userId.toString()) {
+                return res.status(403).json({ message: "Unauthorized to delete this tenant" });
+            }
+        } else if (role !== "SUPER_ADMIN") {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 

@@ -52,10 +52,13 @@ const createInvoice = async (req, res) => {
             return res.status(404).json({ message: "Property not found" });
         }
 
-        // Make sure the requesting manager is actually assigned to this property
-        if (property.manager?.toString() !== managerId.toString()) {
+        // Authorization: Manager must either be the primary property manager OR the tenant's assigned manager
+        const isPropertyManager = property.manager?.toString() === managerId.toString();
+        const isTenantManager = tenantRecord.managerId?.toString() === managerId.toString();
+
+        if (!isPropertyManager && !isTenantManager) {
             return res.status(403).json({
-                message: "You are not the assigned manager for this property",
+                message: "You are not authorized to create invoices for this tenant",
             });
         }
 
@@ -109,15 +112,8 @@ const getAllInvoices = async (req, res) => {
             // Tenant sees only their invoices
             query.tenantId = userId;
         } else if (role === "MANAGER") {
-            // Manager sees invoices for properties they currently manage
-            const managedProperties = await Property.find({ manager: userId }).select("_id");
-            const propertyIds = managedProperties.map((p) => p._id);
-
-            if (propertyIds.length === 0) {
-                return res.status(200).json({ invoices: [] });
-            }
-
-            query.propertyId = { $in: propertyIds };
+            // Manager sees invoices specifically managed by them
+            query.managerId = userId;
         } else {
             return res.status(403).json({ message: "Unauthorized access" });
         }

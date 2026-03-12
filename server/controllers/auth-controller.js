@@ -119,7 +119,23 @@ const user = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password");
+        const userId = req.user._id;
+        const role = req.user.role;
+        let query = {};
+
+        if (role === "MANAGER") {
+            // Managers only see users they created
+            query.createdBy = userId;
+        } else if (role === "OWNER") {
+            // For now owners see all, but later might want to filter by their properties
+            query = {}; 
+        } else if (role === "SUPER_ADMIN") {
+            query = {};
+        } else {
+            return res.status(403).json({ message: "Unauthorized access" });
+        }
+
+        const users = await User.find(query).select("-password");
 
         res.status(200).json({
             msg: users

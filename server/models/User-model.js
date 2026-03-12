@@ -40,8 +40,12 @@ const user_Schema = new mongoose.Schema({
     lastLoginAt: {
         type: Date,
     },
-
-})
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        index: true
+    }
+}, { timestamps: true })
 
 const User = mongoose.model("User", user_Schema)
 module.exports = User

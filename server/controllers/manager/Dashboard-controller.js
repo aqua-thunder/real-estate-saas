@@ -27,8 +27,12 @@ const getManagerDashboardStats = async (req, res) => {
         const vacantUnitsCount = await Unit.countDocuments({ propertyId: { $in: propertyIds }, status: "Vacant" });
         const occupiedUnitsCount = await Unit.countDocuments({ propertyId: { $in: propertyIds }, status: "Occupied" });
 
-        // Active Tenants: Tenants in properties managed by this person
-        const activeTenantsCount = await Tenant.countDocuments({ propertyId: { $in: propertyIds }, isActive: true });
+        // Active Tenants: Only those managed by this particular manager
+        const activeTenantsCount = await Tenant.countDocuments({ 
+            propertyId: { $in: propertyIds }, 
+            managerId: managerId,
+            isActive: true 
+        });
 
         // Pending Maintenance
         const pendingMaintenanceCount = await Maintenance.countDocuments({
@@ -86,6 +90,7 @@ const getManagerDashboardStats = async (req, res) => {
         const currentDate = new Date();
         const upcomingExpiries = await Tenant.find({
             propertyId: { $in: propertyIds },
+            managerId: managerId,
             leaseEnd: { $gte: currentDate },
             isActive: true
         })

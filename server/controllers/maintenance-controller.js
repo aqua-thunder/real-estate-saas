@@ -46,11 +46,6 @@ const createRequest = async (req, res) => {
             return res.status(404).json({ message: "Property not found" });
         }
 
-        // Authorization Check
-        if (role === "MANAGER" && property.manager?.toString() !== userId.toString()) {
-            return res.status(403).json({ message: "You are not the assigned manager for this property" });
-        }
-
         if (role === "OWNER" && property.owner?.user?.toString() !== userId.toString()) {
             return res.status(403).json({ message: "You are not the owner of this property" });
         }
@@ -61,7 +56,24 @@ const createRequest = async (req, res) => {
         }
 
         finalOwnerId = property.owner.user;
-        finalManagerId = property.manager; // Use the manager currently assigned to the property
+        
+        // Resolve manager ID: priority to tenant's assigned manager, fallback to property manager
+        if (finalTenantId) {
+            const tenantRecord = await Tenant.findOne({ userId: finalTenantId });
+            finalManagerId = tenantRecord?.managerId || property.manager;
+        } else {
+            finalManagerId = property.manager;
+        }
+
+        // Authorization Check for Managers: must be either the property manager or the tenant manager
+        if (role === "MANAGER") {
+            const isPropertyManager = property.manager?.toString() === userId.toString();
+            const isTenantManager = finalManagerId?.toString() === userId.toString();
+            
+            if (!isPropertyManager && !isTenantManager) {
+                return res.status(403).json({ message: "You are not authorized to create search maintenance requests here" });
+            }
+        }
 
         const newRequest = await Maintenance.create({
             tenantId: finalTenantId,
@@ -96,10 +108,8 @@ const getRequests = async (req, res) => {
         if (role === "TENANT") {
             query.tenantId = userId;
         } else if (role === "MANAGER") {
-            // Managers see requests for all properties they are currently assigned to
-            const managedProperties = await Property.find({ manager: userId }).select("_id");
-            const propertyIds = managedProperties.map(p => p._id);
-            query.propertyId = { $in: propertyIds };
+            // Managers see requests for tenants they manage or requests they created
+            query.$or = [{ managerId: userId }, { createdBy: userId }];
         } else if (role === "OWNER") {
             // Owners see requests for all their properties via ownerId field
             query.ownerId = userId;

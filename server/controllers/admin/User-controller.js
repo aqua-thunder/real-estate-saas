@@ -13,12 +13,19 @@ const addUser = async (req, res) => {
             return res.status(400).json({ msg: "User is already exists" })
         }
         const hashedPassword = await bcrypt.hash(password, 10);
+        
+        let finalRole = role;
+        if (req.user.role === "MANAGER") {
+            finalRole = "TENANT"; // Managers can only add tenants
+        }
+
         const newUser = await User.create({
             name,
             email,
             password: hashedPassword,
             phone,
-            role,
+            role: finalRole || "TENANT", 
+            createdBy: req.user._id
         })
 
         // If the role is OWNER, automatically create an approved Owner profile
@@ -43,6 +50,16 @@ const updateUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
+        const userToUpdate = await User.findById(userId);
+        if (!userToUpdate) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Authorization: Managers can only update users they created
+        if (req.user.role === "MANAGER" && userToUpdate.createdBy?.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Unauthorized to update this user" });
+        }
+
         const user = await User.findByIdAndUpdate(
             userId,
             req.body,
@@ -66,11 +83,17 @@ const deleteUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
-        const user = await User.findByIdAndDelete(userId);
-
-        if (!user) {
+        const userToDelete = await User.findById(userId);
+        if (!userToDelete) {
             return res.status(404).json({ message: "User not found" });
         }
+
+        // Authorization: Managers can only delete users they created
+        if (req.user.role === "MANAGER" && userToDelete.createdBy?.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Unauthorized to delete this user" });
+        }
+
+        await User.findByIdAndDelete(userId);
 
         res.status(200).json({
             message: "User deleted successfully",
