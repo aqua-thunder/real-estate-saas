@@ -30,6 +30,8 @@ import { useToast } from "../store/ToastContext";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+
+
 const Tenant = () => {
     const { user, token } = useAuth();
     const { toast } = useToast();
@@ -546,7 +548,6 @@ const Tenant = () => {
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Lease Period</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Rent</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Status</th>
-                                <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Balance</th>
                                 <th className="p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
                             </tr>
                         </thead>
@@ -587,11 +588,6 @@ const Tenant = () => {
                                             <StatusPill status={tenant.leaseStatus || tenant.status} />
                                         </td>
                                         <td className="p-6">
-                                            <div className={`text-sm font-black ${tenant.pending > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                ₹{tenant.pending?.toLocaleString() || 0}
-                                            </div>
-                                        </td>
-                                        <td className="p-6">
                                             <div className="flex items-center justify-center gap-2">
                                                 <button
                                                     onClick={() => {
@@ -601,6 +597,13 @@ const Tenant = () => {
                                                     title="View Details"
                                                 >
                                                     <Eye size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => navigate(`/lease-agreement/${tenant._id}`)}
+                                                    className="p-2 text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-all"
+                                                    title="Lease Agreement"
+                                                >
+                                                    <FileText size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEdit(tenant)}
@@ -809,7 +812,7 @@ const Tenant = () => {
                                             <FileText size={14} /> Lease Documents
                                         </h4>
                                         <div
-                                            onClick={() => downloadLeasePDF(selectedTenant)}
+                                            onClick={() => navigate(`/lease-agreement/${selectedTenant._id}`)}
                                             className="bg-white/5 rounded-2xl p-4 flex items-center justify-between group cursor-pointer hover:bg-white/[0.08] transition-colors border border-white/5 hover:border-[var(--color-primary)]/30"
                                         >
                                             <div className="flex items-center gap-3">
@@ -817,12 +820,12 @@ const Tenant = () => {
                                                     <FileText size={18} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-white group-hover:text-[var(--color-primary)] transition-colors">Lease_Agreement_2025.pdf</p>
-                                                    <p className="text-[10px] text-[var(--text-card)]">Ready to download • Signed</p>
+                                                    <p className="text-sm font-medium text-white group-hover:text-[var(--color-primary)] transition-colors">Residential_Lease_Agreement.view</p>
+                                                    <p className="text-[10px] text-[var(--text-card)]">View formal document • Digital Record</p>
                                                 </div>
                                             </div>
                                             <div className="p-2 rounded-full bg-white/5 group-hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] group-hover:text-[var(--color-primary)] transition-all">
-                                                <Download size={16} />
+                                                <Eye size={16} />
                                             </div>
                                         </div>
                                     </section>
