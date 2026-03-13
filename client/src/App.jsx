@@ -26,10 +26,13 @@ import Maintenance from './pages/Maintenance.jsx'
 import Invoice from './pages/Invoice.jsx'
 import LeaseAgrement from './pages/LeaseAgrement.jsx'
 
+import ScrollToTop from './components/ScrollToTop.jsx'
+
 function App() {
   return (
     <>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
 
           {/* Auth routes */}

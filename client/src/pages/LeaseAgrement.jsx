@@ -18,9 +18,12 @@ import {
     ShieldCheck,
     Clock,
     CreditCard,
-    Info
+    Info,
+    Download
 } from "lucide-react";
 import { useAuth } from "../store/auth";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function LeaseAgrement() {
     const { token } = useAuth();
@@ -30,6 +33,85 @@ export default function LeaseAgrement() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
     const [selectedLease, setSelectedLease] = useState(null);
+
+    const handleDownload = (tenant) => {
+        const doc = new jsPDF();
+        const primaryColor = [0, 161, 255]; // Matching the app's primary blue
+
+        // --- Header Section ---
+        doc.setFillColor(245, 247, 250);
+        doc.rect(0, 0, 210, 40, "F");
+
+        doc.setFontSize(22);
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.setFont("helvetica", "bold");
+        doc.text("LEASE AGREEMENT", 105, 25, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Generated on: ${new Date().toLocaleDateString("en-IN")}`, 105, 32, { align: "center" });
+
+        // --- Tenant & Property Details Table ---
+        autoTable(doc, {
+            startY: 50,
+            head: [[{ content: "AGREEMENT DETAILS", colSpan: 2, styles: { halign: "center", fillWidth: true } }]],
+            body: [
+                ["Tenant Name", tenant.userId?.name || tenant.name],
+                ["Tenant Email", tenant.userId?.email || tenant.email || "N/A"],
+                ["Tenant Phone", tenant.userId?.phone || tenant.phone || "N/A"],
+                ["Property", tenant.propertyId?.propertyName || "N/A"],
+                ["Unit / Floor", `Unit ${tenant.unitId?.unitNumber || "N/A"} • ${tenant.floorId?.name || "N/A"}`],
+                ["Lease Start", formatDate(tenant.leaseStart)],
+                ["Lease End", formatDate(tenant.leaseEnd)],
+                ["Lease Duration", calculateDuration(tenant.leaseStart, tenant.leaseEnd)],
+            ],
+            theme: "grid",
+            headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: "bold" },
+            styles: { fontSize: 10, cellPadding: 5 },
+            columnStyles: { 0: { fontStyle: "bold", fillColor: [250, 250, 250], width: 60 } },
+        });
+
+        // --- Financial Information Table ---
+        const finalY = doc.lastAutoTable.finalY + 10;
+        autoTable(doc, {
+            startY: finalY,
+            head: [[{ content: "FINANCIAL SUMMARY", colSpan: 2, styles: { halign: "center" } }]],
+            body: [
+                ["Monthly Rent", tenant.rent],
+                ["Security Deposit", tenant.deposit],
+                ["Maintenance Cost", tenant.maintenanceCost],
+                ["Utility Bill Assignment", "As per usage"],
+                ["Late Fee Penalty", `${tenant.lateFees || 100} per day delay`],
+            ],
+            theme: "grid",
+            headStyles: { fillColor: [52, 211, 153], textColor: 255, fontStyle: "bold" }, // Emerald theme for finance
+            styles: { fontSize: 10, cellPadding: 5 },
+            columnStyles: { 0: { fontStyle: "bold", fillColor: [250, 250, 250], width: 60 } },
+        });
+
+        // --- Footer / Signature Section ---
+        const footerY = doc.lastAutoTable.finalY + 30;
+
+        doc.setDrawColor(200);
+        doc.line(20, footerY, 80, footerY); // Owner Sign Line
+        doc.line(130, footerY, 190, footerY); // Tenant Sign Line
+
+        doc.setFontSize(9);
+        doc.setTextColor(150);
+        doc.text("Property Owner Signature", 50, footerY + 5, { align: "center" });
+        doc.text("Tenant Signature", 160, footerY + 5, { align: "center" });
+
+        // --- Branding ---
+        doc.setTextColor(200);
+        doc.setFontSize(8);
+        doc.text("This is a computer-generated document. No physical signature required for validation.", 105, 285, { align: "center" });
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("MaterialM Real Estate Platform", 105, 290, { align: "center" });
+
+        // Save at the end
+        doc.save(`Lease_Agreement_${tenant.userId?.name || tenant.name}.pdf`);
+    };
 
     const fetchTenants = async () => {
         try {
@@ -195,12 +277,22 @@ export default function LeaseAgrement() {
                                             </span>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <button
-                                                onClick={() => setSelectedLease(tenant)}
-                                                className="p-2 rounded-full bg-white/5 group-hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] group-hover:text-[var(--color-primary)] transition-all"
-                                            >
-                                                <Eye size={16} />
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => setSelectedLease(tenant)}
+                                                    className="p-2 rounded-full bg-white/5 group-hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] group-hover:text-[var(--color-primary)] transition-all"
+                                                    title="View Details"
+                                                >
+                                                    <Eye size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDownload(tenant)}
+                                                    className="p-2 rounded-full bg-white/5 group-hover:bg-emerald-500/10 text-[var(--text-card)] group-hover:text-emerald-500 transition-all"
+                                                    title="Download Agreement"
+                                                >
+                                                    <Download size={16} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
