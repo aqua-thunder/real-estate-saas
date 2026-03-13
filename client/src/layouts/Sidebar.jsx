@@ -18,7 +18,7 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
 
 const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
+    { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
     { name: "Users", icon: Users, path: "/users", roles: ["SUPER_ADMIN", "MANAGER"] },
     { name: "Role", icon: ShieldCheck, path: "/roles", roles: ["SUPER_ADMIN"] },
     { name: "Property", icon: Building2, path: "/properties", roles: ["SUPER_ADMIN", "OWNER"] },
@@ -29,7 +29,7 @@ const menuItems = [
     { name: "Tenant", icon: UserCog, path: "/tenant", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
     { name: "Revenue Report", icon: CreditCard, path: "/revenue-report", roles: ["SUPER_ADMIN", "OWNER"] },
     { name: "Lease", icon: CreditCard, path: "/lease", roles: ["TENANT"] },
-    { name: "Maintenance", icon: Wrench, path: "/maintenance", roles: ["TENANT", "MANAGER", "OWNER"] },
+    { name: "Maintenance Request", icon: Wrench, path: "/maintenance", roles: ["TENANT", "MANAGER", "OWNER"] },
     { name: "Invoice", icon: CreditCard, path: "/invoice", roles: ["TENANT", "MANAGER"] },
     { name: "Profile & Security", icon: UserCog, path: "/profile", roles: ["SUPER_ADMIN", "OWNER", "MANAGER", "TENANT", "TECHNICIAN"] },
 ];

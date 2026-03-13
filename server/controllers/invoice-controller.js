@@ -99,6 +99,10 @@ const createInvoice = async (req, res) => {
             notes,
             status: "Unpaid",
         });
+        
+        // Update Tenant Pending Balance
+        tenantRecord.pending = (tenantRecord.pending || 0) + invoice.totalAmount;
+        await tenantRecord.save();
 
         return res.status(201).json({
             message: "Invoice created successfully",
@@ -191,6 +195,15 @@ const deleteInvoice = async (req, res) => {
             return res.status(403).json({ message: "Unauthorized access" });
         }
 
+        // Update Tenant Pending Balance if the invoice was unpaid
+        if (invoice.status !== "Paid") {
+            const tenantRecord = await Tenant.findOne({ userId: invoice.tenantId });
+            if (tenantRecord) {
+                tenantRecord.pending = Math.max(0, (tenantRecord.pending || 0) - invoice.totalAmount);
+                await tenantRecord.save();
+            }
+        }
+
         await invoice.deleteOne();
         return res.status(200).json({ message: "Invoice deleted successfully" });
     } catch (error) {
@@ -224,6 +237,14 @@ const payInvoice = async (req, res) => {
         invoice.status = "Paid";
         invoice.paidAt = new Date();
         await invoice.save();
+
+        // Update Tenant statistics
+        const tenantRecord = await Tenant.findOne({ userId: invoice.tenantId });
+        if (tenantRecord) {
+            tenantRecord.totalCollected = (tenantRecord.totalCollected || 0) + invoice.totalAmount;
+            tenantRecord.pending = Math.max(0, (tenantRecord.pending || 0) - invoice.totalAmount);
+            await tenantRecord.save();
+        }
 
         return res.status(200).json({ message: "Invoice paid successfully", invoice });
     } catch (error) {

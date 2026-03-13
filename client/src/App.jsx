@@ -44,8 +44,11 @@ function App() {
               <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
 
               {/* All logged in users can access these */}
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
+
+              <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN", "OWNER", "MANAGER"]} />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+              </Route>
 
               {/* Roles: Super Admin Only */}
               <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>

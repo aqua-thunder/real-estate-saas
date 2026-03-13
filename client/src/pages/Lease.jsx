@@ -20,6 +20,7 @@ export default function Lease() {
             if (response.ok) {
                 const data = await response.json();
                 setLeaseData(data.lease);
+                console.log(data.lease)
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || "Failed to fetch lease data");
@@ -101,15 +102,14 @@ export default function Lease() {
     ];
 
     return (
-        <div className="p-6 bg-[var(--bg-main)] min-h-screen text-[var(--text-secondary)] font-[var(--font-body)]">
+        <div className="p-2 bg-[var(--bg-main)] min-h-screen text-[var(--text-secondary)] font-[var(--font-body)]">
 
             {/* Page Title & Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-[var(--text-primary)] font-[var(--font-heading)] tracking-tight">
+                    <h1 className="text-3xl font-bold text-[var(--text-secondary)] font-[var(--font-heading)] tracking-tight">
                         Lease Agreement
                     </h1>
-                    <p className="text-[var(--text-secondary)] mt-1">Manage and view your occupancy details</p>
                 </div>
                 <div className="flex gap-3">
                     <button className="flex items-center gap-2 bg-[var(--bg-card)] border border-[var(--color-main)] px-4 py-2 rounded-lg hover:bg-[var(--color-main)]/10 transition-all text-sm font-medium">
@@ -238,12 +238,12 @@ export default function Lease() {
 
                     <div className="grid grid-cols-2 gap-y-5 text-sm">
                         <div>
-                            <p className="text-[var(--text-card)] mb-1 uppercase text-xs font-bold tracking-wider">Paid to Date</p>
-                            <p className="text-white font-bold text-lg">{formatCurrency(leaseData.totalCollected)}</p>
+                            <p className="text-[var(--text-card)] mb-1 uppercase text-xs font-bold tracking-wider">Total Payed</p>
+                            <p className="text-white font-bold text-lg">{formatCurrency(leaseData.totalCollected || 0)}</p>
                         </div>
                         <div>
                             <p className="text-[var(--text-card)] mb-1 uppercase text-xs font-bold tracking-wider">Outstanding</p>
-                            <p className="text-red-400 font-bold text-lg">{formatCurrency(leaseData.pending)}</p>
+                            <p className="text-red-400 font-bold text-lg">{formatCurrency(leaseData.pending || 0)}</p>
                         </div>
                         <div>
                             <p className="text-[var(--text-card)] mb-1 uppercase text-xs font-bold tracking-wider">Payment Status</p>
