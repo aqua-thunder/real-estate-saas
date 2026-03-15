@@ -197,7 +197,6 @@ export default function LeaseAgrement() {
                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8">
                     <div>
                         <h1 className="text-2xl font-bold text-white tracking-tight mb-1">Lease Agreements</h1>
-                        <p className="text-[10px] font-black text-[var(--text-card)] uppercase tracking-[0.2em]">Live Inventory • {filteredTenants.length} Records</p>
                     </div>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4">

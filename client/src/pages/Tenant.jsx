@@ -38,6 +38,7 @@ const Tenant = () => {
     const [selectedTenant, setSelectedTenant] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
+    const [filterProperty, setFilterProperty] = useState("All");
 
     const [isAddingTenant, setIsAddingTenant] = useState(false);
     const [allTenants, setAllTenants] = useState([]);
@@ -430,16 +431,27 @@ const Tenant = () => {
         };
     }, [allTenants, properties]);
 
-    const filteredTenants = allTenants.filter(tenant => {
+    const filteredTenants = allTenants.filter((tenant) => {
+
         const name = tenant.userId?.name || "";
-        const prop = tenant.propertyId?.propertyName || "";
+        const propName = tenant.propertyId?.propertyName || "";
         const unit = tenant.unitId?.unitNumber || "";
 
-        const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            prop.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        const matchesSearch =
+            name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            propName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             unit.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesStatus = filterStatus === "All" || tenant.paymentStatus === filterStatus || tenant.leaseStatus === filterStatus;
-        return matchesSearch && matchesStatus;
+
+        const matchesStatus =
+            filterStatus === "All" ||
+            tenant.paymentStatus === filterStatus ||
+            tenant.leaseStatus === filterStatus;
+
+        const matchesProperty =
+            filterProperty === "All" ||
+            tenant.propertyId?._id === filterProperty;
+
+        return matchesSearch && matchesStatus && matchesProperty;
     });
 
     const getStatusColor = (status) => {
@@ -527,10 +539,18 @@ const Tenant = () => {
                         </button>
                     ))}
                     <div className="h-10 w-px bg-white/10 mx-1 hidden md:block"></div>
-                    <select className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-[var(--text-card)] focus:outline-none">
-                        <option>All Properties</option>
-                        <option>Skyline Heights</option>
-                        <option>Green Valley</option>
+                    <select
+                        value={filterProperty}
+                        onChange={(e) => setFilterProperty(e.target.value)}
+                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-[var(--text-card)] focus:outline-none"
+                    >
+                        <option value="All">All Properties</option>
+
+                        {properties.map((property) => (
+                            <option key={property._id} value={property._id}>
+                                {property.propertyName}
+                            </option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -588,34 +608,34 @@ const Tenant = () => {
                                             <StatusPill status={tenant.leaseStatus || tenant.status} />
                                         </td>
                                         <td className="p-6">                                             <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedTenant(tenant);
-                                                    }}
-                                                    className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
-                                                    title="View Details"
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-                                                {user?.role === "MANAGER" && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => handleEdit(tenant)}
-                                                            className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
-                                                            title="Edit Tenant"
-                                                        >
-                                                            <Edit size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(tenant._id)}
-                                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                                            title="Delete Tenant"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedTenant(tenant);
+                                                }}
+                                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
+                                                title="View Details"
+                                            >
+                                                <Eye size={18} />
+                                            </button>
+                                            {user?.role === "MANAGER" && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEdit(tenant)}
+                                                        className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all"
+                                                        title="Edit Tenant"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(tenant._id)}
+                                                        className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                                        title="Delete Tenant"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
 
                                         </td>
                                     </tr>
