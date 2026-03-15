@@ -357,18 +357,18 @@ const FloorUnit = () => {
           <h1 className="text-2xl font-black text-[var(--text-secondary)] tracking-tight">Floor & Unit Management</h1>
         </div>
         <div className="flex gap-2 p-1 bg-[var(--color-card)]/50 rounded-2xl w-fit">
-          <button
+          <Button
             onClick={() => setActiveTab("floors")}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "floors" ? "bg-[var(--color-primary)] text-white shadow-lg" : "text-[var(--text-card)] hover:text-[var(--text-secondary)]"}`}
+            variant={activeTab === "floors" ? "primary" : "outline"}
           >
             Floors
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab("units")}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === "units" ? "bg-[var(--color-primary)] text-white shadow-lg" : "text-[var(--text-card)] hover:text-[var(--text-secondary)]"}`}
+            variant={activeTab === "units" ? "primary" : "outline"}
           >
             Units
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -436,7 +436,6 @@ const FloorUnit = () => {
               resetUnitForm();
               setOpenUnitForm(true);
             }}
-            className="rounded-2xl px-8 h-12 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-[var(--color-primary)]/20"
           >
             <Plus size={18} className="mr-2" />
             Create {activeTab === "floors" ? "Floor" : "Unit"}
@@ -637,13 +636,13 @@ const FloorUnit = () => {
                   />
                 </div>
               </div>
-              <div className="flex gap-4 pt-4 border-t border-white/5">
-                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => {
+              <div className="flex gap-4 pt-4 border-t border-white/5 justify-end">
+                <Button type="button" onClick={() => {
                   setOpenFloorForm(false);
                   setEditFloorId(null);
                   setFloorData(initialFloorData);
                 }}>Cancel</Button>
-                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl font-black shadow-xl shadow-blue-500/30 border-none" htmlType="submit">{isEditingFloor ? "UPDATE FLOOR" : "DEPLOY FLOOR"}</Button>
+                <Button type="primary" htmlType="submit">{isEditingFloor ? "UPDATE FLOOR" : "DEPLOY FLOOR"}</Button>
               </div>
             </form>
           </div>
@@ -738,12 +737,12 @@ const FloorUnit = () => {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t border-white/5">
-                <Button type="button" className="flex-1 py-4 bg-[var(--color-card)] text-[var(--text-secondary)] rounded-2xl font-bold" onClick={() => {
+              <div className="flex gap-4 pt-4 border-t border-white/5 justify-end">
+                <Button type="button" onClick={() => {
                   setOpenUnitForm(false);
                   resetUnitForm();
                 }}>{isEditingUnit ? "Cancel" : "Discard"}</Button>
-                <Button type="primary" className="flex-1 py-4 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl font-black shadow-xl shadow-purple-500/30 border-none" htmlType="submit">{isEditingUnit ? "UPDATE UNIT" : "DEPLOY UNIT"}</Button>
+                <Button type="primary" htmlType="submit">{isEditingUnit ? "UPDATE UNIT" : "DEPLOY UNIT"}</Button>
               </div>
             </form>
           </div>

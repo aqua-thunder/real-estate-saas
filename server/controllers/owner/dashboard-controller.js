@@ -2,13 +2,29 @@ const Property = require("../../models/Property-Model");
 const Unit = require("../../models/Unit-model");
 const Invoice = require("../../models/Invoice-model");
 const Maintenance = require("../../models/Maintenance-model");
+const Owner = require("../../models/Owner-model");
 
 const getOwnerDashboardData = async (req, res) => {
     try {
-        const ownerId = req.user._id; // Use _id so it inherently contains an ObjectId for aggregation queries
+        const userId = req.user._id;
 
-        // 1. Properties
-        const properties = await Property.find({ owner: ownerId });
+        // Find or create owner profile to get the correct ID for property queries
+        let ownerProfile = await Owner.findOne({ user: userId });
+
+        if (!ownerProfile) {
+            // Create owner profile if it doesn't exist for consistency with property-controller
+            ownerProfile = await Owner.create({
+                user: userId,
+                ownerType: "INDIVIDUAL",
+                contactNumber: req.user.phone || "0000000000",
+                isApproved: true
+            });
+        }
+
+        const ownerProfileId = ownerProfile._id;
+
+        // 1. Properties - use ownerProfileId because Property model 'owner' field refs Owner model
+        const properties = await Property.find({ owner: ownerProfileId });
         const propertyIds = properties.map(p => p._id);
         const totalProperties = properties.length;
 
@@ -27,14 +43,13 @@ const getOwnerDashboardData = async (req, res) => {
         });
 
         // 5. Monthly Rental Income (Current month)
-        // Check invoices that have been paid in current month, or the `month` field is current month.
-        // Let's use `paidAt` for calculating collected income.
+        // Use userId because Invoice model 'ownerId' field refs User model
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
         const currentMonthInvoices = await Invoice.find({
-            ownerId: ownerId,
+            ownerId: userId,
             status: "Paid",
             paidAt: { $gte: startOfMonth, $lt: startOfNextMonth }
         });
@@ -42,13 +57,13 @@ const getOwnerDashboardData = async (req, res) => {
         const monthlyRentalIncome = currentMonthInvoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
 
         // 6. Pending Maintenance
+        // Use userId because Maintenance model 'ownerId' field refs User model
         const pendingMaintenanceApprovals = await Maintenance.countDocuments({
-            ownerId: ownerId,
+            ownerId: userId,
             status: "Pending"
         });
 
-        // 7. Income Overview Chart (Group by month string, e.g., "Mar 2026")
-        // Alternatively, calculate based on `paidAt` using aggregation to get proper month ordering
+        // 7. Income Overview Chart
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(now.getMonth() - 5);
         sixMonthsAgo.setDate(1);
@@ -56,7 +71,7 @@ const getOwnerDashboardData = async (req, res) => {
         const incomeData = await Invoice.aggregate([
             {
                 $match: {
-                    ownerId: ownerId,
+                    ownerId: userId,
                     status: "Paid",
                     paidAt: { $gte: sixMonthsAgo }
                 }
@@ -112,3 +127,4 @@ const getOwnerDashboardData = async (req, res) => {
 module.exports = {
     getOwnerDashboardData
 };
+

@@ -16,6 +16,7 @@ import {
     ArrowDownRight
 } from "lucide-react";
 import { useAuth } from "../store/auth";
+import Button from "../components/ui/Button";
 
 const RevenueReport = () => {
     const { token } = useAuth();
@@ -85,14 +86,10 @@ const RevenueReport = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="hidden sm:flex bg-white/5 p-1 rounded-2xl border border-white/10">
-                        <FilterOption label="Quarterly" active />
-                        <FilterOption label="Yearly" />
-                    </div>
-                    <button className="group flex items-center gap-2 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:shadow-[0_0_20px_rgba(0,161,255,0.4)] transition-all duration-300 px-6 py-3 rounded-2xl text-black font-bold">
+                    <Button >
                         <Download size={18} className="group-hover:-translate-y-0.5 transition-transform" />
                         <span>Export Report</span>
-                    </button>
+                    </Button>
                 </div>
             </header>
 

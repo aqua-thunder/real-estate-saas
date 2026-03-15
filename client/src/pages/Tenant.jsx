@@ -479,7 +479,7 @@ const Tenant = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-2 md:flex items-center gap-3">
-                    <Button type="secondary" onClick={() => { }} className="mt-0! px-4! py-2! w-full md:w-auto">
+                    <Button type="secondary" onClick={() => { }} variant="secondary">
                         <Download size={18} /> Export
                     </Button>
                     {user?.role === "MANAGER" && (
@@ -527,22 +527,21 @@ const Tenant = () => {
                 </div>
                 <div className="flex flex-wrap gap-2">
                     {["All", "Paid", "Pending", "Expiring"].map((status) => (
-                        <button
+                        <Button
                             key={status}
                             onClick={() => setFilterStatus(status)}
-                            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${filterStatus === status
-                                ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]"
-                                : "bg-white/5 text-[var(--text-card)] border-white/5 hover:border-white/10"
-                                }`}
+                            variant={filterStatus === status ? "primary" : "secondary"}
+                            className="px-4 py-2 rounded-xl text-xs font-semibold transition-all border"
                         >
                             {status}
-                        </button>
+                        </Button>
                     ))}
-                    <div className="h-10 w-px bg-white/10 mx-1 hidden md:block"></div>
+                    <div className="h-10 w-px mx-1 hidden md:block"></div>
                     <select
                         value={filterProperty}
                         onChange={(e) => setFilterProperty(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-[var(--text-card)] focus:outline-none"
+                        variant="secondary"
+                        className="text-sm rounded-xl bg-[var(--color-card)]"
                     >
                         <option value="All">All Properties</option>
 

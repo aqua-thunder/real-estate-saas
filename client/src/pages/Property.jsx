@@ -239,7 +239,6 @@ const Property = () => {
                     {(user?.role === "OWNER" || user?.role === "MANAGER") && (
                         <Button
                             onClick={() => { resetForm(); setOpenForm(true); }}
-                            className="h-12 px-6 rounded-2xl bg-[var(--color-primary)] text-white font-bold hover:scale-[1.02] active:scale-[0.98] transition-all border-none shadow-lg shadow-[var(--color-primary)]/20 whitespace-nowrap mt-[-3px]"
                         >
                             <Plus size={18} className="mr-2" />
                             Add Property
@@ -607,16 +606,16 @@ const Property = () => {
 
                                     <Button
                                         type="button"
-                                        className="flex-1 py-4 bg-[var(--color-card)] hover:bg-white/10 text-[var(--text-secondary)] rounded-2xl font-bold border border-white/10"
                                         onClick={resetForm}
+                                        className="w-full"
                                     >
                                         Discard
                                     </Button>
 
                                     <Button
                                         type="primary"
-                                        className="flex-1 py-4 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-2xl font-black text-white border-none shadow-xl shadow-[var(--color-primary)]/40"
                                         htmlType="submit"
+                                        className="w-full"
                                     >
                                         {isEditing ? "Update Asset" : "Deploy Property"}
                                     </Button>
@@ -795,7 +794,7 @@ function ViewProperty({ property, onClose }) {
                     <div className="pt-4">
                         <Button
                             onClick={onClose}
-                            className="w-full py-5 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black shadow-xl shadow-blue-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300"
+                            className="w-full"
                         >
                             CLOSE INSPECTION
                         </Button>
