@@ -8,7 +8,7 @@ import {
   Maximize2,
   Bed,
   Bath,
-  DollarSign,
+  IndianRupee,
   Edit,
   Trash2
 } from "lucide-react";
@@ -402,10 +402,10 @@ const FloorUnit = () => {
           <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500"></div>
           <div className="relative z-10 flex items-center gap-4">
             <div className="p-4 bg-green-500/10 rounded-2xl text-green-500">
-              <DollarSign size={24} />
+              <IndianRupee size={24} />
             </div>
             <div>
-              <div className="text-2xl font-black text-[var(--text-secondary)]">${units.reduce((acc, u) => acc + (u.rentAmount || 0), 0).toLocaleString()}</div>
+              <div className="text-2xl font-black text-[var(--text-secondary)]">₹{units.reduce((acc, u) => acc + (u.rentAmount || 0), 0).toLocaleString()}</div>
               <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">Total Rent Pipeline</div>
             </div>
           </div>
@@ -528,7 +528,7 @@ const FloorUnit = () => {
                       </span>
                     </td>
                     <td className="p-6">
-                      <div className="text-lg font-black text-green-500">${unit.rentAmount}</div>
+                      <div className="text-lg font-black text-green-500">₹{unit.rentAmount}</div>
                     </td>
                     <td className="p-6 text-center">
                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black border ${unit.status === 'Vacant' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
@@ -718,7 +718,7 @@ const FloorUnit = () => {
 
                   <div className="space-y-4 p-4 bg-[var(--color-card)] rounded-2xl border border-white/5">
                     <div className="text-[10px] font-black uppercase text-green-500 tracking-widest">Financial Configuration</div>
-                    <Input label="Monthly Rent ($)" name="rentAmount" type="number" value={unitData.rentAmount} onChange={handleUnitChange} placeholder="1500" required variant="formInput" />
+                    <Input label="Monthly Rent (₹)" name="rentAmount" type="number" value={unitData.rentAmount} onChange={handleUnitChange} placeholder="1500" required variant="formInput" />
                     <div className="grid grid-cols-1">
                       <Input label="Deposit" name="securityDeposit" type="number" value={unitData.securityDeposit} onChange={handleUnitChange} placeholder="2000" variant="formInput" />
                     </div>

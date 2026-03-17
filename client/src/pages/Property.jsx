@@ -307,7 +307,7 @@ const Property = () => {
                                         </td>
 
                                         <td className="p-4 lg:p-6">
-                                            <div className="text-lg font-black text-green-600 dark:text-green-400">${property.totalRevenue?.toLocaleString() || 0}</div>
+                                            <div className="text-lg font-black text-green-600 dark:text-green-400">₹{property.totalRevenue?.toLocaleString() || 0}</div>
                                         </td>
                                         <td className="p-4 lg:p-6">
                                             <div className="flex items-center justify-center gap-1">
@@ -372,7 +372,7 @@ const Property = () => {
                                 <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Total Revenue</p>
-                                        <p className="text-lg font-black text-green-500">${property.totalRevenue?.toLocaleString() || 0}</p>
+                                        <p className="text-lg font-black text-green-500">₹{property.totalRevenue?.toLocaleString() || 0}</p>
                                     </div>
                                     {user?.role === "SUPER_ADMIN" && (
                                         <div className="space-y-1">
@@ -704,7 +704,7 @@ function ViewProperty({ property, onClose }) {
                         </div>
                         <div className="p-4 bg-green-500/5 rounded-3xl border border-green-500/10 space-y-1">
                             <div className="text-[10px] font-bold text-green-600/70 uppercase tracking-wider">Revenue</div>
-                            <div className="text-xl font-black text-green-600">${property.totalRevenue?.toLocaleString()}</div>
+                            <div className="text-xl font-black text-green-600">₹{property.totalRevenue?.toLocaleString()}</div>
                         </div>
                         <div className="p-4 bg-purple-500/5 rounded-3xl border border-purple-500/10 space-y-1">
                             <div className="text-[10px] font-bold text-purple-600/70 uppercase tracking-wider">Occupancy</div>

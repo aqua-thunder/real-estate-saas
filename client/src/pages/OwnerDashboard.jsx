@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Building2, Home, Key, DoorClosed, DollarSign, Wrench, AlertCircle, Loader2, Calendar, TrendingUp, PieChart as PieChartIcon } from "lucide-react";
+import { Building2, Home, Key, DoorClosed, IndianRupee, Wrench, AlertCircle, Loader2, Calendar, TrendingUp, PieChart as PieChartIcon } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
@@ -91,8 +91,8 @@ const OwnerDashboard = () => {
     },
     {
       label: "Monthly Income",
-      value: `$${(stats?.monthlyRentalIncome || 0).toLocaleString()}`,
-      icon: DollarSign,
+      value: `₹${(stats?.monthlyRentalIncome || 0).toLocaleString()}`,
+      icon: IndianRupee,
       color: "violet"
     },
     {
@@ -173,13 +173,13 @@ const OwnerDashboard = () => {
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => `₹${value}`}
                     dx={-10}
                   />
                   <Tooltip
                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '16px', color: '#fff', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)' }}
                     itemStyle={{ color: '#8b5cf6', fontWeight: 'bold' }}
-                    formatter={(value) => [`$${value.toLocaleString()}`, "Income"]}
+                    formatter={(value) => [`₹${value.toLocaleString()}`, "Income"]}
                   />
                   <Area
                     type="monotone"

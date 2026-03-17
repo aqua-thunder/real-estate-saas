@@ -78,11 +78,11 @@ export default function LeaseAgrement() {
             startY: finalY,
             head: [[{ content: "FINANCIAL SUMMARY", colSpan: 2, styles: { halign: "center" } }]],
             body: [
-                ["Monthly Rent", tenant.rent],
-                ["Security Deposit", tenant.deposit],
-                ["Maintenance Cost", tenant.maintenanceCost],
+                ["Monthly Rent", `₹ ${tenant.rent}`],
+                ["Security Deposit", `₹ ${tenant.deposit}`],
+                ["Maintenance Cost", `₹ ${tenant.maintenanceCost}`],
                 ["Utility Bill Assignment", "As per usage"],
-                ["Late Fee Penalty", `${tenant.lateFees || 100} per day delay`],
+                ["Late Fee Penalty", `₹ ${tenant.lateFees || 100} per day delay`],
             ],
             theme: "grid",
             headStyles: { fillColor: [52, 211, 153], textColor: 255, fontStyle: "bold" }, // Emerald theme for finance

@@ -3,7 +3,7 @@ import {
     LayoutDashboard,
     Building2,
     Users,
-    DollarSign,
+    IndianRupee,
     UserCheck,
     TrendingUp,
     PieChart as PieChartIcon,
@@ -121,7 +121,7 @@ export default function SuperAdminDashboard() {
                     { label: "Total Owners", value: stats?.totalOwners || 0, icon: UserCheck, color: "#6366f1", bg: "rgba(99, 102, 241, 0.1)" },
                     { label: "Properties", value: stats?.totalProperties || 0, icon: Building2, color: "#10b981", bg: "rgba(16, 185, 129, 0.1)" },
                     { label: "Total Tenants", value: stats?.totalTenants || 0, icon: Layers, color: "#f59e0b", bg: "rgba(245, 158, 11, 0.1)" },
-                    { label: "Mo. Revenue", value: `$${stats?.monthlyRevenue?.toLocaleString() || 0}`, icon: DollarSign, color: "#ef4444", bg: "rgba(239, 68, 68, 0.1)" },
+                    { label: "Mo. Revenue", value: `₹${stats?.monthlyRevenue?.toLocaleString() || 0}`, icon: IndianRupee, color: "#ef4444", bg: "rgba(239, 68, 68, 0.1)" },
                 ].map((stat, i) => (
                     <div key={i} className="bg-[var(--bg-card)] p-6 rounded-[2rem] border border-[var(--color-main)]/20 shadow-xl relative overflow-hidden group hover:border-[var(--color-primary)]/30 transition-all duration-500">
                         <div className="absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-10 group-hover:scale-150 transition-transform duration-700" style={{ backgroundColor: stat.color }}></div>

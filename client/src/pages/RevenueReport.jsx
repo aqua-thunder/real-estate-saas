@@ -1,6 +1,6 @@
 import React from "react";
 import {
-    DollarSign,
+    IndianRupee,
     Calendar,
     Home,
     BarChart3,
@@ -68,7 +68,7 @@ const RevenueReport = () => {
     };
 
     const statsConfig = [
-        { title: "Total Revenue", value: stats.totalRevenue, change: "+0%", trending: "up", icon: DollarSign, color: "from-blue-500 to-cyan-400" },
+        { title: "Total Revenue", value: stats.totalRevenue, change: "+0%", trending: "up", icon: IndianRupee, color: "from-blue-500 to-cyan-400" },
         { title: "Monthly Revenue", value: stats.monthlyRevenue, change: "+0%", trending: "up", icon: Calendar, color: "from-indigo-500 to-purple-400" },
         { title: "Occupancy Rate", value: stats.occupancyRate, change: "+0%", trending: "up", icon: BarChart3, color: "from-emerald-500 to-teal-400" },
         { title: "Pending Rent", value: stats.pendingRent, change: "+0%", trending: "down", icon: Receipt, color: "from-rose-500 to-orange-400" },
@@ -156,7 +156,7 @@ const RevenueReport = () => {
                         />
                         <SummaryCard
                             title="Other Income"
-                            icon={DollarSign}
+                            icon={IndianRupee}
                             items={[
                                 { label: "Parking", value: breakdown.other.parking },
                                 { label: "Utilities", value: breakdown.other.utilities },

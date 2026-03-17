@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-    DollarSign,
+    IndianRupee,
     Users,
     Building2,
     Calendar,
@@ -95,7 +95,7 @@ const SuperAdminRevenueReport = () => {
         { title: "Total Rent Collected", value: summaryCards.totalRent, icon: Home, color: "from-blue-600 to-indigo-500" },
         { title: "Maintenance Collected", value: summaryCards.totalMaintenance, icon: Wrench, color: "from-emerald-500 to-teal-400" },
         { title: "Utility Collected", value: summaryCards.totalUtility, icon: UtilityPole, color: "from-amber-500 to-orange-400" },
-        { title: "Total Revenue", value: summaryCards.totalRevenue, icon: DollarSign, color: "from-purple-600 to-pink-500" },
+        { title: "Total Revenue", value: summaryCards.totalRevenue, icon: IndianRupee, color: "from-purple-600 to-pink-500" },
         { title: "Pending Rent", value: summaryCards.pendingRent, icon: Clock, color: "from-rose-500 to-red-400" },
     ];
 
@@ -105,20 +105,14 @@ const SuperAdminRevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-white p-6 space-y-10">
+        <div className="min-h-screen bg-[var(--bg-main)] text-white p-2 space-y-10">
             {/* Header */}
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">
-                        <Activity className="text-[var(--color-primary)]" />
+                    <h1 className="text-2xl font-black tracking-tight flex items-center gap-3">
                         Platform Revenue Intelligence
                     </h1>
-                    <p className="text-slate-400 mt-2 font-medium">Comprehensive financial overview across all owners and properties.</p>
                 </div>
-                <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-3 rounded-2xl transition-all font-bold group">
-                    <Download size={18} className="group-hover:translate-y-0.5 transition-transform" />
-                    <span>Download PDF Report</span>
-                </button>
             </header>
 
             {/* 1️⃣ Revenue Summary Cards */}
@@ -148,8 +142,8 @@ const SuperAdminRevenueReport = () => {
                             <BarChart data={revenueByOwner}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
                                 <XAxis dataKey="ownerName" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
-                                <Tooltip 
+                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                                <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
                                     itemStyle={{ color: '#fff' }}
                                     formatter={(val) => formatCurrency(val)}
@@ -193,9 +187,9 @@ const SuperAdminRevenueReport = () => {
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={revenueByProperty} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" horizontal={false} />
-                                <XAxis type="number" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
+                                <XAxis type="number" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
                                 <YAxis dataKey="propertyName" type="category" stroke="#94a3b8" fontSize={10} width={100} tickLine={false} axisLine={false} />
-                                <Tooltip 
+                                <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
                                     formatter={(val) => formatCurrency(val)}
                                 />
@@ -239,14 +233,14 @@ const SuperAdminRevenueReport = () => {
                             <LineChart data={monthlyRevenueTrend}>
                                 <defs>
                                     <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
-                                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" />
                                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
-                                <Tooltip 
+                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                                <Tooltip
                                     contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
                                     formatter={(val) => formatCurrency(val)}
                                 />
@@ -259,7 +253,7 @@ const SuperAdminRevenueReport = () => {
                 {/* 5️⃣ Occupancy vs Revenue */}
                 <div className="bg-[#1D2B3F] border border-white/10 p-8 rounded-[2.5rem] flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
                     <div className="absolute top-4 left-6">
-                         <h3 className="text-xl font-bold flex items-center gap-3">
+                        <h3 className="text-xl font-bold flex items-center gap-3">
                             <PieChart className="text-amber-400" /> Occupancy Mix
                         </h3>
                     </div>

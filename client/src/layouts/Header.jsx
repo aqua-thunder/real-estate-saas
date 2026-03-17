@@ -97,94 +97,97 @@ const Header = ({ onToggleSidebar }) => {
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-4 md:gap-6 ml-4">
                 {/* Notifications */}
-                <div
-                    className="relative"
-                    onMouseEnter={handleBellHover}
-                    onMouseLeave={() => setOpenNotifications(false)}
-                >
-                    <button
-                        className="relative p-2 rounded-xl hover:bg-[var(--color-card)] transition-all"
+                {user?.role !== "SUPER_ADMIN" && (
+                    <div
+                        className="relative"
+                        onMouseEnter={handleBellHover}
+                        onMouseLeave={() => setOpenNotifications(false)}
                     >
-                        <Bell size={20} className="text-[var(--text-secondary)]" />
-                        {totalActive > 0 && (
-                            <span className="absolute h-3 w-3 top-1 right-1 bg-[var(--color-primary)] text-[var(--text-secondary)] text-[10px] px-1.5 py-0.5 rounded-full font-bold ">
-                            </span>
-                        )}
-                    </button>
+                        <button
 
-                    {/* Notification Dropdown Container */}
-                    {openNotifications && (
-                        <div className="absolute right-0 top-full pt-2 z-50">
-                            <div
-                                className="w-[90vw] sm:w-80 max-w-sm bg-[var(--bg-main)] border border-[var(--color-main)] rounded-2xl shadow-2xl flex flex-col overflow-hidden shadow-black/50 animate-in fade-in slide-in-from-top-2 duration-200"
-                            >
-                                {/* Header */}
-                                <div className="p-4 border-b border-[var(--color-main)]/30 flex items-center justify-between bg-[var(--bg-card)]/30">
-                                    <h3 className="text-[var(--text-secondary)] font-bold text-sm tracking-wide uppercase">
-                                        {user?.role === "TENANT" ? "Status Updates" : "Received Requests"}
-                                    </h3>
-                                    <div className="p-1 px-2 rounded-md bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-black">
-                                        TOP 3
-                                    </div>
-                                </div>
+                            className="relative p-2 rounded-xl hover:bg-[var(--color-card)] transition-all"
+                        >
+                            <Bell size={20} className="text-[var(--text-secondary)]" />
+                            {totalActive > 0 && (
+                                <span className="absolute h-3 w-3 top-1 right-1 bg-[var(--color-primary)] text-[var(--text-secondary)] text-[10px] px-1.5 py-0.5 rounded-full font-bold ">
+                                </span>
+                            )}
+                        </button>
 
-                                {/* Content */}
-                                <div className="max-h-[300px] overflow-y-auto">
-                                    {notifications.length > 0 ? (
-                                        <div className="divide-y divide-[var(--color-main)]/20">
-                                            {notifications.map((req) => (
-                                                <NavLink
-                                                    key={req._id}
-                                                    to="/maintenance"
-                                                    className="p-4 hover:bg-[var(--bg-card)]/50 transition-colors flex flex-col gap-2 block"
-                                                    onClick={() => setOpenNotifications(false)}
-                                                >
-                                                    <div className="flex justify-between items-start">
-                                                        <span className="text-[var(--text-secondary)] text-sm font-semibold truncate pr-2">
-                                                            {req.title}
-                                                        </span>
-                                                        <span className={`text-[9px] px-2 py-0.5 rounded-full border ${getStatusStyle(req.status)} uppercase font-black tracking-tighter`}>
-                                                            {req.status}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-[var(--text-card)] text-xs line-clamp-1 font-medium italic opacity-80">
-                                                        {req.description}
-                                                    </p>
-                                                    <div className="flex items-center justify-between text-[10px] text-[var(--text-card)] font-bold uppercase tracking-wider">
-                                                        <span className="flex items-center gap-1">
-                                                            <Clock size={10} /> {new Date(req.updatedAt || req.createdAt).toLocaleDateString()}
-                                                        </span>
-                                                        <span className={req.priority === "Critical" ? "text-rose-500" : "text-amber-500"}>
-                                                            • {req.priority}
-                                                        </span>
-                                                    </div>
-                                                </NavLink>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="p-8 text-center">
-                                            <Bell size={32} className="mx-auto text-[var(--text-card)] mb-2 opacity-20" />
-                                            <p className="text-[var(--text-card)] text-xs font-medium">
-                                                {user?.role === "TENANT"
-                                                    ? "No status updates yet"
-                                                    : "No new received requests"}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Footer */}
-                                <NavLink
-                                    to="/maintenance"
-                                    onClick={() => setOpenNotifications(false)}
-                                    className="p-3 text-center text-[var(--color-primary)] text-xs font-black uppercase tracking-widest hover:bg-[var(--color-primary)]/5 transition-all border-t border-[var(--color-main)]/30 block"
+                        {/* Notification Dropdown Container */}
+                        {openNotifications && (
+                            <div className="absolute right-0 top-full pt-2 z-50">
+                                <div
+                                    className="w-[90vw] sm:w-80 max-w-sm bg-[var(--bg-main)] border border-[var(--color-main)] rounded-2xl shadow-2xl flex flex-col overflow-hidden shadow-black/50 animate-in fade-in slide-in-from-top-2 duration-200"
                                 >
-                                    View All Activity
-                                </NavLink>
+                                    {/* Header */}
+                                    <div className="p-4 border-b border-[var(--color-main)]/30 flex items-center justify-between bg-[var(--bg-card)]/30">
+                                        <h3 className="text-[var(--text-secondary)] font-bold text-sm tracking-wide uppercase">
+                                            {user?.role === "TENANT" ? "Status Updates" : "Received Requests"}
+                                        </h3>
+                                        <div className="p-1 px-2 rounded-md bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-black">
+                                            TOP 3
+                                        </div>
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="max-h-[300px] overflow-y-auto">
+                                        {notifications.length > 0 ? (
+                                            <div className="divide-y divide-[var(--color-main)]/20">
+                                                {notifications.map((req) => (
+                                                    <NavLink
+                                                        key={req._id}
+                                                        to="/maintenance"
+                                                        className="p-4 hover:bg-[var(--bg-card)]/50 transition-colors flex flex-col gap-2 block"
+                                                        onClick={() => setOpenNotifications(false)}
+                                                    >
+                                                        <div className="flex justify-between items-start">
+                                                            <span className="text-[var(--text-secondary)] text-sm font-semibold truncate pr-2">
+                                                                {req.title}
+                                                            </span>
+                                                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${getStatusStyle(req.status)} uppercase font-black tracking-tighter`}>
+                                                                {req.status}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-[var(--text-card)] text-xs line-clamp-1 font-medium italic opacity-80">
+                                                            {req.description}
+                                                        </p>
+                                                        <div className="flex items-center justify-between text-[10px] text-[var(--text-card)] font-bold uppercase tracking-wider">
+                                                            <span className="flex items-center gap-1">
+                                                                <Clock size={10} /> {new Date(req.updatedAt || req.createdAt).toLocaleDateString()}
+                                                            </span>
+                                                            <span className={req.priority === "Critical" ? "text-rose-500" : "text-amber-500"}>
+                                                                • {req.priority}
+                                                            </span>
+                                                        </div>
+                                                    </NavLink>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="p-8 text-center">
+                                                <Bell size={32} className="mx-auto text-[var(--text-card)] mb-2 opacity-20" />
+                                                <p className="text-[var(--text-card)] text-xs font-medium">
+                                                    {user?.role === "TENANT"
+                                                        ? "No status updates yet"
+                                                        : "No new received requests"}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Footer */}
+                                    <NavLink
+                                        to="/maintenance"
+                                        onClick={() => setOpenNotifications(false)}
+                                        className="p-3 text-center text-[var(--color-primary)] text-xs font-black uppercase tracking-widest hover:bg-[var(--color-primary)]/5 transition-all border-t border-[var(--color-main)]/30 block"
+                                    >
+                                        View All Activity
+                                    </NavLink>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Account Dropdown */}
                 <div

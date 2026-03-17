@@ -207,11 +207,11 @@ const Subscriptions = () => {
                             {/* Pricing Section */}
                             <div className="mb-8 p-6 bg-[var(--color-card)]/30 rounded-3xl border border-white/5">
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-[var(--text-secondary)]">${plan.priceMonthly}</span>
+                                    <span className="text-4xl font-black text-[var(--text-secondary)]">₹{plan.priceMonthly}</span>
                                     <span className="text-[var(--text-card)] font-bold text-sm">/ month</span>
                                 </div>
                                 <div className="mt-2 text-xs font-bold text-green-500/80 uppercase tracking-wider">
-                                    Annual billing: ${plan.priceYearly}/yr
+                                    Annual billing: ₹{plan.priceYearly}/yr
                                 </div>
                             </div>
 
@@ -311,7 +311,7 @@ const Subscriptions = () => {
                                         variant="formInput"
                                         type="number"
                                         name="priceMonthly"
-                                        label="Monthly Price ($)"
+                                        label="Monthly Price (₹)"
                                         value={formData.priceMonthly}
                                         onChange={handleChange}
                                         className="rounded-2xl bg-[var(--color-card)] border-white/10"
@@ -321,7 +321,7 @@ const Subscriptions = () => {
                                         variant="formInput"
                                         type="number"
                                         name="priceYearly"
-                                        label="Yearly Price ($)"
+                                        label="Yearly Price (₹)"
                                         value={formData.priceYearly}
                                         onChange={handleChange}
                                         className="rounded-2xl bg-[var(--color-card)] border-white/10"

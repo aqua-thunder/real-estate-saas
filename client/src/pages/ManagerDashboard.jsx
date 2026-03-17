@@ -204,7 +204,7 @@ export default function ManagerDashboard() {
                                         <td className="px-8 py-4">
                                             <span className="bg-blue-500/10 text-blue-500 text-[10px] font-black px-2 py-1 rounded-lg border border-blue-500/20">{payment.unitId?.unitNumber}</span>
                                         </td>
-                                        <td className="px-8 py-4 text-sm font-black text-emerald-500">${payment.totalAmount}</td>
+                                        <td className="px-8 py-4 text-sm font-black text-emerald-500">₹{payment.totalAmount}</td>
                                         <td className="px-8 py-4 text-xs font-medium text-[var(--text-card)]">{new Date(payment.paidAt).toLocaleDateString()}</td>
                                     </tr>
                                 ))}

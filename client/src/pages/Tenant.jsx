@@ -378,8 +378,8 @@ const Tenant = () => {
             body: [
                 ["Lease Term Start", new Date(tenant.leaseStart).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
                 ["Lease Term End", new Date(tenant.leaseEnd).toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })],
-                ["Monthly Installment", `INR ${tenant.rent?.toLocaleString()}`],
-                ["Initial Security Deposit", `INR ${tenant.deposit?.toLocaleString()}`],
+                ["Monthly Installment", `₹ ${tenant.rent?.toLocaleString()}`],
+                ["Initial Security Deposit", `₹ ${tenant.deposit?.toLocaleString()}`],
                 ["Current Payment Status", tenant.paymentStatus],
             ],
             theme: 'plain',
