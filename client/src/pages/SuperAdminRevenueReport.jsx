@@ -15,7 +15,8 @@ import {
     Home,
     UtilityPole,
     Wrench,
-    Activity
+    Activity,
+    MoreVertical
 } from "lucide-react";
 import {
     BarChart,
@@ -30,8 +31,11 @@ import {
     Cell,
     PieChart as RePieChart,
     Pie,
+    AreaChart,
+    Area
 } from "recharts";
 import { useAuth } from "../store/auth";
+import Button from "../components/ui/Button";
 
 const SuperAdminRevenueReport = () => {
     const { token } = useAuth();
@@ -67,14 +71,14 @@ const SuperAdminRevenueReport = () => {
         return (
             <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center">
                 <div className="relative w-20 h-20">
-                    <div className="absolute inset-0 border-4 border-[var(--color-primary)]/20 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-[var(--color-primary)]/10 rounded-full"></div>
                     <div className="absolute inset-0 border-4 border-t-[var(--color-primary)] rounded-full animate-spin"></div>
                 </div>
             </div>
         );
     }
 
-    if (!data) return <div className="p-10 text-white">No data available</div>;
+    if (!data) return <div className="p-10 text-[var(--color-secondary)] font-black text-center">No intelligence data available at this time.</div>;
 
     const {
         summaryCards,
@@ -92,11 +96,11 @@ const SuperAdminRevenueReport = () => {
     }).format(val);
 
     const statsConfig = [
-        { title: "Total Rent Collected", value: summaryCards.totalRent, icon: Home, color: "from-blue-600 to-indigo-500" },
-        { title: "Maintenance Collected", value: summaryCards.totalMaintenance, icon: Wrench, color: "from-emerald-500 to-teal-400" },
-        { title: "Utility Collected", value: summaryCards.totalUtility, icon: UtilityPole, color: "from-amber-500 to-orange-400" },
-        { title: "Total Revenue", value: summaryCards.totalRevenue, icon: IndianRupee, color: "from-purple-600 to-pink-500" },
-        { title: "Pending Rent", value: summaryCards.pendingRent, icon: Clock, color: "from-rose-500 to-red-400" },
+        { title: "Total Rent", value: summaryCards.totalRent, icon: Home, color: "bg-blue-50 text-blue-600" },
+        { title: "Total Maintenance", value: summaryCards.totalMaintenance, icon: Wrench, color: "bg-emerald-50 text-emerald-600" },
+        { title: "Total Utility", value: summaryCards.totalUtility, icon: UtilityPole, color: "bg-amber-50 text-amber-600" },
+        { title: "Total Revenue", value: summaryCards.totalRevenue, icon: IndianRupee, color: "bg-indigo-50 text-indigo-600" },
+        { title: "Total Pending Rent", value: summaryCards.pendingRent, icon: Clock, color: "bg-rose-50 text-rose-600" },
     ];
 
     const pieData = [
@@ -105,70 +109,79 @@ const SuperAdminRevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-white p-2 space-y-10">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-2 space-y-10 font-['Inter']">
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-2xl font-black tracking-tight flex items-center gap-3">
-                        Platform Revenue Intelligence
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">
+                        Revenue Report
                     </h1>
+                </div>
+
+                <div className="flex items-center gap-4">
+                    <Button variant="secondary" size="md" icon={<Download size={18} />}>
+                        Download Report
+                    </Button>
                 </div>
             </header>
 
             {/* 1️⃣ Revenue Summary Cards */}
             <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {statsConfig.map((stat, idx) => (
-                    <div key={idx} className="bg-[#1D2B3F] border border-white/10 p-6 rounded-3xl hover:border-[var(--color-primary)]/50 transition-all group relative overflow-hidden">
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-10 blur-2xl rounded-full -mr-10 -mt-10`}></div>
-                        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}>
-                            <stat.icon size={22} className="text-white" />
+                    <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[2rem] hover:border-[var(--color-primary)]/30 transition-all group relative overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]">
+                        <div className={`w-12 h-12 rounded-2xl ${stat.color} flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-500`}>
+                            <stat.icon size={22} />
                         </div>
-                        <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">{stat.title}</p>
-                        <h3 className="text-2xl font-black">{formatCurrency(stat.value)}</h3>
+                        <p className="text-[var(--text-muted)] text-[10px] font-black uppercase tracking-[0.2em] mb-1 opacity-60 group-hover:opacity-100 transition-opacity">{stat.title}</p>
+                        <h3 className="text-2xl font-black text-[var(--color-secondary)] tracking-tighter">{formatCurrency(stat.value)}</h3>
+                        <div className="absolute -bottom-1 -right-1 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity">
+                            <stat.icon size={80} />
+                        </div>
                     </div>
                 ))}
             </section>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* 2️⃣ Revenue by Owner */}
-                <div className="bg-[#1D2B3F] border border-white/10 p-8 rounded-[2.5rem] space-y-6">
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold flex items-center gap-3">
-                            <Users className="text-blue-400" /> Revenue by Owner
+                        <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
+                            <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                            Revenue By Owner
                         </h3>
                     </div>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={revenueByOwner}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
-                                <XAxis dataKey="ownerName" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                <XAxis dataKey="ownerName" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
-                                    itemStyle={{ color: '#fff' }}
+                                    cursor={{ fill: '#f8fafc' }}
+                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                                     formatter={(val) => formatCurrency(val)}
                                 />
                                 <Bar dataKey="revenue" fill="#3b82f6" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto pt-4">
                         <table className="w-full text-left">
-                            <thead className="text-[10px] uppercase font-black text-slate-500 border-b border-white/5">
+                            <thead className="text-[10px] uppercase font-black text-[var(--text-muted)] border-b border-gray-50 opacity-60">
                                 <tr>
-                                    <th className="pb-4">Owner</th>
-                                    <th className="pb-4">Props</th>
-                                    <th className="pb-4">Units</th>
+                                    <th className="pb-4">Owner Identity</th>
+                                    <th className="pb-4">Portfolio</th>
+                                    <th className="pb-4">Cap.</th>
                                     <th className="pb-4 text-right">Revenue</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-gray-50">
                                 {revenueByOwner.map((owner, idx) => (
-                                    <tr key={idx} className="group hover:bg-white/[0.02]">
-                                        <td className="py-4 font-bold">{owner.ownerName}</td>
-                                        <td className="py-4 text-slate-400">{owner.propertyCount}</td>
-                                        <td className="py-4 text-slate-400">{owner.totalUnits}</td>
-                                        <td className="py-4 text-right font-black text-emerald-400">{formatCurrency(owner.revenue)}</td>
+                                    <tr key={idx} className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="py-5 font-black text-[var(--color-secondary)] text-sm">{owner.ownerName}</td>
+                                        <td className="py-5 text-[var(--text-muted)] text-[11px] font-bold uppercase tracking-widest opacity-60">{owner.propertyCount} Properties</td>
+                                        <td className="py-5 text-[var(--text-muted)] text-[11px] font-bold opacity-60">{owner.totalUnits} Units</td>
+                                        <td className="py-5 text-right font-black text-emerald-600 italic">{formatCurrency(owner.revenue)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -177,43 +190,45 @@ const SuperAdminRevenueReport = () => {
                 </div>
 
                 {/* 3️⃣ Revenue by Property */}
-                <div className="bg-[#1D2B3F] border border-white/10 p-8 rounded-[2.5rem] space-y-6">
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-bold flex items-center gap-3">
-                            <Building2 className="text-emerald-400" /> Revenue by Property
+                        <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
+                            <span className="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
+                            Property Revenue
                         </h3>
                     </div>
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={revenueByProperty} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" horizontal={false} />
-                                <XAxis type="number" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                                <XAxis type="number" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
                                 <YAxis dataKey="propertyName" type="category" stroke="#94a3b8" fontSize={10} width={100} tickLine={false} axisLine={false} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
+                                    cursor={{ fill: '#f8fafc' }}
+                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                                     formatter={(val) => formatCurrency(val)}
                                 />
                                 <Bar dataKey="monthlyRevenue" fill="#10b981" radius={[0, 6, 6, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto pt-4">
                         <table className="w-full text-left">
-                            <thead className="text-[10px] uppercase font-black text-slate-500 border-b border-white/5">
+                            <thead className="text-[10px] uppercase font-black text-[var(--text-muted)] border-b border-gray-50 opacity-60">
                                 <tr>
-                                    <th className="pb-4">Property</th>
-                                    <th className="pb-4">Owner</th>
-                                    <th className="pb-4">Units</th>
-                                    <th className="pb-4 text-right">Revenue</th>
+                                    <th className="pb-4">Asset Name</th>
+                                    <th className="pb-4">Operator</th>
+                                    <th className="pb-4">Size</th>
+                                    <th className="pb-4 text-right">Yield</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-gray-50">
                                 {revenueByProperty.slice(0, 5).map((prop, idx) => (
-                                    <tr key={idx} className="group hover:bg-white/[0.02]">
-                                        <td className="py-4 font-bold">{prop.propertyName}</td>
-                                        <td className="py-4 text-slate-400 text-xs">{prop.ownerName}</td>
-                                        <td className="py-4 text-slate-400 text-xs">{prop.units}</td>
-                                        <td className="py-4 text-right font-black text-blue-400">{formatCurrency(prop.monthlyRevenue)}</td>
+                                    <tr key={idx} className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="py-5 font-black text-[var(--color-secondary)] text-sm">{prop.propertyName}</td>
+                                        <td className="py-5 text-[var(--text-muted)] text-[10px] font-black uppercase opacity-60">{prop.ownerName}</td>
+                                        <td className="py-5 text-[var(--text-muted)] text-[11px] font-bold opacity-60">{prop.units} Units</td>
+                                        <td className="py-5 text-right font-black text-blue-600">{formatCurrency(prop.monthlyRevenue)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -224,37 +239,40 @@ const SuperAdminRevenueReport = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* 4️⃣ Monthly Revenue Trend */}
-                <div className="lg:col-span-2 bg-[#1D2B3F] border border-white/10 p-8 rounded-[2.5rem] space-y-6">
-                    <h3 className="text-xl font-bold flex items-center gap-3">
-                        <TrendingUp className="text-purple-400" /> Platform Growth Trend
+                <div className="lg:col-span-2 bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden relative">
+                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-50 blur-[80px] rounded-full opacity-50"></div>
+                    <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4 relative z-10">
+                        <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                        monthly Revenue Trend
                     </h3>
-                    <div className="h-[350px] w-full">
+                    <div className="h-[350px] w-full relative z-10">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={monthlyRevenueTrend}>
+                            <AreaChart data={monthlyRevenueTrend}>
                                 <defs>
-                                    <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.1} />
                                         <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" />
-                                <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => `₹${val / 1000}k`} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '12px' }}
+                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #f1f5f9', borderRadius: '16px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
                                     formatter={(val) => formatCurrency(val)}
                                 />
-                                <Line type="monotone" dataKey="revenue" stroke="#a855f7" strokeWidth={4} dot={{ fill: '#a855f7', r: 6 }} activeDot={{ r: 8 }} />
-                            </LineChart>
+                                <Area type="monotone" dataKey="revenue" stroke="#a855f7" strokeWidth={4} fill="url(#areaGrad)" dot={{ fill: '#a855f7', r: 5, strokeWidth: 0 }} activeDot={{ r: 7 }} />
+                            </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* 5️⃣ Occupancy vs Revenue */}
-                <div className="bg-[#1D2B3F] border border-white/10 p-8 rounded-[2.5rem] flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
-                    <div className="absolute top-4 left-6">
-                        <h3 className="text-xl font-bold flex items-center gap-3">
-                            <PieChart className="text-amber-400" /> Occupancy Mix
+                {/* 5️⃣ Occupancy Flow */}
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] flex flex-col items-center justify-center space-y-8 relative overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                    <div className="absolute top-8 left-8">
+                        <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
+                            <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span>
+                            Utilization
                         </h3>
                     </div>
                     <div className="relative w-64 h-64 mt-10">
@@ -262,10 +280,11 @@ const SuperAdminRevenueReport = () => {
                             <RePieChart>
                                 <Pie
                                     data={pieData}
-                                    innerRadius={70}
-                                    outerRadius={90}
-                                    paddingAngle={8}
+                                    innerRadius={75}
+                                    outerRadius={95}
+                                    paddingAngle={10}
                                     dataKey="value"
+                                    strokeWidth={0}
                                 >
                                     {pieData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -275,75 +294,76 @@ const SuperAdminRevenueReport = () => {
                             </RePieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-4xl font-black">{occupancyStats.occupancyRate}%</span>
-                            <span className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Rate</span>
+                            <span className="text-3xl font-black text-[var(--color-secondary)] tracking-tighter">{occupancyStats.occupancyRate}%</span>
+                            <span className="text-[var(--text-muted)] text-[10px] uppercase font-black  mt-2 opacity-60">Avg. Utilization</span>
                         </div>
                     </div>
                     <div className="w-full grid grid-cols-2 gap-4">
-                        <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">Occupied</p>
-                            <p className="text-xl font-black text-emerald-400">{occupancyStats.occupiedUnits}</p>
+                        <div className="bg-emerald-50/50 p-5 rounded-[2rem] border border-emerald-100/50 text-center">
+                            <p className="text-emerald-700 text-[9px] uppercase font-black tracking-widest mb-1">Occupied</p>
+                            <p className="text-2xl font-black text-emerald-600 tracking-tighter">{occupancyStats.occupiedUnits}</p>
                         </div>
-                        <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-                            <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">Vacant</p>
-                            <p className="text-xl font-black text-rose-400">{occupancyStats.vacantUnits}</p>
+                        <div className="bg-rose-50/50 p-5 rounded-[2rem] border border-rose-100/50 text-center">
+                            <p className="text-rose-700 text-[9px] uppercase font-black tracking-widest mb-1">Vacant</p>
+                            <p className="text-2xl font-black text-rose-600 tracking-tighter">{occupancyStats.vacantUnits}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* 6️⃣ Pending Rent Report */}
-            <section className="bg-[#1D2B3F] border border-white/10 rounded-[2.5rem] overflow-hidden">
-                <div className="p-8 border-b border-white/5 flex items-center justify-between">
-                    <h3 className="text-xl font-bold flex items-center gap-3">
-                        <Clock className="text-rose-400" /> Pending Collection Report
+            <section className="bg-white border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                <div className="p-10 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
+                        <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
+                        pending Rent Report
                     </h3>
-                    <span className="bg-rose-500/10 text-rose-400 text-xs font-black px-4 py-1.5 rounded-full border border-rose-500/20">
-                        {pendingRentReport.length} Outstanding Invoices
-                    </span>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="text-[10px] uppercase tracking-widest font-black text-slate-500">
+                        <thead className="text-[10px] uppercase tracking-widest font-black text-[var(--text-muted)] bg-gray-50/50 opacity-60">
                             <tr>
-                                <th className="px-10 py-6">Tenant</th>
-                                <th className="px-10 py-6">Property</th>
-                                <th className="px-10 py-6">Amount</th>
-                                <th className="px-10 py-6">Duration</th>
-                                <th className="px-10 py-6 text-right">Action</th>
+                                <th className="px-10 py-6">Tenant Name</th>
+                                <th className="px-10 py-6">Property Name</th>
+                                <th className="px-10 py-6">Rent Due</th>
+                                <th className="px-10 py-6">days Late</th>
+                                <th className="px-10 py-6 text-right">Operational Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-gray-50">
                             {pendingRentReport.map((item, idx) => (
-                                <tr key={idx} className="hover:bg-white/[0.02] group transition-colors">
+                                <tr key={idx} className="hover:bg-gray-50/50 group transition-colors">
                                     <td className="px-10 py-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-black text-slate-400">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-[14px] bg-slate-100 flex items-center justify-center text-xs font-black text-[var(--color-secondary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-all">
                                                 {item.tenant[0]}
                                             </div>
-                                            <span className="font-bold">{item.tenant}</span>
+                                            <span className="font-black text-[var(--color-secondary)] text-sm">{item.tenant}</span>
                                         </div>
                                     </td>
-                                    <td className="px-10 py-6 text-slate-400 text-sm">{item.property}</td>
-                                    <td className="px-10 py-6 font-black text-white">{formatCurrency(item.amount)}</td>
+                                    <td className="px-10 py-6 text-[var(--text-muted)] text-[11px] font-bold uppercase tracking-widest opacity-60">{item.property}</td>
+                                    <td className="px-10 py-6 font-black text-[var(--color-secondary)] text-lg tracking-tighter">{formatCurrency(item.amount)}</td>
                                     <td className="px-10 py-6">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${item.daysLate > 30 ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
-                                            {item.daysLate} Days Late
+                                        <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${item.daysLate > 30 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-600 border-amber-100'}`}>
+                                            {item.daysLate} Days late
                                         </span>
                                     </td>
                                     <td className="px-10 py-6 text-right">
-                                        <button className="text-[var(--color-primary)] text-xs font-bold hover:underline">Send Reminder</button>
+                                        <Button variant="ghost" size="xs">Escalate</Button>
                                     </td>
                                 </tr>
                             ))}
                             {pendingRentReport.length === 0 && (
                                 <tr>
-                                    <td colSpan="5" className="px-10 py-20 text-center text-slate-500">
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                                                <TrendingUp size={32} />
+                                    <td colSpan="5" className="px-10 py-24 text-center">
+                                        <div className="flex flex-col items-center gap-6">
+                                            <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 shadow-inner">
+                                                <TrendingUp size={40} />
                                             </div>
-                                            <p className="font-bold">Excellent! No pending rent found across the platform.</p>
+                                            <div className="space-y-1">
+                                                <p className="font-black text-[var(--color-secondary)] text-xl tracking-tight uppercase">Perfect Liquidity</p>
+                                                <p className="text-[var(--text-muted)] text-sm font-medium">No pending rent found across the platform network.</p>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

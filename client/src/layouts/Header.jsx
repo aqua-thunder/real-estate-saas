@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Search, Mail, Bell, User, ChevronDown, Menu, Layers, Clock } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Search, Mail, Bell, User, ChevronDown, Menu, Layers, Clock, LogOut } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth.jsx";
-
-
+import Button from "../components/ui/Button";
 
 const Header = ({ onToggleSidebar }) => {
     const [openAccount, setOpenAccount] = useState(false);
@@ -11,6 +10,7 @@ const Header = ({ onToggleSidebar }) => {
     const [notifications, setNotifications] = useState([]);
     const [totalActive, setTotalActive] = useState(0);
     const { user, token } = useAuth();
+    const navigate = useNavigate();
 
     const fetchNotifications = async () => {
         try {
@@ -65,30 +65,30 @@ const Header = ({ onToggleSidebar }) => {
     };
 
     return (
-        <header className="w-full bg-[var(--bg-card)] border-b border-[var(--color-card)] px-4 md:px-8 py-4 flex items-center justify-between">
+        <header className="w-full bg-white/80 backdrop-blur-md border-b border-gray-100 px-6 md:px-10 py-5 flex items-center justify-between sticky top-0 z-30 font-['Inter']">
 
             {/* LEFT SIDE — Hamburger + Search */}
             <div className="flex items-center gap-4 flex-1">
                 {/* Hamburger Menu (Mobile Only) */}
-                <button
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    iconOnly
+                    icon={<Menu size={22} />}
                     onClick={onToggleSidebar}
-                    className="lg:hidden p-2 rounded-lg hover:bg-[var(--color-card)] transition-colors"
-                >
-                    <Menu size={24} className="text-[var(--text-secondary)]" />
-                </button>
-
-
+                    className="lg:hidden text-[var(--text-muted)]"
+                />
 
                 {/* 🔍 SEARCH */}
-                <div className="relative w-full max-w-xs md:max-w-sm ml-2">
+                <div className="relative w-full max-w-xs md:max-w-sm ml-2 group">
                     <Search
-                        size={18}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
+                        size={16}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors"
                     />
                     <input
                         type="text"
-                        placeholder="Search..."
-                        className="w-full pl-10 pr-4 py-2 rounded-xl border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all"
+                        placeholder="Search for everything..."
+                        className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-transparent bg-gray-50/50 text-[var(--color-secondary)] text-[13px] font-bold placeholder:text-[var(--text-muted)] placeholder:font-medium focus:outline-none focus:bg-white focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all"
                     />
                 </div>
             </div>
@@ -103,58 +103,62 @@ const Header = ({ onToggleSidebar }) => {
                         onMouseEnter={handleBellHover}
                         onMouseLeave={() => setOpenNotifications(false)}
                     >
-                        <button
-
-                            className="relative p-2 rounded-xl hover:bg-[var(--color-card)] transition-all"
-                        >
-                            <Bell size={20} className="text-[var(--text-secondary)]" />
-                            {totalActive > 0 && (
-                                <span className="absolute h-3 w-3 top-1 right-1 bg-[var(--color-primary)] text-[var(--text-secondary)] text-[10px] px-1.5 py-0.5 rounded-full font-bold ">
-                                </span>
-                            )}
-                        </button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            iconOnly
+                            icon={
+                                <div className="relative">
+                                    <Bell size={20} className="group-hover:rotate-12 transition-transform" />
+                                    {totalActive > 0 && (
+                                        <span className="absolute h-2 w-2 top-0 right-0 bg-[#e74c3c] rounded-full ring-2 ring-white"></span>
+                                    )}
+                                </div>
+                            }
+                            className="text-[var(--text-muted)] hover:text-[var(--color-primary)]"
+                        />
 
                         {/* Notification Dropdown Container */}
                         {openNotifications && (
                             <div className="absolute right-0 top-full pt-2 z-50">
                                 <div
-                                    className="w-[90vw] sm:w-80 max-w-sm bg-[var(--bg-main)] border border-[var(--color-main)] rounded-2xl shadow-2xl flex flex-col overflow-hidden shadow-black/50 animate-in fade-in slide-in-from-top-2 duration-200"
+                                    className="w-[90vw] sm:w-80 max-w-sm bg-white border border-gray-100 rounded-3xl shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200"
                                 >
                                     {/* Header */}
-                                    <div className="p-4 border-b border-[var(--color-main)]/30 flex items-center justify-between bg-[var(--bg-card)]/30">
-                                        <h3 className="text-[var(--text-secondary)] font-bold text-sm tracking-wide uppercase">
-                                            {user?.role === "TENANT" ? "Status Updates" : "Received Requests"}
+                                    <div className="p-5 border-b border-gray-50 flex items-center justify-between">
+                                        <h3 className="text-[var(--color-secondary)] font-black text-xs tracking-widest uppercase">
+                                            {user?.role === "TENANT" ? "Status Updates" : "Requests"}
                                         </h3>
-                                        <div className="p-1 px-2 rounded-md bg-[var(--color-primary)]/10 text-[var(--color-primary)] text-[10px] font-black">
-                                            TOP 3
+                                        <div className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-black italic">
+                                            LATEST ONLY
                                         </div>
                                     </div>
 
                                     {/* Content */}
-                                    <div className="max-h-[300px] overflow-y-auto">
+                                    <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                                         {notifications.length > 0 ? (
-                                            <div className="divide-y divide-[var(--color-main)]/20">
+                                            <div className="divide-y divide-gray-50">
                                                 {notifications.map((req) => (
                                                     <NavLink
                                                         key={req._id}
                                                         to="/maintenance"
-                                                        className="p-4 hover:bg-[var(--bg-card)]/50 transition-colors flex flex-col gap-2 block"
+                                                        className="p-5 hover:bg-gray-50/50 transition-colors flex flex-col gap-2.5 block group/item"
                                                         onClick={() => setOpenNotifications(false)}
                                                     >
                                                         <div className="flex justify-between items-start">
-                                                            <span className="text-[var(--text-secondary)] text-sm font-semibold truncate pr-2">
+                                                            <span className="text-[var(--color-secondary)] text-[13px] font-black truncate pr-2 group-hover/item:text-[var(--color-primary)] transition-colors">
                                                                 {req.title}
                                                             </span>
-                                                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${getStatusStyle(req.status)} uppercase font-black tracking-tighter`}>
+                                                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${getStatusStyle(req.status)} uppercase font-black tracking-widest`}>
                                                                 {req.status}
                                                             </span>
                                                         </div>
-                                                        <p className="text-[var(--text-card)] text-xs line-clamp-1 font-medium italic opacity-80">
+                                                        <p className="text-[var(--text-muted)] text-[11px] line-clamp-2 font-medium leading-relaxed italic opacity-80">
                                                             {req.description}
                                                         </p>
-                                                        <div className="flex items-center justify-between text-[10px] text-[var(--text-card)] font-bold uppercase tracking-wider">
-                                                            <span className="flex items-center gap-1">
-                                                                <Clock size={10} /> {new Date(req.updatedAt || req.createdAt).toLocaleDateString()}
+                                                        <div className="flex items-center justify-between text-[10px] text-[var(--text-muted)] font-black uppercase tracking-widest">
+                                                            <span className="flex items-center gap-1.5 opacity-60">
+                                                                <Clock size={11} /> {new Date(req.updatedAt || req.createdAt).toLocaleDateString()}
                                                             </span>
                                                             <span className={req.priority === "Critical" ? "text-rose-500" : "text-amber-500"}>
                                                                 • {req.priority}
@@ -164,12 +168,12 @@ const Header = ({ onToggleSidebar }) => {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="p-8 text-center">
-                                                <Bell size={32} className="mx-auto text-[var(--text-card)] mb-2 opacity-20" />
-                                                <p className="text-[var(--text-card)] text-xs font-medium">
-                                                    {user?.role === "TENANT"
-                                                        ? "No status updates yet"
-                                                        : "No new received requests"}
+                                            <div className="p-10 text-center">
+                                                <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-gray-100">
+                                                    <Bell size={20} className="text-gray-300" />
+                                                </div>
+                                                <p className="text-[var(--text-muted)] text-xs font-bold uppercase tracking-widest opacity-40">
+                                                    All catch up
                                                 </p>
                                             </div>
                                         )}
@@ -179,9 +183,9 @@ const Header = ({ onToggleSidebar }) => {
                                     <NavLink
                                         to="/maintenance"
                                         onClick={() => setOpenNotifications(false)}
-                                        className="p-3 text-center text-[var(--color-primary)] text-xs font-black uppercase tracking-widest hover:bg-[var(--color-primary)]/5 transition-all border-t border-[var(--color-main)]/30 block"
+                                        className="p-4 text-center text-[var(--color-primary)] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-50 transition-all border-t border-gray-50 block"
                                     >
-                                        View All Activity
+                                        Manage Activities
                                     </NavLink>
                                 </div>
                             </div>
@@ -195,61 +199,59 @@ const Header = ({ onToggleSidebar }) => {
                     onMouseEnter={() => setOpenAccount(true)}
                     onMouseLeave={() => setOpenAccount(false)}
                 >
-                    <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--color-card)] transition-all cursor-pointer">
-                        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--text-secondary)]">
-                            <User size={16} />
+                    <button className="flex items-center gap-2 pl-2 pr-1 py-1 rounded-2xl hover:bg-gray-50/80 border border-transparent hover:border-gray-100 transition-all cursor-pointer group">
+                        <div className="flex flex-col items-end mr-2 hidden sm:flex">
+                            <span className="text-[13px] font-black text-[var(--color-secondary)] leading-none">{user?.name?.split(' ')[0]}</span>
+                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mt-0.5 opacity-60">{user?.role}</span>
+                        </div>
+                        <div className="w-10 h-10 flex items-center justify-center rounded-[14px] bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/50 text-[var(--color-primary)] shadow-sm group-hover:shadow-[var(--color-primary)]/10 transition-all">
+                            <User size={18} />
                         </div>
                     </button>
 
                     {/* Dropdown Menu */}
                     {openAccount && (
                         <div className="absolute right-0 top-full pt-2 z-50">
-                            <div className="w-[90vw] sm:w-72 max-w-sm bg-[var(--bg-main)] border border-[var(--color-main)] rounded-2xl shadow-2xl p-5 transition-all duration-200 ease-out shadow-black/50 space-y-5">
-
-                                {/* Title */}
-                                <h2 className="text-[var(--text-secondary)] text-lg font-semibold">
-                                    User Profile
-                                </h2>
-
-                                {/* User Info */}
-                                <div className="flex items-center gap-4 mt-5">
-                                    <div className="w-14 h-14 flex items-center justify-center rounded-full bg-[var(--color-primary)] text-white shrink-0">
-                                        <User />
-                                    </div>
-
-                                    <div className="flex flex-col overflow-hidden space-y-1">
-                                        <span className="text-[var(--text-secondary)] font-medium truncate">
-                                            {user.name}
-                                        </span>
-                                        <span className="text-[var(--text-card)] text-xs capitalize">
-                                            {user.role}
-                                        </span>
-                                        <span className="text-[var(--text-card)] text-xs truncate">
-                                            {user.email}
-                                        </span>
+                            <div className="w-[90vw] sm:w-72 max-w-sm bg-white border border-gray-100 rounded-3xl shadow-[0_30px_60px_-12px_rgba(0,0,0,0.15)] p-2 transition-all duration-200 ease-out">
+                                <div className="p-4 mb-2">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-[#e74c3c] text-white shadow-lg shadow-[var(--color-primary)]/20 font-black text-xl">
+                                            {user?.name?.charAt(0)}
+                                        </div>
+                                        <div className="flex flex-col overflow-hidden">
+                                            <span className="text-[var(--color-secondary)] font-black text-base truncate">
+                                                {user.name}
+                                            </span>
+                                            <span className="text-[var(--text-muted)] text-xs font-bold truncate opacity-70">
+                                                {user.email}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Divider */}
-                                <div className="my-5 h-[1px] bg-gray-600"></div>
+                                <div className="space-y-1">
+                                    <NavLink to="/profile" className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 transition-colors group">
+                                        <div className="p-2.5 bg-gray-50 rounded-xl group-hover:bg-white group-hover:shadow-sm transition-all border border-transparent group-hover:border-gray-100">
+                                            <Layers size={18} className="text-[var(--color-primary)]" />
+                                        </div>
+                                        <div>
+                                            <div className="text-[var(--color-secondary)] text-sm font-bold">My Profile</div>
+                                            <div className="text-[var(--text-muted)] text-[10px] font-bold uppercase tracking-wider opacity-60">Account Settings</div>
+                                        </div>
+                                    </NavLink>
+                                </div>
 
-                                <NavLink to="/profile" className="flex items-center space-x-5 cursor-pointer group">
-                                    <div className="p-3 bg-[var(--color-primary)]/10 rounded-2xl text-[var(--color-primary)] group-hover:scale-110 transition-transform">
-                                        <Layers size={22} />
-                                    </div>
-                                    <div className="">
-                                        <div className="text-[var(--text-secondary)] text-sm hover:text-[var(--text-primary)]">My Profile</div>
-                                        <div className="text-[var(--text-card)] text-xs">Account Settings</div>
-                                    </div>
-                                </NavLink>
-
-                                {/* Logout Button */}
-                                <NavLink
-                                    to="/logout"
-                                    className="block w-full text-center px-4 py-2.5 text-sm font-medium rounded-full bg-[var(--color-primary)] text-white hover:opacity-90 transition-all duration-200"
-                                >
-                                    Logout
-                                </NavLink>
+                                <div className="mt-2 p-2 pt-2 border-t border-gray-50">
+                                    <Button
+                                        variant="secondary"
+                                        size="md"
+                                        className="w-full flex items-center justify-center gap-2 "
+                                        onClick={() => navigate("/logout")}
+                                        icon={<LogOut size={16} />}
+                                    >
+                                        LOGOUT SESSION
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     )}

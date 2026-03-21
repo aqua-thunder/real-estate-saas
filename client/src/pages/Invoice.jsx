@@ -21,6 +21,7 @@ import {
     Tag,
     Loader2,
     Trash,
+    MoreVertical
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -226,7 +227,7 @@ const Invoice = () => {
         const total = getTotal(inv);
 
         // Header
-        doc.setFillColor(30, 41, 59); // Dark slate
+        doc.setFillColor(28, 40, 52); // Brand Secondary
         doc.rect(0, 0, 210, 40, "F");
 
         doc.setFontSize(24);
@@ -243,10 +244,10 @@ const Invoice = () => {
         // Section Helper
         const drawSectionHeader = (title, y) => {
             doc.setFontSize(12);
-            doc.setTextColor(30, 41, 59);
+            doc.setTextColor(28, 40, 52);
             doc.setFont("helvetica", "bold");
             doc.text(title.toUpperCase(), 20, y);
-            doc.setDrawColor(226, 232, 240);
+            doc.setDrawColor(240, 240, 240);
             doc.line(20, y + 2, 190, y + 2);
             return y + 10;
         };
@@ -283,8 +284,8 @@ const Invoice = () => {
             ],
             foot: [["Total Payable", `₹ ${total?.toLocaleString()}`]],
             theme: "striped",
-            headStyles: { fillColor: [30, 41, 59], textColor: 255 },
-            footStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], fontStyle: "bold" },
+            headStyles: { fillColor: [231, 76, 60], textColor: 255 },
+            footStyles: { fillColor: [250, 250, 250], textColor: [28, 40, 52], fontStyle: "bold" },
             styles: { fontSize: 10, cellPadding: 4 },
             margin: { left: 20 },
         });
@@ -304,117 +305,118 @@ const Invoice = () => {
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
-            doc.setTextColor(148, 163, 184);
+            doc.setTextColor(150, 150, 150);
             doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: "center" });
-            doc.text(`Generated on ${new Date().toLocaleString()} | Real Estate SaaS`, 105, 290, { align: "center" });
+            doc.text(`Generated on ${new Date().toLocaleString()} | Trevita Property Mgmt.`, 105, 290, { align: "center" });
         }
 
         doc.save(`${inv.invoiceNumber || "Invoice"}_${tenantName.replace(/\s+/g, "_")}.pdf`);
         toast.success("Invoice downloaded successfully");
     };
+
     const paidCount = invoices.filter((i) => i.status === "Paid").length;
     const unpaidCount = invoices.filter((i) => i.status === "Unpaid").length;
     const overdueCount = invoices.filter((i) => i.status === "Overdue").length;
 
     const summaryCards = [
         {
-            label: "Total Invoices",
+            label: "Total Flow",
             value: invoices.length,
             icon: Receipt,
-            color: "from-blue-500/20 to-blue-600/5",
-            iconColor: "text-blue-400",
-            borderColor: "border-blue-500/20",
+            color: "bg-blue-50/50",
+            iconBg: "bg-blue-600",
+            borderColor: "border-blue-100",
+            textColor: "text-blue-600"
         },
         {
-            label: "Paid",
+            label: "Settled",
             value: paidCount,
             icon: CheckCircle2,
-            color: "from-emerald-500/20 to-emerald-600/5",
-            iconColor: "text-emerald-400",
-            borderColor: "border-emerald-500/20",
+            color: "bg-emerald-50/50",
+            iconBg: "bg-emerald-600",
+            borderColor: "border-emerald-100",
+            textColor: "text-emerald-600"
         },
         {
-            label: "Unpaid",
+            label: "Pending",
             value: unpaidCount,
             icon: Clock,
-            color: "from-amber-500/20 to-amber-600/5",
-            iconColor: "text-amber-400",
-            borderColor: "border-amber-500/20",
+            color: "bg-amber-50/50",
+            iconBg: "bg-amber-600",
+            borderColor: "border-amber-100",
+            textColor: "text-amber-600"
         },
         {
             label: "Overdue",
             value: overdueCount,
             icon: AlertCircle,
-            color: "from-red-500/20 to-red-600/5",
-            iconColor: "text-red-400",
-            borderColor: "border-red-500/20",
+            color: "bg-rose-50/50",
+            iconBg: "bg-rose-600",
+            borderColor: "border-rose-100",
+            textColor: "text-rose-600"
         },
     ];
 
-    // ── Format date helper ─────────────────────────
     const formatDate = (dateStr) => {
         if (!dateStr) return "—";
         const d = new Date(dateStr);
         return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
     };
 
-    // ── Get display values from populated invoice ──
-    const getTenantName = (inv) => inv.tenantId?.name || "Unknown";
-    const getUnitNumber = (inv) => inv.unitId?.unitNumber || "—";
+    const getTenantName = (inv) => inv.tenantId?.name || "Unknown Account";
+    const getUnitNumber = (inv) => inv.unitId?.unitNumber || "N/A";
     const getTotal = (inv) =>
         inv.totalAmount ||
         (inv.rent || 0) + (inv.utilityCharges || 0) + (inv.maintenanceCharges || 0) + (inv.lateFee || 0);
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-8 font-['Inter'] space-y-8">
 
             {/* ── HEADER ─────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                <div className="flex items-center gap-3">
-                    <div>
-                        <h1
-                            className="text-2xl font-bold text-white"
-                            style={{ fontFamily: "var(--font-heading)" }}
-                        >
-                            Invoice Management
-                        </h1>
-                    </div>
+            <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-2">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">
+                        Financial Management
+                    </h1>
+                    <p className="text-[var(--text-muted)] font-medium text-sm">Issue invoices, track payments, and manage property yields.</p>
                 </div>
 
                 {role === "manager" && (
-                    <button
+                    <Button
                         onClick={() => setShowCreate(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] hover:bg-[#0091e6] text-white font-semibold text-sm transition-all duration-200 shadow-lg shadow-[var(--color-primary)]/20 hover:scale-[1.02] active:scale-[0.97] self-start sm:self-auto"
+                        variant="primary"
+                        size="md"
+                        icon={<Plus size={18} />}
                     >
-                        <Plus size={17} />
-                        Create Invoice
-                    </button>
+                        CREATE NEW INVOICE
+                    </Button>
                 )}
-            </div>
+            </header>
 
             {/* ── SUMMARY CARDS ──────────────────────────── */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {summaryCards.map((card, i) => {
                     const Icon = card.icon;
                     return (
                         <div
                             key={i}
-                            className={`relative overflow-hidden bg-gradient-to-br ${card.color} border ${card.borderColor} rounded-2xl p-4 sm:p-5`}
+                            className={`premium-card p-6 rounded-[2.5rem] relative overflow-hidden group border ${card.borderColor}`}
                         >
-                            {/* Glow blob */}
-                            <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-20 blur-2xl bg-current" />
-                            <div className="flex items-start justify-between">
-                                <div>
-                                    <p className="text-xs text-[var(--text-card)] font-medium mb-2">
+                            <div className="flex items-start justify-between relative z-10">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em]">
                                         {card.label}
                                     </p>
-                                    <p className="text-3xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
+                                    <p className="text-3xl font-black text-[var(--color-secondary)] tracking-tighter">
                                         {card.value}
                                     </p>
                                 </div>
-                                <div className={`p-2.5 rounded-xl bg-white/5 ${card.iconColor}`}>
+                                <div className={`p-3 rounded-2xl ${card.iconBg} text-white shadow-lg shadow-black/5 group-hover:scale-110 transition-transform duration-500`}>
                                     <Icon size={20} />
                                 </div>
+                            </div>
+                            <div className={`absolute -right-4 -bottom-4 w-24 h-24 rounded-full opacity-[0.03] ${card.textColor} group-hover:scale-150 transition-transform duration-700`}>
+                                <Icon size={80} />
                             </div>
                         </div>
                     );
@@ -422,160 +424,153 @@ const Invoice = () => {
             </div>
 
             {/* ── FILTERS ────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <div className="relative flex-1 sm:max-w-sm">
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1 sm:max-w-md group">
                     <Search
                         size={16}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors"
                     />
                     <input
-                        placeholder="Search tenant or invoice…"
-                        className="w-full bg-[var(--color-card)] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors"
+                        placeholder="Search by tenant, invoice or unit..."
+                        className="w-full bg-white border border-gray-100 rounded-2xl pl-12 pr-4 py-3 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all shadow-sm"
                     />
                 </div>
 
                 <div className="relative">
-                    <select className="appearance-none bg-[var(--color-card)] border border-white/10 rounded-xl pl-4 pr-9 py-2.5 text-sm text-[var(--text-secondary)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors cursor-pointer w-full sm:w-auto">
-                        <option value="">All Status</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Unpaid">Unpaid</option>
+                    <select className="appearance-none bg-white border border-gray-100 rounded-2xl px-6 py-3 text-[13px] font-black text-[var(--color-secondary)] uppercase tracking-wider focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all cursor-pointer shadow-sm pr-12 min-w-[160px]">
+                        <option value="">Status: All</option>
+                        <option value="Paid">Settled</option>
+                        <option value="Unpaid">Pending</option>
                     </select>
                     <ChevronDown
-                        size={15}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none"
+                        size={16}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-50"
                     />
                 </div>
             </div>
 
-            {/* ── LOADING STATE ─────────────────────────── */}
-            {loading && (
-                <div className="flex items-center justify-center py-20">
-                    <Loader2 size={32} className="animate-spin text-[var(--color-primary)]" />
-                </div>
-            )}
-
-            {/* ── EMPTY STATE ──────────────────────────── */}
-            {!loading && invoices.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <Receipt size={48} className="text-white/10 mb-4" />
-                    <p className="text-[var(--text-card)] text-sm">No invoices found.</p>
-                    {role === "manager" && (
-                        <button
-                            onClick={() => setShowCreate(true)}
-                            className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--color-primary)] hover:bg-[#0091e6] text-white font-semibold text-sm transition-all"
-                        >
-                            <Plus size={17} />
-                            Create your first invoice
-                        </button>
-                    )}
-                </div>
-            )}
-
-            {/* ── TABLE (desktop) / CARDS (mobile) ───────── */}
-            {!loading && invoices.length > 0 && (
-                <>
-                    {/* Desktop Table */}
-                    <div className="hidden md:block bg-[var(--color-card)] border border-white/5 rounded-2xl overflow-hidden shadow-xl">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="border-b border-white/5">
-                                        {["Invoice", "Tenant", "Unit", "Month", "Rent", "Utility", "Total", "Due Date", "Status", "Actions"].map((h) => (
-                                            <th
-                                                key={h}
-                                                className="px-5 py-4 text-left text-xs font-semibold text-[var(--text-card)] uppercase tracking-wider whitespace-nowrap"
-                                            >
-                                                {h}
-                                            </th>
-                                        ))}
+            {/* ── TABLE / LIST ─────────────────────────── */}
+            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                {loading ? (
+                    <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                        <Loader2 size={40} className="animate-spin text-[var(--color-primary)]" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Synchronizing Financials...</p>
+                    </div>
+                ) : invoices.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-32 text-center px-10">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-200 mb-6 border border-gray-100">
+                            <Receipt size={40} />
+                        </div>
+                        <h3 className="text-xl font-black text-[var(--color-secondary)] uppercase tracking-tight">Pure Ledger</h3>
+                        <p className="text-[var(--text-muted)] text-sm font-medium mt-2 max-w-xs">No invoices have been recorded in the platform yet.</p>
+                        {role === "manager" && (
+                            <Button
+                                onClick={() => setShowCreate(true)}
+                                variant="secondary"
+                                size="md"
+                            >
+                                Generate First Invoice
+                            </Button>
+                        )}
+                    </div>
+                ) : (
+                    <>
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="text-[10px] uppercase font-black text-[var(--text-muted)] bg-gray-50/50 border-b border-gray-50">
+                                    <tr>
+                                        <th className="px-8 py-5 tracking-widest">Serial</th>
+                                        <th className="px-8 py-5 tracking-widest">Tenant Profile</th>
+                                        <th className="px-8 py-5 tracking-widest">Billing Cycle</th>
+                                        <th className="px-8 py-5 tracking-widest">Yield</th>
+                                        <th className="px-8 py-5 tracking-widest">Settlement Date</th>
+                                        <th className="px-8 py-5 tracking-widest text-center">Status</th>
+                                        <th className="px-8 py-5 text-right tracking-widest">Operations</th>
                                     </tr>
                                 </thead>
-
-                                <tbody className="divide-y divide-white/5">
+                                <tbody className="divide-y divide-gray-50">
                                     {invoices.map((inv, index) => {
                                         const total = getTotal(inv);
                                         const isPaid = inv.status === "Paid";
                                         const tenantName = getTenantName(inv);
 
                                         return (
-                                            <tr
-                                                key={inv._id || index}
-                                                className="group hover:bg-white/[0.03] transition-colors duration-150"
-                                            >
-                                                <td className="px-5 py-4">
-                                                    <span className="font-mono text-xs font-semibold text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2.5 py-1 rounded-lg">
-                                                        {`INV-${String(index + 1).padStart(3, "0")}`}
+                                            <tr key={inv._id} className="group hover:bg-gray-50/50 transition-colors border-l-4 border-l-transparent hover:border-l-[var(--color-primary)]">
+                                                <td className="px-8 py-7">
+                                                    <span className="text-[11px] font-black text-[var(--text-muted)] opacity-60">
+                                                        #{String(index + 1).padStart(4, "0")}
                                                     </span>
                                                 </td>
-                                                <td className="px-5 py-4">
-                                                    <div className="flex items-center gap-2.5">
-                                                        <span className="text-sm font-medium text-white">
-                                                            {tenantName}
-                                                        </span>
+                                                <td className="px-8 py-7">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-10 h-10 rounded-[14px] bg-slate-100 flex items-center justify-center text-xs font-black text-[var(--color-secondary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-all shadow-sm">
+                                                            {tenantName[0]}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-black text-[var(--color-secondary)] text-sm">{tenantName}</span>
+                                                            <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase mt-0.5 opacity-60">Unit {getUnitNumber(inv)}</span>
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-5 py-4 text-sm text-[var(--text-card)]">
-                                                    {getUnitNumber(inv)}
-                                                </td>
-                                                <td className="px-5 py-4 text-sm text-[var(--text-secondary)]">
+                                                <td className="px-8 py-7 text-[13px] font-bold text-[var(--color-secondary)]">
                                                     {inv.month}
                                                 </td>
-                                                <td className="px-5 py-4 text-sm text-[var(--text-secondary)]">
-                                                    ₹{(inv.rent || 0).toLocaleString()}
+                                                <td className="px-8 py-7">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-lg font-black text-[var(--color-secondary)]">₹{total.toLocaleString()}</span>
+                                                        <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">Gross Amount</span>
+                                                    </div>
                                                 </td>
-                                                <td className="px-5 py-4 text-sm text-[var(--text-card)]">
-                                                    ₹{(inv.utilityCharges || 0).toLocaleString()}
-                                                </td>
-                                                <td className="px-5 py-4 text-sm font-bold text-white">
-                                                    ₹{total.toLocaleString()}
-                                                </td>
-                                                <td className="px-5 py-4 text-sm text-[var(--text-card)] whitespace-nowrap">
+                                                <td className="px-8 py-7 text-[12px] font-bold text-[var(--text-muted)]">
                                                     {formatDate(inv.dueDate)}
                                                 </td>
-                                                <td className="px-5 py-4">
-                                                    <span
-                                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${isPaid
-                                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                                            }`}
-                                                    >
-                                                        <span className={`w-1.5 h-1.5 rounded-full ${isPaid ? "bg-emerald-400" : "bg-amber-400"}`} />
+                                                <td className="px-8 py-7 text-center">
+                                                    <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${isPaid
+                                                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                        : "bg-amber-50 text-amber-600 border-amber-100"
+                                                        }`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${isPaid ? "bg-emerald-600" : "bg-amber-600"}`} />
                                                         {inv.status}
                                                     </span>
                                                 </td>
-                                                <td className="px-5 py-4">
-                                                    <div className="flex items-center gap-1">
-                                                        <button
-                                                            onClick={() => setSelectedInvoice(inv)}
-                                                            title="View"
-                                                            className="p-2 rounded-lg text-[var(--text-card)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-all duration-150"
-                                                        >
-                                                            <Eye size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => downloadInvoicePDF(inv)}
-                                                            title="Download"
-                                                            className="p-2 rounded-lg text-[var(--text-card)] hover:text-emerald-400 hover:bg-emerald-500/10 transition-all duration-150"
-                                                        >
-                                                            <Download size={16} />
-                                                        </button>
+                                                <td className="px-8 py-7">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button 
+                                                            onClick={() => setSelectedInvoice(inv)} 
+                                                            variant="secondary" 
+                                                            size="xs" 
+                                                            iconOnly 
+                                                            icon={<Eye size={16} />} 
+                                                            title="Inspector"
+                                                        />
+                                                        <Button 
+                                                            onClick={() => downloadInvoicePDF(inv)} 
+                                                            variant="secondary" 
+                                                            size="xs" 
+                                                            iconOnly 
+                                                            icon={<Download size={16} />} 
+                                                            title="Export PDF"
+                                                        />
                                                         {role === "manager" && (
-                                                            <button
-                                                                title="Delete"
-                                                                onClick={() => handleDelete(inv._id)}
-                                                                className="p-2 rounded-lg text-[var(--text-card)] hover:text-violet-400 hover:bg-violet-500/10 transition-all duration-150"
-                                                            >
-                                                                <Trash size={16} />
-                                                            </button>
+                                                            <Button 
+                                                                onClick={() => handleDelete(inv._id)} 
+                                                                variant="danger" 
+                                                                size="xs" 
+                                                                iconOnly 
+                                                                icon={<Trash size={16} />} 
+                                                                title="Purge Record"
+                                                            />
                                                         )}
                                                         {role === "tenant" && !isPaid && (
-                                                            <button
-                                                                title="Pay"
-                                                                onClick={() => handlePay(inv._id)}
-                                                                className="p-2 rounded-lg text-[var(--text-card)] hover:text-violet-400 hover:bg-violet-500/10 transition-all duration-150"
+                                                            <Button 
+                                                                onClick={() => handlePay(inv._id)} 
+                                                                variant="primary" 
+                                                                size="xs" 
+                                                                className="ml-2 font-black uppercase tracking-widest"
                                                             >
-                                                                <CreditCard size={16} />
-                                                            </button>
+                                                                Pay Now
+                                                            </Button>
                                                         )}
                                                     </div>
                                                 </td>
@@ -585,394 +580,152 @@ const Invoice = () => {
                                 </tbody>
                             </table>
                         </div>
-                    </div>
 
-                    {/* Mobile Invoice Cards */}
-                    <div className="md:hidden flex flex-col gap-4 p-1">
-                        {invoices.map((inv, index) => {
-                            const total = getTotal(inv);
-                            const isPaid = inv.status === "Paid";
-                            const tenantName = getTenantName(inv);
+                        {/* Mobile Grid View */}
+                        <div className="md:hidden p-4 space-y-4">
+                            {invoices.map((inv, index) => {
+                                const total = getTotal(inv);
+                                const isPaid = inv.status === "Paid";
+                                const tenantName = getTenantName(inv);
 
-                            return (
-                                <div
-                                    key={inv._id || index}
-                                    className="bg-[var(--color-card)]/40 border border-white/5 rounded-3xl p-6 shadow-xl backdrop-blur-sm hover:bg-white/[0.03] transition-all"
-                                >
-                                    {/* Card Top */}
-                                    <div className="flex items-start justify-between mb-5">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-black text-lg shadow-lg">
-                                                {tenantName[0]}
-                                            </div>
-                                            <div>
-                                                <p className="text-base font-bold text-white tracking-tight">{tenantName}</p>
-                                                <div className="flex items-center gap-1.5 text-[10px] text-[var(--text-card)] font-black uppercase tracking-widest mt-0.5">
-                                                    <Home size={10} /> unit {getUnitNumber(inv)}
+                                return (
+                                    <div key={inv._id} className="bg-gray-50/50 border border-gray-100 rounded-3xl p-6 space-y-5 hover:bg-white transition-all shadow-sm">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-lg font-black text-[var(--color-secondary)] shadow-sm">
+                                                    {tenantName[0]}
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-[var(--color-secondary)]">{tenantName}</p>
+                                                    <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 opacity-60">Unit {getUnitNumber(inv)}</p>
                                                 </div>
                                             </div>
+                                            <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${isPaid
+                                                ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                : "bg-amber-50 text-amber-600 border-amber-100"
+                                                }`}>
+                                                {inv.status}
+                                            </span>
                                         </div>
-                                        <span
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${isPaid
-                                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                                }`}
-                                        >
-                                            <span className={`w-1.5 h-1.5 rounded-full ${isPaid ? "bg-emerald-400" : "bg-amber-400"} animate-pulse`} />
-                                            {inv.status}
-                                        </span>
-                                    </div>
 
-                                    {/* Card Info Bar */}
-                                    <div className="flex items-center justify-between mb-5 bg-white/5 p-3 rounded-2xl">
-                                        <span className="font-mono text-[10px] font-black text-[var(--color-primary)] tracking-wider">
-                                            {inv.invoiceNumber || `INV-${String(index + 1).padStart(3, "0")}`}
-                                        </span>
-                                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--text-card)] uppercase">
-                                            <Calendar size={12} className="text-[var(--color-primary)]" />
-                                            {inv.month}
+                                        <div className="grid grid-cols-2 gap-4 bg-white/50 p-4 rounded-2xl border border-gray-100/50">
+                                            <div className="space-y-0.5">
+                                                <p className="text-[9px] font-black text-[var(--text-muted)] uppercase opacity-40">Period</p>
+                                                <p className="text-xs font-black text-[var(--color-secondary)]">{inv.month}</p>
+                                            </div>
+                                            <div className="space-y-0.5 text-right">
+                                                <p className="text-[9px] font-black text-[var(--text-muted)] uppercase opacity-40">Settlement</p>
+                                                <p className="text-xs font-black text-[var(--color-secondary)] italic">₹{total.toLocaleString()}</p>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 mb-6">
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Rent</span>
-                                            <p className="text-sm font-bold text-white">₹{(inv.rent || 0).toLocaleString()}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Utility</span>
-                                            <p className="text-sm font-bold text-white">₹{(inv.utilityCharges || 0).toLocaleString()}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Due Date</span>
-                                            <p className="text-sm font-bold text-[var(--text-secondary)]">{formatDate(inv.dueDate)}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-[var(--color-primary)]">Total</span>
-                                            <p className="text-lg font-black text-white">₹{total.toLocaleString()}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Card Actions */}
-                                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-white/5">
-                                        <button
-                                            onClick={() => setSelectedInvoice(inv)}
-                                            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white/5 hover:bg-[var(--color-primary)]/10 text-[var(--text-card)] hover:text-white transition-all text-xs font-bold border border-white/5"
-                                        >
-                                            <Eye size={14} /> View Details
-                                        </button>
-                                        <button
-                                            onClick={() => downloadInvoicePDF(inv)}
-                                            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 text-[var(--color-primary)] transition-all text-xs font-bold border border-[var(--color-primary)]/20 shadow-lg shadow-[var(--color-primary)]/5"
-                                        >
-                                            <Download size={14} /> Get PDF
-                                        </button>
-                                        {role === "tenant" && !isPaid && (
-                                            <button 
-                                                onClick={() => handlePay(inv._id)}
-                                                className="col-span-2 flex items-center justify-center gap-2 py-3 mt-1 rounded-2xl bg-gradient-to-r from-violet-600/20 to-purple-600/20 hover:from-violet-600/30 hover:to-purple-600/30 text-violet-400 transition-all text-xs font-black uppercase tracking-widest border border-violet-500/30"
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <Button 
+                                                onClick={() => setSelectedInvoice(inv)} 
+                                                variant="secondary" 
+                                                size="sm" 
+                                                icon={<Eye size={14} />} 
+                                                className="w-full"
                                             >
-                                                <CreditCard size={14} /> Pay Balance
-                                            </button>
-                                        )}
+                                                Inspect
+                                            </Button>
+                                            <Button 
+                                                onClick={() => downloadInvoicePDF(inv)} 
+                                                variant="primary" 
+                                                size="sm" 
+                                                icon={<Download size={14} />} 
+                                                className="w-full bg-gray-900 shadow-black/10"
+                                            >
+                                                PDF
+                                            </Button>
+                                            {role === "tenant" && !isPaid && (
+                                                <Button 
+                                                    onClick={() => handlePay(inv._id)} 
+                                                    variant="primary" 
+                                                    size="md" 
+                                                    className="col-span-2 tracking-widest"
+                                                >
+                                                    Finalize Payment
+                                                </Button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </>
-            )}
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
+            </section>
 
-            {/* ── CREATE INVOICE MODAL ───────────────────── */}
+            {/* ── MODALS (Unified Design) ───────────────────── */}
             {showCreate && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-[var(--color-card)] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
-
-                        {/* Modal Header */}
-                        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
-                                    <Plus size={18} className="text-[var(--color-primary)]" />
-                                </div>
-                                <h2 className="text-base font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
-                                    Create Invoice
-                                </h2>
+                <div className="fixed inset-0 bg-white/20 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+                    <div className="bg-white border border-gray-100 rounded-[3rem] w-full max-w-xl shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
+                        <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">Ledger Entry</h2>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Generate Secure Digital Invoice</p>
                             </div>
-                            <button
-                                onClick={() => { setShowCreate(false); setFormData(initialFormData); }}
-                                className="p-2 rounded-lg text-[var(--text-card)] hover:text-white hover:bg-white/5 transition-colors"
-                            >
-                                <X size={18} />
-                            </button>
+                            <Button 
+                                onClick={() => { setShowCreate(false); setFormData(initialFormData); }} 
+                                variant="secondary" 
+                                size="sm" 
+                                iconOnly 
+                                icon={<X size={20} />} 
+                            />
                         </div>
-
-                        {/* Modal Body */}
-                        <form onSubmit={handleSubmit}>
-                            <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                                {/* Tenant Select */}
-                                <div className="sm:col-span-2 space-y-2">
-                                    <label className="block text-sm font-semibold text-[var(--text-secondary)]">
-                                        Tenant *
-                                    </label>
-                                    <div className="relative">
-                                        <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-card)]" />
-                                        <select
-                                            required
-                                            value={formData.tenantId}
-                                            onChange={(e) => handleTenantChange(e.target.value)}
-                                            className="w-full bg-[var(--bg-main)] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--text-secondary)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors appearance-none"
-                                        >
-                                            <option value="">Select Tenant</option>
-                                            {tenants.map((t) => (
-                                                <option key={t._id} value={t.userId?._id || t._id}>
-                                                    {t.userId?.name || t.name} — Unit {t.unitId?.unitNumber || "N/A"}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none" />
-                                    </div>
-                                </div>
-
-                                {/* Month */}
-                                <Input
-                                    label="Month *"
-                                    required
-                                    placeholder="e.g. Mar 2026"
-                                    value={formData.month}
-                                    onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Rent */}
-                                <Input
-                                    label="Rent (₹) *"
-                                    type="number"
-                                    required
-                                    placeholder="15000"
-                                    value={formData.rent}
-                                    onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Utility Charges */}
-                                <Input
-                                    label="Utility Charges (₹)"
-                                    type="number"
-                                    placeholder="800"
-                                    value={formData.utilityCharges}
-                                    onChange={(e) => setFormData({ ...formData, utilityCharges: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Maintenance Charges */}
-                                <Input
-                                    label="Maintenance (₹)"
-                                    type="number"
-                                    placeholder="1000"
-                                    value={formData.maintenanceCharges}
-                                    onChange={(e) => setFormData({ ...formData, maintenanceCharges: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Late Fee */}
-                                <Input
-                                    label="Late Fee (₹)"
-                                    type="number"
-                                    placeholder="0"
-                                    value={formData.lateFee}
-                                    onChange={(e) => setFormData({ ...formData, lateFee: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Due Date */}
-                                <Input
-                                    label="Due Date *"
-                                    type="date"
-                                    required
-                                    value={formData.dueDate}
-                                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                                    className="bg-[var(--bg-main)]!"
-                                />
-
-                                {/* Notes */}
-                                <div className="sm:col-span-2 space-y-2">
-                                    <label className="block text-sm font-semibold text-[var(--text-secondary)]">
-                                        Notes
-                                    </label>
-                                    <textarea
-                                        placeholder="Optional notes..."
-                                        value={formData.notes}
-                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                        rows={2}
-                                        className="w-full bg-[var(--bg-main)] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:border-[var(--color-primary)]/50 focus:ring-1 focus:ring-[var(--color-primary)]/30 transition-colors resize-none"
-                                    />
-                                </div>
-
-                                {/* Total Preview */}
-                                <div className="sm:col-span-2 pt-2">
-                                    <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/10">
-                                        <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                                            <Banknote size={16} className="text-[var(--color-primary)]" />
-                                            <span className="text-sm font-semibold">Total Amount</span>
-                                        </div>
-                                        <span className="text-xl font-bold text-[var(--color-primary)]">
-                                            ₹{((Number(formData.rent) || 0) +
-                                                (Number(formData.utilityCharges) || 0) +
-                                                (Number(formData.maintenanceCharges) || 0) +
-                                                (Number(formData.lateFee) || 0)).toLocaleString()}
-                                        </span>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            {/* Modal Footer */}
-                            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/5">
-                                <button
-                                    type="button"
-                                    onClick={() => { setShowCreate(false); setFormData(initialFormData); }}
-                                    className="px-5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-card)] hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
-                                >
-                                    Cancel
-                                </button>
-                                <Button
-                                    htmlType="submit"
-                                    disabled={submitting}
-                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[#0091e6] transition-all shadow-lg shadow-[var(--color-primary)]/20 hover:scale-[1.02] active:scale-[0.97]"
-                                >
-                                    {submitting ? (
-                                        <span className="flex items-center gap-2">
-                                            <Loader2 size={16} className="animate-spin" />
-                                            Saving…
-                                        </span>
-                                    ) : (
-                                        "Save Invoice"
-                                    )}
-                                </Button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            )}
-
-            {/* ── INVOICE DETAILS MODAL ─────────────────── */}
-            {selectedInvoice && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-[var(--color-card)] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl">
-
-                        {/* Modal Header */}
-                        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20">
-                                    <Receipt size={18} className="text-[var(--color-primary)]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-base font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
-                                        Invoice Details
-                                    </h2>
-                                    <p className="text-xs text-[var(--text-card)] font-mono">
-                                        {selectedInvoice.invoiceNumber || "—"}
-                                    </p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setSelectedInvoice(null)}
-                                className="p-2 rounded-lg text-[var(--text-card)] hover:text-white hover:bg-white/5 transition-colors"
-                            >
-                                <X size={18} />
-                            </button>
-                        </div>
-
-                        {/* Tenant Info */}
-                        <div className="px-6 py-5">
-                            <div className="flex items-center gap-3 mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-white/5">
-                                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
-                                    {getTenantName(selectedInvoice)[0]}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-white">{getTenantName(selectedInvoice)}</p>
-                                    <p className="text-xs text-[var(--text-card)]">
-                                        Unit {getUnitNumber(selectedInvoice)} · {selectedInvoice.month}
-                                    </p>
-                                </div>
-                                <div className="ml-auto">
-                                    <span
-                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${selectedInvoice.status === "Paid"
-                                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                                            }`}
+                        
+                        <form onSubmit={handleSubmit} className="p-10 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Target Tenant Record</label>
+                                <div className="relative">
+                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
+                                    <select
+                                        required
+                                        value={formData.tenantId}
+                                        onChange={(e) => handleTenantChange(e.target.value)}
+                                        className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-4 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all appearance-none"
                                     >
-                                        <span className={`w-1.5 h-1.5 rounded-full ${selectedInvoice.status === "Paid" ? "bg-emerald-400" : "bg-amber-400"}`} />
-                                        {selectedInvoice.status}
-                                    </span>
+                                        <option value="">Select Resident...</option>
+                                        {tenants.map((t) => (
+                                            <option key={t._id} value={t.userId?._id || t._id}>
+                                                {t.userId?.name || t.name} — Unit {t.unitId?.unitNumber || "N/A"}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-40" />
                                 </div>
                             </div>
 
-                            {/* Breakdown */}
-                            <div className="space-y-2.5 mb-4">
-                                {[
-                                    { label: "Rent", value: selectedInvoice.rent || 0, icon: Home },
-                                    { label: "Utility", value: selectedInvoice.utilityCharges || 0, icon: Zap },
-                                    { label: "Maintenance", value: selectedInvoice.maintenanceCharges || 0, icon: Wrench },
-                                    { label: "Late Fee", value: selectedInvoice.lateFee || 0, icon: Tag },
-                                ].map(({ label, value, icon: Icon }) => (
-                                    <div key={label} className="flex items-center justify-between py-2.5 px-3.5 rounded-xl bg-white/[0.03]">
-                                        <div className="flex items-center gap-2.5 text-sm text-[var(--text-card)]">
-                                            <Icon size={14} />
-                                            {label}
-                                        </div>
-                                        <span className="text-sm font-medium text-[var(--text-secondary)]">
-                                            ₹{value.toLocaleString()}
-                                        </span>
-                                    </div>
-                                ))}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <Input label="BILLING CYCLE" required placeholder="e.g. March 2026" value={formData.month} onChange={(e) => setFormData({ ...formData, month: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-bold" />
+                                <Input label="BASE RENT (₹)" type="number" required placeholder="0.00" value={formData.rent} onChange={(e) => setFormData({ ...formData, rent: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-black" />
+                                <Input label="UTILITY YIELD (₹)" type="number" placeholder="0.00" value={formData.utilityCharges} onChange={(e) => setFormData({ ...formData, utilityCharges: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-bold" />
+                                <Input label="MAINTENANCE (₹)" type="number" placeholder="0.00" value={formData.maintenanceCharges} onChange={(e) => setFormData({ ...formData, maintenanceCharges: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-bold" />
+                                <Input label="LATE FEE ACCRUAL (₹)" type="number" placeholder="0.00" value={formData.lateFee} onChange={(e) => setFormData({ ...formData, lateFee: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-bold" />
+                                <Input label="MATURITY DATE" type="date" required value={formData.dueDate} onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })} className="bg-gray-50 border-transparent rounded-2xl px-5 h-14 font-bold" />
                             </div>
 
-                            {/* Total */}
-                            <div className="flex items-center justify-between py-3 px-3.5 rounded-xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 mb-4">
-                                <span className="text-sm font-semibold text-[var(--color-primary)]">Total Amount</span>
-                                <span className="text-lg font-bold text-[var(--color-primary)]" style={{ fontFamily: "var(--font-heading)" }}>
-                                    ₹{getTotal(selectedInvoice).toLocaleString()}
-                                </span>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Contextual Notes</label>
+                                <textarea rows="3" placeholder="Additional details or instructions..." value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none" />
                             </div>
 
-                            <div className="flex items-center gap-1.5 text-xs text-[var(--text-card)]">
-                                <Calendar size={13} />
-                                Due: {formatDate(selectedInvoice.dueDate)}
-                            </div>
-                        </div>
-
-                        {/* Modal Footer */}
-                        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/5">
-                            <button
-                                onClick={() => setSelectedInvoice(null)}
-                                className="px-5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-card)] hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+                            <Button 
+                                type="submit" 
+                                disabled={submitting} 
+                                variant="primary" 
+                                size="lg" 
+                                className="w-full py-5 rounded-[2rem] bg-gray-900 shadow-xl shadow-gray-200 hover:shadow-red-200 tracking-[0.2em]"
+                                loading={submitting}
+                                loadingText="Finalizing Transaction..."
                             >
-                                Close
-                            </button>
-
-                            <button
-                                onClick={() => downloadInvoicePDF(selectedInvoice)}
-                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
-                            >
-                                <Download size={15} />
-                                Download
-                            </button>
-
-                            {role === "tenant" && (
-                                <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[var(--color-primary)] hover:bg-[#0091e6] transition-all shadow-lg shadow-[var(--color-primary)]/20 hover:scale-[1.02] active:scale-[0.97]">
-                                    <CreditCard size={15} />
-                                    Pay Rent
-                                </button>
-                            )}
-                        </div>
-
+                                Issue Digital Invoice
+                            </Button>
+                        </form>
                     </div>
                 </div>
             )}
-
         </div>
     );
 };

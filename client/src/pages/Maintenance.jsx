@@ -14,7 +14,11 @@ import {
     Send,
     Loader2,
     Calendar,
-    ArrowRight
+    ArrowRight,
+    X,
+    MessageSquare,
+    AlertCircle,
+    ChevronDown
 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
@@ -117,11 +121,9 @@ export default function Maintenance() {
             } else {
                 const data = await response.json();
                 toast.error(data.message || "Failed to create request");
-                console.error("Maintenance creation failed:", data);
             }
         } catch (err) {
             toast.error("Error connecting to server");
-            console.error("Maintenance connection error:", err);
         } finally {
             setSubmitting(false);
         }
@@ -150,7 +152,7 @@ export default function Maintenance() {
         }
     };
 
-    const [activeTab, setActiveTab] = useState("Received"); // Received or Sent
+    const [activeTab, setActiveTab] = useState("Received");
 
     const filteredRequests = requests.filter(req => {
         const titleMatch = req.title?.toLowerCase().includes(filter.search.toLowerCase());
@@ -160,7 +162,6 @@ export default function Maintenance() {
         const matchesStatus = filter.status === "All" || req.status === filter.status;
         const matchesPriority = filter.priority === "All" || req.priority === filter.priority;
 
-        // Manager specific tab filtering
         let matchesTab = true;
         if (role === "MANAGER") {
             if (activeTab === "Sent") {
@@ -175,21 +176,21 @@ export default function Maintenance() {
 
     const getStatusStyle = (status) => {
         switch (status) {
-            case "Pending": return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-            case "In Progress": return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-            case "Completed": return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-            case "Cancelled": return "bg-rose-500/10 text-rose-500 border-rose-500/20";
-            default: return "bg-gray-500/10 text-gray-500 border-gray-500/20";
+            case "Pending": return "bg-amber-50 text-amber-600 border-amber-100";
+            case "In Progress": return "bg-blue-50 text-blue-600 border-blue-100";
+            case "Completed": return "bg-emerald-50 text-emerald-600 border-emerald-100";
+            case "Cancelled": return "bg-gray-100 text-gray-400 border-gray-200";
+            default: return "bg-gray-50 text-gray-500 border-gray-100";
         }
     };
 
     const getPriorityStyle = (priority) => {
         switch (priority) {
-            case "Critical": return "text-rose-500";
-            case "High": return "text-orange-500";
-            case "Medium": return "text-amber-500";
-            case "Low": return "text-emerald-500";
-            default: return "text-gray-500";
+            case "Critical": return "bg-rose-50 text-rose-600 border-rose-100";
+            case "High": return "bg-orange-50 text-orange-600 border-orange-100";
+            case "Medium": return "bg-blue-50 text-blue-600 border-blue-100";
+            case "Low": return "bg-emerald-50 text-emerald-600 border-emerald-100";
+            default: return "bg-gray-50 text-gray-500 border-gray-100";
         }
     };
 
@@ -200,137 +201,150 @@ export default function Maintenance() {
     );
 
     return (
-        <div className="p-4 md:p-0 bg-[var(--bg-main)] min-h-screen text-[var(--text-secondary)] font-[var(--font-body)]">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-8 space-y-8 font-['Inter']">
 
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-5">
-                {/* Page Header Area */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                            Maintenance Management
-                        </h1>
-                    </div>
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">
+                        Asset Maintenance
+                    </h1>
+                    <p className="text-[var(--text-muted)] font-medium text-sm">Monitor property health, track repair workflows, and satisfy resident needs.</p>
                 </div>
 
                 {isAuthorizedToCreate && (
-                    <Button variant="primary" onClick={() => setShowForm(true)} icon={<Plus size={20} />} >New Request</Button>
+                    <Button
+                        onClick={() => setShowForm(true)}
+                        variant="primary"
+                        size="md"
+                        icon={<Plus size={18} />}
+                    >
+                        NEW REPAIR REQUEST
+                    </Button>
                 )}
-            </div>
+            </header>
 
             {/* Manager Tabs */}
             {role === "MANAGER" && (
-                <div className="flex gap-4 mb-6 pt-2 border-b border-[var(--color-main)]/10">
-                    <button
-                        onClick={() => setActiveTab("Received")}
-                        className={`pb-4 px-2 text-sm font-bold uppercase tracking-widest transition-all relative ${activeTab === "Received" ? "text-[var(--color-primary)]" : "text-[var(--text-card)] hover:text-white"
-                            }`}
-                    >
-                        Receive
-                        {activeTab === "Received" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[var(--color-primary)] rounded-full shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.5)]"></div>}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("Sent")}
-                        className={`pb-4 px-2 text-sm font-bold uppercase tracking-widest transition-all relative ${activeTab === "Sent" ? "text-[var(--color-primary)]" : "text-[var(--text-card)] hover:text-white"
-                            }`}
-                    >
-                        Send
-                        {activeTab === "Sent" && <div className="absolute bottom-0 left-0 w-full h-1 bg-[var(--color-primary)] rounded-full shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.5)]"></div>}
-                    </button>
+                <div className="flex gap-8 border-b border-gray-100">
+                    {["Received", "Sent"].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`pb-4 text-xs font-black uppercase tracking-[0.2em] transition-all relative ${activeTab === tab ? "text-[var(--color-primary)] opacity-100" : "text-[var(--text-muted)] opacity-40 hover:opacity-100"
+                                }`}
+                        >
+                            {tab} REQUESTS
+                            {activeTab === tab && <div className="absolute bottom-0 left-0 w-full h-1 bg-[var(--color-primary)] rounded-full shadow-[0_4px_10px_rgba(231,76,60,0.3)]"></div>}
+                        </button>
+                    ))}
                 </div>
             )}
 
-
-
             {/* Filters */}
-            <div className="bg-[var(--bg-card)] p-2 rounded-2xl border border-[var(--color-main)]/30 shadow-md mb-8 flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" size={18} />
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] opacity-50 group-focus-within:opacity-100 group-focus-within:text-[var(--color-primary)] transition-all" size={18} />
                     <input
                         type="text"
-                        placeholder="Search by title or unit..."
-                        className="w-full bg-[var(--bg-main)]/50 border border-[var(--color-main)]/20 rounded-xl py-3 pl-12 pr-4 focus:ring-2 focus:ring-[var(--color-primary)]/50 outline-none transition-all"
+                        placeholder="Search by title, unit or context..."
+                        className="w-full bg-white border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all shadow-sm"
                         value={filter.search}
                         onChange={(e) => setFilter({ ...filter, search: e.target.value })}
                     />
                 </div>
-                <div className="flex gap-4 w-full md:w-auto">
-                    <select
-                        className="bg-[var(--bg-card)] border border-[var(--color-main)]/20 rounded-xl px-4 py-3 outline-none text-sm font-medium"
-                        value={filter.status}
-                        onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-                    >
-                        <option value="All">All Status</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                    <select
-                        className="bg-[var(--bg-card)] border border-[var(--color-main)]/20 rounded-xl px-4 py-3 outline-none text-sm font-medium"
-                        value={filter.priority}
-                        onChange={(e) => setFilter({ ...filter, priority: e.target.value })}
-                    >
-                        <option value="All">All Priorities</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                        <option value="Critical">Critical</option>
-                    </select>
+                <div className="flex gap-4">
+                    <div className="relative">
+                        <select
+                            className="bg-white border border-gray-100 rounded-2xl px-6 py-3 text-[13px] font-black text-[var(--color-secondary)] uppercase tracking-wider focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all cursor-pointer shadow-sm pr-12 appearance-none"
+                            value={filter.status}
+                            onChange={(e) => setFilter({ ...filter, status: e.target.value })}
+                        >
+                            <option value="All">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">Working</option>
+                            <option value="Completed">Resolved</option>
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-secondary)] pointer-events-none" />
+                    </div>
+                    <div className="relative">
+                        <select
+                            className="bg-white border border-gray-100 rounded-2xl px-6 py-3 text-[13px] font-black text-[var(--color-secondary)] uppercase tracking-wider focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all cursor-pointer shadow-sm pr-12 appearance-none"
+                            value={filter.priority}
+                            onChange={(e) => setFilter({ ...filter, priority: e.target.value })}
+                        >
+                            <option value="All">Priorities</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-secondary)] pointer-events-none" />
+                    </div>
                 </div>
             </div>
 
-            {/* Requests Grid/List */}
+            {/* Requests Area */}
             {filteredRequests.length === 0 ? (
-                <div className="text-center py-20 bg-[var(--bg-card)] rounded-3xl border border-dashed border-[var(--color-main)]/40">
-                    <Eye className="mx-auto text-[var(--text-card)] mb-4" size={48} />
-                    <h3 className="text-xl font-bold text-[var(--text-primary)]">No requests found</h3>
-                    <p className="text-[var(--text-card)]">Try adjusting your filters or create a new request.</p>
+                <div className="py-32 bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200 text-center flex flex-col items-center">
+                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-gray-200 mb-6 border border-gray-100 shadow-sm">
+                        <MessageSquare size={32} />
+                    </div>
+                    <h3 className="text-xl font-black text-[var(--color-secondary)] uppercase tracking-tight">Pure Operational Status</h3>
+                    <p className="text-[var(--text-muted)] text-sm font-medium mt-2 max-w-xs">No maintenance tickets matching your filters found.</p>
                 </div>
             ) : (
-                <div className="grid gap-4 md:gap-6">
+                <div className="grid gap-6">
                     {filteredRequests.map((req) => (
-                        <div key={req._id} className="bg-[var(--bg-card)] hover:bg-[var(--bg-card)]/80 p-5 rounded-[2rem] border border-[var(--color-main)]/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all group shadow-sm">
+                        <div key={req._id} className="premium-card p-0 rounded-[2.5rem] group overflow-hidden border border-gray-100">
+                            <div className="p-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 bg-white transition-all group-hover:bg-gray-50/30">
 
-                            <div className="flex items-start gap-4 flex-1">
-                                <div className="space-y-1 overflow-hidden">
-                                    <h4 className="font-bold text-lg text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors truncate">{req.title}</h4>
-                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">
-                                        <span className="flex items-center gap-1.5"><Calendar size={12} /> {new Date(req.createdAt).toLocaleDateString()}</span>
-                                        <span className="flex items-center gap-1.5"><Building2 size={12} /> {req.propertyId?.propertyName || "Common Area"}</span>
-                                        <span className="flex items-center gap-1.5"><User size={12} /> Unit: {req.unitId?.unitNumber || "N/A"}</span>
-                                        <span className="flex items-center gap-1.5"><User size={12} /> By: {req.createdBy?.name || "Unknown"}</span>
-                                        <span className={`font-black ${getPriorityStyle(req.priority)}`}>• {req.priority} Priority</span>
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${getPriorityStyle(req.priority)} shadow-sm`}>
+                                            {req.priority} Priority
+                                        </span>
+                                        <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest bg-gray-100 px-3 py-1.5 rounded-full opacity-60">
+                                            {req.category}
+                                        </span>
                                     </div>
-                                    <p className="text-sm line-clamp-2 text-[var(--text-card)]/80 mt-2 font-medium leading-relaxed">{req.description}</p>
-                                </div>
-                            </div>
 
-                            <div className="flex flex-col md:items-end gap-3 w-full md:w-auto mt-2 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-[var(--color-main)]/20">
-                                <div className="flex items-center gap-3">
-                                    {req.status !== "Completed" && (
-                                        <>
-                                            {/* Manager can fix requests received from tenants */}
-                                            {role === "MANAGER" && activeTab === "Received" && (
-                                                <>
-                                                    <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "In Progress")} className="text-xs py-2 px-4 h-auto" >Start Fixing</Button>
-                                                    <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "Completed")} className="text-xs py-2 px-4 h-auto" >Finish</Button>
-                                                </>
-                                            )}
-                                            {/* Owner can fix requests sent by managers or tenants */}
-                                            {role === "OWNER" && (
-                                                <>
-                                                    <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "In Progress")} className="text-xs py-2 px-4 h-auto" >Start Fixing</Button>
-                                                    <Button variant="primary" onClick={() => handleUpdateStatus(req._id, "Completed")} className="text-xs py-2 px-4 h-auto" >Finish</Button>
-                                                </>
-                                            )}
-                                        </>
-                                    )}
-                                    <button className="p-3 rounded-xl bg-white/5 text-[var(--text-card)] hover:text-white transition-colors border border-white/5 hover:border-[var(--color-main)]/20">
-                                        <Eye size={18} />
-                                    </button>
+                                    <div className="space-y-1">
+                                        <h4 className="text-2xl font-black text-[var(--color-secondary)] group-hover:text-[var(--color-primary)] transition-colors tracking-tight line-clamp-1">{req.title}</h4>
+                                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-bold text-[var(--text-muted)]">
+                                            <span className="flex items-center gap-2"><Calendar size={14} className="opacity-40" /> {new Date(req.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            <span className="flex items-center gap-2"><Building2 size={14} className="opacity-40" /> {req.propertyId?.propertyName || "Common Infrastructure"}</span>
+                                            <span className="flex items-center gap-2"><User size={14} className="opacity-40" /> {req.createdBy?.name || "Resident Account"}</span>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-[13px] text-[var(--text-muted)]/80 leading-relaxed font-medium line-clamp-2 max-w-3xl pt-2">{req.description}</p>
                                 </div>
-                                <div className={`inline-block self-start md:self-auto text-[10px] uppercase font-black tracking-[0.15em] px-4 py-1.5 rounded-full border ${getStatusStyle(req.status)}`}>
-                                    {req.status}
+
+                                <div className="flex flex-col lg:items-end gap-5 w-full lg:w-auto pt-6 lg:pt-0 lg:pl-10 lg:border-l border-gray-100">
+                                    <div className="flex items-center gap-2">
+                                        {req.status !== "Completed" && (
+                                            <>
+                                                {(role === "OWNER" || (role === "MANAGER" && activeTab === "Received")) && (
+                                                    <div className="flex gap-2">
+                                                        {req.status === "Pending" && (
+                                                            <Button onClick={() => handleUpdateStatus(req._id, "In Progress")} variant="primary" size="sm" className="bg-gray-900 border-gray-900">
+                                                                DEPLOY CREW
+                                                            </Button>
+                                                        )}
+                                                        <Button onClick={() => handleUpdateStatus(req._id, "Completed")} variant="primary" size="sm" className="bg-emerald-600 border-emerald-600 hover:bg-emerald-700">
+                                                            MARK RESOLVED
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                        <Button iconOnly variant="secondary" size="xs" icon={<Eye size={18} />} title="View Details" />
+                                    </div>
+                                    <div className={`inline-flex self-start lg:self-auto items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm ${getStatusStyle(req.status)}`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${req.status === 'Completed' ? 'bg-emerald-500' : 'bg-current'}`}></span>
+                                        {req.status}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -340,112 +354,115 @@ export default function Maintenance() {
 
             {/* Create Request Modal */}
             {showForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowForm(false)}></div>
-                    <div className="relative bg-[var(--bg-card)] w-full max-w-2xl rounded-3xl border border-[var(--color-main)]/30 shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="p-8">
-                            <h2 className="text-2xl font-bold text-[var(--text-secondary)] mb-6 flex items-center gap-3">
-                                <Send className="text-[var(--color-primary)]" />
-                                Submit Maintenance Request
-                            </h2>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => setShowForm(false)}></div>
+                    <div className="relative bg-white w-full max-w-2xl rounded-[3rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
+                        <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">Facility Request</h2>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Report an active asset maintenance issue</p>
+                            </div>
+                            <Button onClick={() => setShowForm(false)} iconOnly variant="secondary" size="xs" icon={<X size={20} />} className="hover:bg-rose-50 hover:text-rose-600" />
+                        </div>
 
-                            <form onSubmit={handleCreateRequest} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-[var(--text-card)] mb-2 uppercase tracking-wide">Issue Title</label>
+                        <form onSubmit={handleCreateRequest} className="p-10 space-y-8">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">ISSUE IDENTITY</label>
                                     <input
                                         type="text"
                                         name="title"
                                         required
-                                        className="w-full bg-[var(--bg-main)]/50 border border-[var(--color-main)]/20 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[var(--color-primary)]/50 outline-none transition-all"
-                                        placeholder="e.g., Leaking Kitchen Sink"
+                                        className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
+                                        placeholder="e.g., Critical HVAC System Leak"
                                         value={formData.title}
                                         onChange={handleInputChange}
                                     />
                                 </div>
 
                                 {isPropertySelectRequired && (
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-bold text-[var(--text-card)] mb-2 uppercase tracking-wide">Select Property</label>
-                                        <select
-                                            name="propertyId"
-                                            required
-                                            className="w-full bg-[var(--bg-main)]/50 border border-[var(--color-main)]/20 rounded-xl py-3 px-4 outline-none"
-                                            value={formData.propertyId}
-                                            onChange={handleInputChange}
-                                        >
-                                            <option value="">Choose a property...</option>
-                                            {properties.map(p => (
-                                                <option key={p._id} value={p._id}>{p.propertyName}</option>
-                                            ))}
-                                        </select>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">TARGET ASSET</label>
+                                        <div className="relative">
+                                            <Building2 size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
+                                            <select
+                                                name="propertyId"
+                                                required
+                                                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-12 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all appearance-none"
+                                                value={formData.propertyId}
+                                                onChange={handleInputChange}
+                                            >
+                                                <option value="">Select Target Property...</option>
+                                                {properties.map(p => (
+                                                    <option key={p._id} value={p._id}>{p.propertyName}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-secondary)] pointer-events-none" />
+                                        </div>
                                     </div>
                                 )}
 
-                                <div>
-                                    <label className="block text-sm font-bold text-[var(--text-card)] mb-2 uppercase tracking-wide">Category</label>
-                                    <select
-                                        name="category"
-                                        className="w-full bg-[var(--bg-card)] border border-[var(--color-main)]/20 rounded-xl py-3 px-4 outline-none"
-                                        value={formData.category}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option>Plumbing</option>
-                                        <option>Electrical</option>
-                                        <option>Appliance</option>
-                                        <option>Structural</option>
-                                        <option>HVAC</option>
-                                        <option>Other</option>
-                                    </select>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">DOMAIN</label>
+                                        <div className="relative">
+                                            <select
+                                                name="category"
+                                                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all appearance-none"
+                                                value={formData.category}
+                                                onChange={handleInputChange}
+                                            >
+                                                <option>Plumbing</option>
+                                                <option>Electrical</option>
+                                                <option>Appliance</option>
+                                                <option>Structural</option>
+                                                <option>HVAC</option>
+                                                <option>Exteriors</option>
+                                                <option>Other</option>
+                                            </select>
+                                            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-secondary)] pointer-events-none opacity-40" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">SEVERITY</label>
+                                        <div className="relative">
+                                            <select
+                                                name="priority"
+                                                className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all appearance-none"
+                                                value={formData.priority}
+                                                onChange={handleInputChange}
+                                            >
+                                                <option>Low</option>
+                                                <option>Medium</option>
+                                                <option>High</option>
+                                                <option>Critical</option>
+                                            </select>
+                                            <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-secondary)] pointer-events-none opacity-40" />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-bold text-[var(--text-card)] mb-2 uppercase tracking-wide">Priority Level</label>
-                                    <select
-                                        name="priority"
-                                        className="w-full bg-[var(--bg-card)] border border-[var(--color-main)]/20 rounded-xl py-3 px-4 outline-none"
-                                        value={formData.priority}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option>Low</option>
-                                        <option>Medium</option>
-                                        <option>High</option>
-                                        <option>Critical</option>
-                                    </select>
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-[var(--text-card)] mb-2 uppercase tracking-wide">Description</label>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">DETAILED INTELLIGENCE</label>
                                     <textarea
                                         name="description"
                                         required
                                         rows="4"
-                                        className="w-full bg-[var(--bg-main)]/50 border border-[var(--color-main)]/20 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[var(--color-primary)]/50 outline-none transition-all resize-none"
-                                        placeholder="Please provide details about the location and nature of the issue..."
+                                        className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none resize-none"
+                                        placeholder="Please provide specific details about the issue location and visible symptoms..."
                                         value={formData.description}
                                         onChange={handleInputChange}
                                     ></textarea>
                                 </div>
+                            </div>
 
-                                <div className="md:col-span-2 flex items-center justify-end gap-4 mt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowForm(false)}
-                                        className="px-6 py-3 rounded-xl font-bold text-[var(--text-card)] hover:bg-[var(--bg-main)] transition-colors"
-                                    >
-                                        Dismiss
-                                    </button>
-                                    <Button
-                                        htmlType="submit"
-                                        type="primary"
-                                        disabled={submitting}
-                                        className="bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-50 text-black px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all"
-                                    >
-                                        {submitting ? <Loader2 className="animate-spin" /> : <ArrowRight size={20} />}
-                                        Submit Request
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
+                            <div className="flex items-center justify-end gap-5">
+                                <Button type="button" variant="ghost" size="sm" onClick={() => setShowForm(false)}>Cancel Operation</Button>
+                                <Button type="submit" loading={submitting} variant="primary" size="lg" icon={<AlertCircle size={16} />}>
+                                    SUBMIT INTELLIGENCE
+                                </Button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}

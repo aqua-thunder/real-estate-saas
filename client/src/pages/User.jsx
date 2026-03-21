@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { UserPlus, Edit, Trash2, X } from "lucide-react";
+import { UserPlus, Edit, Trash2, X, Search, Mail, Smartphone, ShieldCheck, ChevronDown, User as UserIcon, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
 import Button from "../components/ui/Button";
@@ -24,14 +24,13 @@ const User = () => {
     });
     const [openForm, setOpenForm] = useState(false);
     const [editId, setEditId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const isEditing = Boolean(editId);
 
     useEffect(() => {
         if (Array.isArray(users)) {
             if (currentUser?.role === "MANAGER" || currentUser?.role === "OWNER") {
-                // Filter users to only show those created by the current manager/owner 
-                // and where their role is appropriate (Tenants for Managers, Manager/Tenant for Owners)
                 setUserList(users.filter(u => u.createdBy === currentUser?._id || u.createdBy?._id === currentUser?._id));
             } else {
                 setUserList(users);
@@ -39,7 +38,6 @@ const User = () => {
         }
     }, [users, currentUser]);
 
-    // Update role if currentUser is Manager or Owner
     useEffect(() => {
         if (["MANAGER", "OWNER"].includes(currentUser?.role) && !isEditing) {
             setFormData(prev => ({ ...prev, role: "TENANT" }));
@@ -131,84 +129,102 @@ const User = () => {
         }
     };
 
-    return (
-        <div className="space-y-6">
+    const filteredUsers = userList.filter(u =>
+        u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.phone?.includes(searchTerm)
+    );
 
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                {/* Page Header Area */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div className="space-y-1">
-                        <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                            User Management
-                        </h1>
-                    </div>
+    return (
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+                <div className="space-y-1">
+                    <h1 className="font-black text-[var(--color-secondary)] tracking-tight">
+                        User Management
+                    </h1>
                 </div>
 
-                <Button onClick={() => {
-                    setFormData(initialState);
-                    setEditId(null);
-                    setOpenForm(true);
-                }}>
-                    <UserPlus size={20} />
-                    <span className="font-medium">Add User</span>
-                </Button>
-            </div>
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="relative group w-full sm:w-80">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] opacity-50 group-focus-within:opacity-100 group-focus-within:text-[var(--color-primary)] transition-all" size={16} />
+                        <input
+                            type="text"
+                            placeholder="Search by name, email or phone..."
+                            className="w-full bg-white border border-gray-100 rounded-2xl py-3 pl-12 pr-6 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all shadow-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <Button
+                        onClick={() => {
+                            setFormData(initialState);
+                            setEditId(null);
+                            setOpenForm(true);
+                        }}
+                        variant="primary"
+                        size="md"
+                        icon={<UserPlus size={14} />}
+                    >
+                        ADD USER
+                    </Button>
+                </div>
+            </header>
 
-            {/* User Table / Cards */}
-            <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--color-card)] shadow-sm overflow-hidden">
-                {/* Desktop/Tablet view */}
+            {/* Content Area */}
+            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                {/* Desktop view */}
                 <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-[var(--color-card)] bg-[var(--color-card)]/50">
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">#</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">Name</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">Email</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">Phone</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">Role</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)]">Status</th>
-                                <th className="p-4 font-bold text-[var(--text-secondary)] text-center">Actions</th>
+                    <table className="w-full text-left">
+                        <thead className="bg-gray-50/50 border-b border-gray-50">
+                            <tr>
+                                <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Serial</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Participant Details</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center">Authorization Level</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center">Status</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Operations</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {Array.isArray(userList) && userList.map((user, index) => (
-                                <tr key={user._id} className={`border-b border-[var(--color-card)] hover:bg-[var(--color-card)]/30 transition-colors ${!user.isActive ? "opacity-60 grayscale" : ""}`}>
-                                    <td className="p-4 text-[var(--text-card)]">{index + 1}</td>
-                                    <td className="p-4 font-medium text-[var(--text-secondary)]">{user.name}</td>
-                                    <td className="p-4 text-[var(--text-card)]">{user.email}</td>
-                                    <td className="p-4 text-[var(--text-card)]">{user.phone || "—"}</td>
-                                    <td className="p-4 text-[var(--text-card)]">
-                                        <span className="px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)]">
+                        <tbody className="divide-y divide-gray-50">
+                            {filteredUsers.map((user, index) => (
+                                <tr key={user._id} className={`hover:bg-gray-50/50 transition-all group border-l-4 border-l-transparent hover:border-l-[var(--color-primary)] ${user.isBlocked ? "opacity-40 grayscale" : ""}`}>
+                                    <td className="px-8 py-7">
+                                        <span className="text-[11px] font-black text-[var(--text-muted)] opacity-40">#{String(index + 1).padStart(4, '0')}</span>
+                                    </td>
+                                    <td className="px-8 py-7">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-[14px] bg-slate-100 flex items-center justify-center text-xs font-black text-[var(--color-secondary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-all shadow-sm">
+                                                {user.name[0]}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-black text-[var(--color-secondary)] truncate max-w-[200px]">{user.name}</p>
+                                                <div className="flex items-center gap-3 mt-0.5">
+                                                    <span className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--text-muted)] opacity-60"><Mail size={10} /> {user.email}</span>
+                                                    {user.phone && <span className="flex items-center gap-1.5 text-[10px] font-bold text-[var(--text-muted)] opacity-60"><Smartphone size={10} /> {user.phone}</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-7 text-center">
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-100 text-[var(--color-secondary)] bg-white shadow-sm">
+                                            <ShieldCheck size={10} className="text-indigo-500" />
                                             {user.role}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-[var(--text-card)]">
-                                        <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide rounded-full ${user.isBlocked
-                                            ? "bg-red-500/20 text-red-400"
-                                            : user.isActive
-                                                ? "bg-green-500/20 text-green-400"
-                                                : "bg-yellow-500/20 text-yellow-400"
+                                    <td className="px-8 py-7 text-center">
+                                        <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${user.isBlocked ? "bg-rose-50 text-rose-600 border-rose-100" :
+                                            user.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                                "bg-amber-50 text-amber-600 border-amber-100"
                                             }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${user.isBlocked ? "bg-rose-500" : user.isActive ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`} />
                                             {user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}
                                         </span>
                                     </td>
-                                    <td className="p-4">
-                                        <div className="flex items-center justify-center gap-3">
-                                            <button
-                                                onClick={() => handleEdit(user)}
-                                                className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors"
-                                                title="Edit User"
-                                            >
-                                                <Edit size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user._id)}
-                                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                title="Delete User"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                    <td className="px-8 py-7">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <Button onClick={() => handleEdit(user)} iconOnly variant="secondary" size="xs" icon={<Edit size={16} />} title="Modify Record" />
+                                            <Button onClick={() => handleDelete(user._id)} iconOnly variant="secondary" size="xs" icon={<Trash2 size={16} />} title="Delete Identity" className="text-rose-300 hover:text-rose-600 hover:border-rose-100" />
                                         </div>
                                     </td>
                                 </tr>
@@ -217,166 +233,182 @@ const User = () => {
                     </table>
                 </div>
 
-                {/* Mobile Card View */}
+                {/* Mobile View */}
                 <div className="md:hidden p-4 space-y-4">
-                    {Array.isArray(userList) && userList.map((user, index) => (
-                        <div key={user._id} className={`p-4 space-y-4 bg-[var(--color-card)]/10 border border-[var(--color-card)] hover:bg-[var(--color-card)]/20 transition-colors rounded-xl shadow-sm ${!user.isActive ? "opacity-60 grayscale" : ""}`}>
+                    {filteredUsers.map((user) => (
+                        <div key={user._id} className={`p-6 bg-gray-50/50 border border-gray-100 rounded-[2.5rem] space-y-5 hover:bg-white transition-all shadow-sm ${user.isBlocked ? "grayscale opacity-50" : ""}`}>
                             <div className="flex justify-between items-start">
-                                <div className="space-y-1">
-                                    <h4 className="font-bold text-white text-lg">{user.name}</h4>
-                                    <p className="text-sm text-[var(--text-card)]">{user.email}</p>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-lg font-black text-[var(--color-secondary)] shadow-sm">
+                                        {user.name[0]}
+                                    </div>
+                                    <div>
+                                        <p className="font-black text-[var(--color-secondary)]">{user.name}</p>
+                                        <p className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest mt-0.5 opacity-60 italic">{user.role}</p>
+                                    </div>
                                 </div>
-                                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${user.isBlocked
-                                    ? "bg-red-500/20 text-red-400"
-                                    : user.isActive
-                                        ? "bg-green-500/20 text-green-400"
-                                        : "bg-yellow-500/20 text-yellow-400"
+                                <span className={`px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border ${user.isBlocked ? "bg-rose-50 text-rose-600 border-rose-100" :
+                                    user.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                        "bg-amber-50 text-amber-600 border-amber-100"
                                     }`}>
-                                    {user.isBlocked ? "Blocked" : user.isActive ? "Active" : "Inactive"}
+                                    {user.isActive ? "Active" : "Inactive"}
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Phone</p>
-                                    <p className="text-sm text-[var(--text-secondary)]">{user.phone || "—"}</p>
+                            <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                                <div className="space-y-0.5">
+                                    <p className="text-[9px] font-black text-[var(--text-muted)] uppercase opacity-40">Identifier</p>
+                                    <p className="text-[11px] font-bold text-[var(--color-secondary)] truncate">{user.email}</p>
                                 </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Role</p>
-                                    <span className="inline-block px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-full border border-[var(--color-card)] bg-[var(--bg-card)] text-[var(--text-secondary)]">
-                                        {user.role}
-                                    </span>
+                                <div className="space-y-0.5 text-right">
+                                    <p className="text-[9px] font-black text-[var(--text-muted)] uppercase opacity-40">Communication</p>
+                                    <p className="text-[11px] font-bold text-[var(--color-secondary)]">{user.phone || "—"}</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-3 pt-2">
-                                <button
-                                    onClick={() => handleEdit(user)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-500 rounded-xl text-xs font-bold transition-all active:scale-95"
-                                >
-                                    <Edit size={14} /> Edit
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(user._id)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-xs font-bold transition-all active:scale-95"
-                                >
-                                    <Trash2 size={14} /> Delete
-                                </button>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button onClick={() => handleEdit(user)} variant="secondary" size="md" icon={<Edit size={14} />} className="w-full">Update</Button>
+                                <Button onClick={() => handleDelete(user._id)} variant="primary" size="md" icon={<Trash2 size={14} />} className="w-full">Delete</Button>
                             </div>
                         </div>
                     ))}
                 </div>
-            </div>
+            </section>
 
-            {/* Modal */}
+            {/* Identity Modal */}
             {openForm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
-                    <div className="bg-[var(--bg-card)] w-full max-w-md p-6 rounded-2xl border border-[var(--color-card)] shadow-xl relative">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={resetForm}></div>
 
-                        {/* Close Button */}
-                        <button
-                            onClick={resetForm}
-                            className="absolute top-4 right-4 text-[var(--text-card)] hover:text-[var(--color-primary)]"
-                        >
-                            <X size={20} />
-                        </button>
+                    <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
 
-                        <h3 className="text-xl font-bold text-[var(--text-secondary)] mb-6">
-                            {isEditing ? "Update User" : "Add New User"}
-                        </h3>
+                        <div className="px-10 pt-4 border-b border-gray-50 flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h3 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">
+                                    {isEditing ? "Edit User" : "New User"}
+                                </h3>
+                            </div>
+                            <Button onClick={resetForm} iconOnly variant="secondary" size="sm" icon={<X size={20} />} className="hover:bg-rose-50 hover:text-rose-600" />
+                        </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Input
-                                    label="Name"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="Enter name"
-                                    variant='formInput'
-                                    className='text-sm'
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <Input
-                                    label="Email"
-                                    name="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder="Enter email"
-                                    variant='formInput'
-                                    className='text-sm'
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <Input
-                                    label="Password"
-                                    type="password"
-                                    name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder={isEditing ? "Leave blank to keep current" : "Enter password"}
-                                    variant='formInput'
-                                    className='text-sm'
-                                    required={!isEditing}
-                                />
-                            </div>
-                            <div>
-                                <Input
-                                    label="Phone"
-                                    type="tel"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    placeholder="Enter phone number"
-                                    variant='formInput'
-                                    className='text-sm'
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-                                    Role
-                                </label>
-                                <select
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                    className={`w-full bg-[var(--bg-card)] border border-[var(--color-card)] rounded-lg px-4 py-2.5 text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition ${["MANAGER", "OWNER"].includes(currentUser?.role) && isEditing ? "opacity-70 cursor-not-allowed" : ""}`}
-                                    required
-                                    disabled={["MANAGER", "OWNER"].includes(currentUser?.role) && isEditing}
-                                >
-                                    {currentUser?.role === "MANAGER" && (
-                                        <option value="TENANT">Tenant</option>
-                                    )}
-                                    {currentUser?.role === "OWNER" && (
-                                        <>
-                                            <option value="MANAGER">Manager</option>
-                                            <option value="TENANT">Tenant</option>
-                                        </>
-                                    )}
-                                    {currentUser?.role === "SUPER_ADMIN" && (
-                                        <>
-                                            <option value="TENANT">Tenant</option>
-                                            <option value="OWNER">Owner</option>
-                                            <option value="MANAGER">Manager</option>
-                                            <option value="MAINTENANCE_STAFF">Maintenance Staff</option>
-                                            <option value="SUPER_ADMIN">Super Admin</option>
-                                        </>
-                                    )}
-                                </select>
+                        <form onSubmit={handleSubmit} className="px-10 pb-10 space-y-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Name</label>
+                                    <div className="relative">
+                                        <UserIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            required
+                                            placeholder="Full Name"
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Email Address</label>
+                                    <div className="relative">
+                                        <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] opacity-60" />
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            required
+                                            placeholder="Email Address"
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Password</label>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            placeholder={isEditing ? "Stay Current" : "Passphrase"}
+                                            required={!isEditing}
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            placeholder="Contact"
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Role</label>
+                                    <div className="relative">
+                                        <ShieldCheck size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
+                                        <select
+                                            name="role"
+                                            value={formData.role}
+                                            onChange={handleChange}
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-black text-[var(--color-secondary)] transition-all appearance-none cursor-pointer focus:outline-none"
+                                            disabled={["MANAGER", "OWNER"].includes(currentUser?.role) && isEditing}
+                                        >
+                                            {currentUser?.role === "MANAGER" && <option value="TENANT">Tenant Access</option>}
+                                            {currentUser?.role === "OWNER" && (
+                                                <>
+                                                    <option value="MANAGER">Facility Manager</option>
+                                                    <option value="TENANT">Tenant Access</option>
+                                                </>
+                                            )}
+                                            {currentUser?.role === "SUPER_ADMIN" && (
+                                                <>
+                                                    <option value="TENANT">Tenant</option>
+                                                    <option value="OWNER">Property Owner</option>
+                                                    <option value="MANAGER">Facility Manager</option>
+                                                    <option value="MAINTENANCE_STAFF">Ground Crew</option>
+                                                    <option value="SUPER_ADMIN">System Root</option>
+                                                </>
+                                            )}
+                                        </select>
+                                        <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-40" />
+                                    </div>
+                                </div>
                             </div>
 
-                            <Button type="primary" className="w-full" htmlType="submit">
-                                {isEditing ? "Update User" : "Save User"}
-                            </Button>
-
+                            <div className="flex justify-end">
+                                <Button type="submit" variant="primary" size="lg" className="min-w-[170px]">
+                                    {isEditing ? "UPDATE USER" : "ADD USER"}
+                                </Button>
+                            </div>
                         </form>
                     </div>
                 </div>
             )}
+
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(0,0,0,0.05);
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: var(--color-primary);
+                }
+            `}</style>
         </div>
     );
 };

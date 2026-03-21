@@ -40,19 +40,17 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex text-white font-['Jost'] bg-[var(--bg-main)] overflow-hidden relative">
-            {/* Left Section - Simple & Clean */}
-            <div className="hidden lg:flex lg:w-[45%] flex-col justify-center px-16 xl:px-24 bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg-main)] border-r border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[var(--color-primary)] opacity-[0.02] pointer-events-none"></div>
-
+        <div className="min-h-screen flex text-[var(--text-secondary)] bg-[var(--bg-main)] overflow-hidden relative">
+            {/* Side Panel - Aesthetic Mesh */}
+            <div className="hidden lg:flex lg:w-[45%] flex-col justify-center px-16 xl:px-24 bg-mesh border-r border-gray-100 relative overflow-hidden">
                 <div className="relative z-10">
-                    <div className="flex items-center mb-12">
-                        <img src="/SVGs/logo.jpg" alt="Logo" className="h-30 w-auto rounded-xl shadow-lg" />
-                    </div>
+                    {/* <div className="flex items-center mb-10">
+                        <img src="/SVGs/logo.jpg" alt="Logo" className="h-24 w-auto rounded-xl shadow-md" />
+                    </div> */}
 
-                    <h1 className="text-4xl xl:text-5xl font-bold mb-8 leading-tight">
+                    <h1 className="text-3xl xl:text-4xl font-black mb-8 leading-tight tracking-tight text-[var(--color-secondary)]">
                         Secure Your Account <br />
-                        <span className="text-[var(--color-primary)]">Easily.</span>
+                        <span className="hero-gradient-text">Easily.</span>
                     </h1>
 
                     <div className="space-y-6">
@@ -61,13 +59,13 @@ const ForgotPassword = () => {
                             { title: "Safe & Encrypted", desc: "Your security is our top priority.", icon: ShieldCheck },
                             { title: "24/7 Support", desc: "Need help? Our team is always here for you.", icon: MailQuestion }
                         ].map((item, idx) => (
-                            <div key={idx} className="flex gap-4 items-start group">
-                                <div className="mt-1 p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[var(--color-primary)]/50 transition-colors">
-                                    <item.icon className="w-4 h-4 text-[var(--color-primary)]" />
+                            <div key={idx} className="flex gap-5 items-start group">
+                                <div className="mt-1 p-2.5 rounded-xl bg-white border border-gray-100 shadow-sm group-hover:border-[var(--color-primary)]/40 group-hover:shadow-[0_4px_12px_rgba(231,76,60,0.1)] transition-all">
+                                    <item.icon className="w-4 h-4 text-[var(--color-primary)] opacity-80" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-white/90">{item.title}</h3>
-                                    <p className="text-sm text-[var(--text-card)]">{item.desc}</p>
+                                    <h3 className="font-bold text-[var(--color-secondary)] text-base group-hover:text-[var(--color-primary)] transition-colors">{item.title}</h3>
+                                    <p className="font-md text-[var(--text-muted)] mt-0.5 leading-relaxed">{item.desc}</p>
                                 </div>
                             </div>
                         ))}
@@ -75,24 +73,24 @@ const ForgotPassword = () => {
                 </div>
             </div>
 
-            {/* Right Section - Form */}
-            <div className="w-full lg:w-[55%] flex items-center justify-center p-6 relative z-10">
-                <div className="w-full max-w-[480px] bg-[var(--bg-card)]/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 sm:p-12 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-white/20">
-                    <div className="mb-10">
-                        <div className="p-3 w-fit rounded-2xl bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 mb-6">
-                            <KeyRound className="w-8 h-8 text-[var(--color-primary)]" />
+            {/* Main Form Container */}
+            <div className="w-full lg:w-[55%] flex items-center justify-center p-6 relative z-10 bg-[var(--bg-main)]">
+                <div className="w-full max-w-[440px] premium-card rounded-[2.5rem] p-10 sm:p-12">
+                    <div className="mb-10 text-center sm:text-left">
+                        <div className="p-3.5 w-fit rounded-2xl bg-[var(--color-primary)]/5 border border-[var(--color-primary)]/10 mb-6 mx-auto sm:mx-0 shadow-sm">
+                            <KeyRound className="w-6 h-6 text-[var(--color-primary)] opacity-90" />
                         </div>
-                        <h2 className="text-3xl font-bold mb-3">Forgot Password?</h2>
-                        <p className="text-[var(--text-card)]">
-                            Enter your email address and we'll send you a link to reset your password.
+                        <h2 className="text-2xl font-black mb-3 text-[var(--color-secondary)] tracking-tight">Forgot Password?</h2>
+                        <p className="font-md text-[var(--text-muted)] leading-relaxed">
+                            We'll send a secure restoration link to your verified email.
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 mb-1.5 ml-1">
-                                <Mail className="w-4 h-4 text-[var(--color-primary)]" />
-                                <span className="text-sm font-medium text-[var(--text-card)] uppercase tracking-wider">Email Address</span>
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 mb-1 ml-1 text-xs font-bold text-[var(--color-secondary)] uppercase tracking-[0.2em] opacity-80">
+                                <Mail className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                                Recovery Email
                             </div>
                             <Input
                                 type="email"
@@ -100,28 +98,28 @@ const ForgotPassword = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="name@example.com"
-                                className="bg-white/5 border-white/10 focus:bg-white/10 focus:border-[var(--color-primary)] h-13 transition-all rounded-2xl"
+                                className="bg-gray-50/50 border-gray-100 focus:bg-white focus:border-[var(--color-primary)] h-13 transition-all rounded-xl font-md shadow-sm"
                                 required
                             />
                         </div>
 
                         <Button 
                             type="primary" 
-                            className="w-full h-14 rounded-2xl text-lg font-bold group shadow-[0_10px_20px_-5px_rgba(0,161,255,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(0,161,255,0.5)] flex items-center justify-center gap-2" 
+                            className="w-full h-14 rounded-xl font-md font-extrabold group shadow-[0_15px_30px_-5px_rgba(231,76,60,0.2)] hover:shadow-[0_20px_40px_-5px_rgba(231,76,60,0.3)] transition-all flex items-center justify-center gap-3 mt-2" 
                             htmlType="submit"
                             disabled={isLoading}
                         >
-                            {isLoading ? "Sending Link..." : "Send Reset Link"}
-                            <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                            {isLoading ? "Dispatching..." : "Send Reset Link"}
+                            <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
                         </Button>
                     </form>
 
-                    <div className="mt-12 text-center pt-6 border-t border-white/5">
+                    <div className="mt-12 text-center pt-8 border-t border-gray-50/50">
                         <NavLink
                             to="/"
-                            className="inline-flex items-center gap-2 text-[var(--color-primary)] font-bold hover:underline underline-offset-4 decoration-2"
+                            className="inline-flex items-center gap-2.5 text-[var(--color-primary)] font-black hover:underline underline-offset-8 font-md transition-all group"
                         >
-                            <ArrowLeft className="w-4 h-4" />
+                            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                             Back to Sign In
                         </NavLink>
                     </div>

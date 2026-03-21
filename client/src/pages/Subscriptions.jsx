@@ -2,7 +2,24 @@ import React, { useState, useEffect } from "react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useToast } from "../store/ToastContext";
-import { Plus, Edit, Trash2, X, Shield, Users, Database, LayoutGrid, Search, Layers } from "lucide-react";
+import { 
+    Plus, 
+    Edit, 
+    Trash2, 
+    X, 
+    Shield, 
+    Users, 
+    Database, 
+    LayoutGrid, 
+    Search, 
+    Layers,
+    ArrowRight,
+    TrendingUp,
+    CheckCircle2,
+    ShieldAlert,
+    MoreVertical,
+    Loader2
+} from "lucide-react";
 
 const initialState = {
     name: "",
@@ -143,276 +160,290 @@ const Subscriptions = () => {
     );
 
     return (
-        <div className="space-y-6 animate-fadeIn p-6">
-            {/* Controls Bar */}
-            <div className="relative overflow-hidden bg-[var(--bg-card)] p-4 sm:p-5 rounded-3xl border border-[var(--color-card)] shadow-sm">
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--color-primary)]/40 to-transparent"></div>
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-8 space-y-8 font-['Inter']">
 
-                <div className="flex flex-col xl:flex-row gap-3 xl:gap-4 xl:items-center xl:justify-between">
-                    <div className="relative w-full xl:max-w-xl">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]" />
+            {/* Header Section */}
+            <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">
+                        Subscription Models
+                    </h1>
+                    <p className="text-[var(--text-muted)] font-medium text-sm">Define tier-based access controls, pricing frameworks, and service boundaries.</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                     <div className="relative group w-full sm:w-80">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] opacity-50 group-focus-within:opacity-100 transition-all font-bold" size={16} />
                         <input
                             type="text"
-                            placeholder="Search subscription plans by name..."
-                            className="w-full h-12 bg-[var(--color-card)]/90 border border-transparent rounded-2xl pl-12 pr-4 text-sm text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/70 focus:border-[var(--color-primary)]/20 transition-all"
+                            placeholder="Filter tiers..."
+                            className="w-full bg-white border border-gray-100 rounded-2xl py-3 pl-12 pr-6 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all shadow-sm"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-
-                    <div>
-                        <Button
-                            onClick={() => { resetForm(); setOpenForm(true); }}
-                            className="h-12 px-5 rounded-2xl bg-gradient-to-r from-[var(--color-primary)] to-blue-600 hover:scale-[1.02] active:scale-[0.98] transition-transform duration-200 border-none shadow-lg shadow-[var(--color-primary)]/30 mt-0"
-                        >
-                            <Plus size={19} className="mr-2" />
-                            <span className="font-bold">Create Plan</span>
-                        </Button>
-                    </div>
+                    <Button 
+                        onClick={() => { resetForm(); setOpenForm(true); }}
+                        variant="primary"
+                        size="md"
+                        icon={<Plus size={18} />}
+                    >
+                        CREATE NEW TIER
+                    </Button>
                 </div>
-            </div>
+            </header>
 
-            {/* Grid of Plan Cards */}
+            {/* Main Content Area */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center p-20 space-y-4">
-                    <div className="w-12 h-12 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-[var(--text-card)] font-medium animate-pulse">Syncing subscription models...</p>
+                <div className="flex flex-col items-center justify-center py-40 space-y-4">
+                    <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Synchronizing Service Tiers...</p>
                 </div>
             ) : filteredPlans.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredPlans.map((plan) => (
-                        <div key={plan._id} className="group relative bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--color-card)] p-8 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-                            {/* Decorative Background Element */}
-                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[var(--color-primary)]/5 rounded-full blur-3xl group-hover:bg-[var(--color-primary)]/10 transition-colors"></div>
-
-                            {/* Plan Header */}
-                            <div className="flex justify-between items-start mb-6">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-[var(--color-primary)]/10 rounded-2xl text-[var(--color-primary)] group-hover:scale-110 transition-transform">
-                                        <Layers size={22} />
+                        <div key={plan._id} className="premium-card p-0 rounded-[3rem] bg-white border border-gray-100 group overflow-hidden flex flex-col transition-all duration-500 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-2">
+                            
+                            {/* Card Header Area */}
+                            <div className="p-8 pb-4 relative">
+                                <div className="absolute top-0 right-0 p-8 text-[var(--color-primary)] opacity-5 transform group-hover:rotate-12 transition-transform duration-700">
+                                    <Layers size={100} />
+                                </div>
+                                
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${
+                                        plan.isActive ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'
+                                    }`}>
+                                        <span className={`inline-block w-1.5 h-1.5 rounded-full mr-2 ${plan.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
+                                        {plan.isActive ? 'Live' : 'Inactive'}
                                     </div>
-                                    <div>
-                                        <h4 className="text-xl font-black text-[var(--text-secondary)] tracking-tight">{plan.name}</h4>
-                                        <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-[9px] font-black tracking-widest uppercase border ${plan.isActive ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}>
-                                            {plan.isActive ? 'Active' : 'Inactive'}
-                                        </span>
+                                    <div className="flex gap-2">
+                                        <Button 
+                                            onClick={() => handleEdit(plan)} 
+                                            variant="secondary" 
+                                            size="xs" 
+                                            iconOnly 
+                                            icon={<Edit size={16} />} 
+                                        />
+                                        <Button 
+                                            onClick={() => handleDelete(plan._id)} 
+                                            variant="danger" 
+                                            size="xs" 
+                                            iconOnly 
+                                            icon={<Trash2 size={16} />} 
+                                        />
                                     </div>
                                 </div>
-                                <div className="flex gap-1">
-                                    <button onClick={() => handleEdit(plan)} className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-xl transition-all" title="Edit Plan"><Edit size={18} /></button>
-                                    <button onClick={() => handleDelete(plan._id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-xl transition-all" title="Delete Plan"><Trash2 size={18} /></button>
+
+                                <div className="space-y-1 relative z-10">
+                                    <h4 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight group-hover:text-[var(--color-primary)] transition-colors">{plan.name}</h4>
+                                    <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] opacity-40">Tier Specification ID: #{plan._id.slice(-6).toUpperCase()}</p>
                                 </div>
                             </div>
 
-                            {/* Pricing Section */}
-                            <div className="mb-8 p-6 bg-[var(--color-card)]/30 rounded-3xl border border-white/5">
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-[var(--text-secondary)]">₹{plan.priceMonthly}</span>
-                                    <span className="text-[var(--text-card)] font-bold text-sm">/ month</span>
+                            {/* Pricing Framework */}
+                            <div className="px-8 py-8 bg-gray-50/50 border-y border-gray-50/80">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-4xl font-black text-[var(--color-secondary)]">₹{plan.priceMonthly.toLocaleString()}</span>
+                                    <span className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">/ Mensum</span>
                                 </div>
-                                <div className="mt-2 text-xs font-bold text-green-500/80 uppercase tracking-wider">
-                                    Annual billing: ₹{plan.priceYearly}/yr
-                                </div>
-                            </div>
-
-                            {/* Features/Limits List */}
-                            <div className="space-y-4 mb-8">
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
-                                        <LayoutGrid size={16} className="text-[var(--color-primary)]" />
-                                        Property Limit
-                                    </div>
-                                    <span className="font-black text-[var(--text-secondary)]">{plan.propertyLimit} Units</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
-                                        <Layers size={16} className="text-purple-500" />
-                                        Unit Capacity
-                                    </div>
-                                    <span className="font-black text-[var(--text-secondary)]">{plan.unitLimit} Units</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
-                                        <Users size={16} className="text-orange-500" />
-                                        Manager Access
-                                    </div>
-                                    <span className="font-black text-[var(--text-secondary)]">{plan.managerLimit} Seats</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <div className="flex items-center gap-3 text-[var(--text-card)] font-semibold">
-                                        <Database size={16} className="text-blue-400" />
-                                        Cloud Storage
-                                    </div>
-                                    <span className="font-black text-[var(--text-secondary)]">{plan.storageLimitMB}MB</span>
+                                <div className="mt-4 flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-gray-100 w-fit shadow-sm">
+                                    <TrendingUp size={14} className="text-emerald-500" />
+                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                                        ALC: ₹{plan.priceYearly.toLocaleString()} Annually
+                                    </span>
                                 </div>
                             </div>
 
-                            {/* Trial Footer */}
-                            <div className="flex items-center gap-2 pt-4 border-t border-white/5">
-                                <Shield size={14} className="text-[var(--text-card)]" />
-                                <span className="text-[10px] font-bold text-[var(--text-card)] uppercase tracking-widest">
-                                    {plan.trialDays > 0 ? `${plan.trialDays} Day Free Trial available` : 'No Free Trial'}
+                            {/* Logic Barriers/Limits */}
+                            <div className="p-8 space-y-5 flex-1">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-indigo-50 text-indigo-500 rounded-lg">
+                                            <LayoutGrid size={14} />
+                                        </div>
+                                        <span className="text-xs font-bold text-[var(--text-muted)]">Assets Framework</span>
+                                    </div>
+                                    <span className="text-xs font-black text-[var(--color-secondary)] uppercase">{plan.propertyLimit} Properties</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-purple-50 text-purple-500 rounded-lg">
+                                            <Layers size={14} />
+                                        </div>
+                                        <span className="text-xs font-bold text-[var(--text-muted)]">Inventory Capacity</span>
+                                    </div>
+                                    <span className="text-xs font-black text-[var(--color-secondary)] uppercase">{plan.unitLimit} Units Total</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-amber-50 text-amber-500 rounded-lg">
+                                            <Users size={14} />
+                                        </div>
+                                        <span className="text-xs font-bold text-[var(--text-muted)]">Administrative Access</span>
+                                    </div>
+                                    <span className="text-xs font-black text-[var(--color-secondary)] uppercase">{plan.managerLimit} Managers</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-50 text-blue-500 rounded-lg">
+                                            <Database size={14} />
+                                        </div>
+                                        <span className="text-xs font-bold text-[var(--text-muted)]">Secure Vault</span>
+                                    </div>
+                                    <span className="text-xs font-black text-[var(--color-secondary)] uppercase">{plan.storageLimitMB} MB Volume</span>
+                                </div>
+                            </div>
+
+                            {/* Trial Provision */}
+                            <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Shield size={14} className="text-[var(--text-muted)] opacity-30" />
+                                    <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-60">
+                                        Trial Provision
+                                    </span>
+                                </div>
+                                <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-lg ${plan.trialDays > 0 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/10' : 'bg-gray-200 text-gray-400'}`}>
+                                    {plan.trialDays > 0 ? `${plan.trialDays} DIMENSIONS` : "NOT APPLICABLE"}
                                 </span>
                             </div>
                         </div>
                     ))}
                 </div>
             ) : (
-                <div className="bg-[var(--bg-card)] rounded-[3rem] border border-[var(--color-card)] p-20 text-center shadow-xl">
-                    <div className="flex flex-col items-center gap-6">
-                        <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center text-[var(--text-card)] border-4 border-[var(--color-card)] border-dashed animate-pulse">
-                            <Shield size={40} />
-                        </div>
-                        <div>
-                            <h3 className="text-2xl font-black text-[var(--text-secondary)] tracking-tight">No Tiers Found</h3>
-                            <p className="text-[var(--text-card)] text-sm max-w-xs mx-auto mt-2">Scale your business by defining new subscription models.</p>
-                        </div>
-                        <Button onClick={() => setOpenForm(true)} className="rounded-2xl px-12 py-4">Establish First Plan</Button>
+                <div className="bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-200 py-40 text-center flex flex-col items-center">
+                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-gray-200 mb-8 border border-gray-100 shadow-sm">
+                        <ShieldAlert size={40} />
                     </div>
+                    <div className="space-y-2">
+                        <h3 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight uppercase">Operational Vacuum</h3>
+                        <p className="text-[var(--text-muted)] text-sm font-medium max-w-xs mx-auto">No subscription models have been established in the core engine yet.</p>
+                    </div>
+                    <Button 
+                        onClick={() => { resetForm(); setOpenForm(true); }} 
+                        variant="primary"
+                        size="md"
+                        className="mt-10"
+                    >
+                        ESTABLISH FIRST TIER
+                    </Button>
                 </div>
             )}
 
-
-            {/* Modal Form */}
+            {/* Modal Tier Constructor */}
             {openForm && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={resetForm}></div>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={resetForm}></div>
 
-                    <div className="bg-[var(--bg-card)] w-full max-w-2xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-                        {/* Modal Header */}
-                        <div className="p-8 pb-4 flex justify-between items-center relative z-10">
-                            <div>
-                                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
-                                    {isEditing ? "Modify Tier" : "Define New Tier"}
+                    <div className="relative bg-white w-full max-w-2xl rounded-[3rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
+                        
+                        <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between bg-white relative z-10">
+                            <div className="space-y-1">
+                                <h3 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">
+                                    {isEditing ? "Modify Subscription Tier" : "Tier Constructor"}
                                 </h3>
-                                <p className="text-[var(--text-card)] font-medium mt-1">Configure subscription barriers and pricing models</p>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Configure access barriers and fiscal yields</p>
                             </div>
-                            <button onClick={resetForm} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+                            <Button variant="secondary" size="sm" iconOnly icon={<X size={24} />} onClick={resetForm} />
                         </div>
 
-                        <div className="h-1 w-24 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-full mx-8 mb-6"></div>
-
-                        <form onSubmit={handleSubmit} className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto relative z-10 custom-scrollbar">
-                            <div className="space-y-6">
-                                <Input
-                                    variant="formInput"
+                        <form onSubmit={handleSubmit} className="p-10 pt-8 space-y-8 max-h-[75vh] overflow-y-auto custom-scrollbar relative z-10">
+                            
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">TIER IDENTIFIER</label>
+                                <input
                                     type="text"
                                     name="name"
-                                    label="Plan Name"
-                                    placeholder="e.g. Enterprise, Professional"
+                                    required
+                                    placeholder="e.g. Enterprise Framework"
+                                    className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] transition-all focus:outline-none"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                    required
                                 />
+                            </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        variant="formInput"
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">MONTHLY YIELD (₹)</label>
+                                    <input
                                         type="number"
                                         name="priceMonthly"
-                                        label="Monthly Price (₹)"
+                                        required
+                                        className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-black text-[var(--color-secondary)] transition-all focus:outline-none"
                                         value={formData.priceMonthly}
                                         onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
                                     />
-                                    <Input
-                                        variant="formInput"
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">ANNUAL COMMITMENT (₹)</label>
+                                    <input
                                         type="number"
                                         name="priceYearly"
-                                        label="Yearly Price (₹)"
+                                        required
+                                        className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-black text-[var(--color-secondary)] transition-all focus:outline-none"
                                         value={formData.priceYearly}
                                         onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
                                     />
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-3 gap-4">
-                                    <Input
-                                        variant="formInput"
-                                        type="number"
-                                        name="propertyLimit"
-                                        label="Property Limit"
-                                        value={formData.propertyLimit}
-                                        onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
-                                    />
-                                    <Input
-                                        variant="formInput"
-                                        type="number"
-                                        name="unitLimit"
-                                        label="Unit Limit"
-                                        value={formData.unitLimit}
-                                        onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
-                                    />
-                                    <Input
-                                        variant="formInput"
-                                        type="number"
-                                        name="managerLimit"
-                                        label="Manager Limit"
-                                        value={formData.managerLimit}
-                                        onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
-                                    />
+                            <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 space-y-8">
+                                <p className="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest text-center">Service Boundaries</p>
+                                
+                                <div className="grid grid-cols-3 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center block">Assets</label>
+                                        <input type="number" name="propertyLimit" required className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-black text-center text-[var(--color-secondary)] focus:outline-none focus:border-[var(--color-primary)]/20" value={formData.propertyLimit} onChange={handleChange} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center block">Units</label>
+                                        <input type="number" name="unitLimit" required className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-black text-center text-[var(--color-secondary)] focus:outline-none focus:border-[var(--color-primary)]/20" value={formData.unitLimit} onChange={handleChange} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center block">Access</label>
+                                        <input type="number" name="managerLimit" required className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-black text-center text-[var(--color-secondary)] focus:outline-none focus:border-[var(--color-primary)]/20" value={formData.managerLimit} onChange={handleChange} />
+                                    </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Input
-                                        variant="formInput"
-                                        type="number"
-                                        name="storageLimitMB"
-                                        label="Storage Limit (MB)"
-                                        value={formData.storageLimitMB}
-                                        onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
-                                    />
-                                    <Input
-                                        variant="formInput"
-                                        type="number"
-                                        name="trialDays"
-                                        label="Trial Period (Days)"
-                                        value={formData.trialDays}
-                                        onChange={handleChange}
-                                        className="rounded-2xl bg-[var(--color-card)] border-white/10"
-                                        required
-                                    />
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center block">Vault (MB)</label>
+                                        <input type="number" name="storageLimitMB" required className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-black text-center text-[var(--color-secondary)] focus:outline-none focus:border-[var(--color-primary)]/20" value={formData.storageLimitMB} onChange={handleChange} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center block">Trial Period</label>
+                                        <input type="number" name="trialDays" required className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-xs font-black text-center text-[var(--color-secondary)] focus:outline-none focus:border-[var(--color-primary)]/20" value={formData.trialDays} onChange={handleChange} />
+                                    </div>
                                 </div>
+                            </div>
 
-                                <div className="flex items-center gap-3 p-4 bg-[var(--color-card)]/50 rounded-2xl border border-white/10">
+                            <div className="flex items-center gap-4 bg-gray-900/5 p-6 rounded-[2rem] border border-gray-100">
+                                <div className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
                                         name="isActive"
                                         id="isActive"
                                         checked={formData.isActive}
                                         onChange={handleChange}
-                                        className="w-5 h-5 accent-[var(--color-primary)] cursor-pointer"
+                                        className="sr-only peer"
                                     />
-                                    <label htmlFor="isActive" className="text-sm font-bold text-[var(--text-secondary)] cursor-pointer">
-                                        Activate this plan immediately
-                                    </label>
+                                    <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500 shadow-inner"></div>
+                                </div>
+                                <div>
+                                    <label htmlFor="isActive" className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-widest cursor-pointer">Immediate Activation</label>
+                                    <p className="text-[9px] font-bold text-[var(--text-muted)] uppercase opacity-60">Authorize tier for production scaling</p>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 pt-4 sticky bottom-0 bg-[var(--bg-card)] mt-4 border-t border-white/5">
-                                <Button
-                                    type="secondary"
-                                    className="flex-1 py-4 text-[var(--text-secondary)] rounded-2xl font-bold mt-0"
-                                    onClick={resetForm}
+                            <div className="flex items-center justify-end gap-6 pt-6">
+                                <Button type="button" variant="ghost" size="sm" onClick={resetForm}>Discard Draft</Button>
+                                <Button 
+                                    type="submit" 
+                                    variant="primary"
+                                    size="md"
+                                    icon={isEditing ? <CheckCircle2 size={16} /> : <ArrowRight size={16} />}
                                 >
-                                    Discard
-                                </Button>
-                                <Button
-                                    htmlType="submit"
-                                    className="flex-1 py-4 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-2xl font-black text-white border-none mt-0"
-                                >
-                                    {isEditing ? "Update Tier" : "Establish Tier"}
+                                    {isEditing ? "Update Specification" : "Issue Operational Tier"}
                                 </Button>
                             </div>
                         </form>
@@ -420,9 +451,23 @@ const Subscriptions = () => {
                 </div>
             )}
 
+            <style>{`
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: rgba(0,0,0,0.05);
+                    border-radius: 10px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: var(--color-primary);
+                }
+            `}</style>
         </div>
     );
 };
 
 export default Subscriptions;
-

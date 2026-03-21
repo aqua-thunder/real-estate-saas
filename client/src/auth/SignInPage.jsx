@@ -60,107 +60,117 @@ const SignInPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex text-white font-['Jost'] bg-[var(--bg-main)] overflow-hidden relative">
-            {/* Left Section - Simple & Clean */}
-            <div className="hidden lg:flex lg:w-[45%] flex-col justify-center px-16 xl:px-24 bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg-main)] border-r border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[var(--color-primary)] opacity-[0.02] pointer-events-none"></div>
+        <div className="min-h-screen flex text-[var(--text-secondary)] bg-[var(--bg-main)] font-['Inter']">
+            {/* Left Section - Aesthetic & Modern */}
+            <div className="hidden lg:flex lg:w-[50%] flex-col justify-between p-12 bg-[var(--color-primary)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)] to-blue-900 opacity-90 z-0"></div>
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1073&q=80')] bg-cover bg-center mix-blend-overlay opacity-40 z-0"></div>
 
-                <div className="relative z-10">
-                    <div className="flex items-center mb-12">
-                        <img src="/SVGs/logo.jpg" alt="Logo" className="h-30 w-auto rounded-xl shadow-lg" />
+                <div className="relative z-10 flex items-center">
+                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
+                        <LayoutDashboard className="w-6 h-6 text-[var(--color-primary)]" />
                     </div>
+                    <span className="ml-3 text-2xl font-black text-white tracking-tight">EstateFlow.</span>
+                </div>
 
-                    <h1 className="text-4xl xl:text-5xl font-bold mb-8 leading-tight">
+                <div className="relative z-10 text-white space-y-6 max-w-lg mb-12">
+                    <h1 className="text-4xl xl:text-5xl font-black leading-tight tracking-tight">
                         The Smarter Way to <br />
-                        <span className="text-[var(--color-primary)]">Manage Properties.</span>
+                        Manage Properties.
                     </h1>
+                    <p className="text-lg text-blue-100/80 font-medium leading-relaxed">
+                        Experience unified management, military-grade security, and seamless automation in one completely redesigned, beautiful interface.
+                    </p>
 
-                    <div className="space-y-6">
-                        {[
-                            { title: "Everything in One Place", desc: "Centralize your property data and workflows.", icon: LayoutDashboard },
-                            { title: "Secure by Design", desc: "Your data is protected with industry-standard security.", icon: Lock },
-                            { title: "Built for Growth", desc: "Scale your portfolio with powerful automation.", icon: ArrowRight }
-                        ].map((item, idx) => (
-                            <div key={idx} className="flex gap-4 items-start group">
-                                <div className="mt-1 p-2 rounded-lg bg-white/5 border border-white/10 group-hover:border-[var(--color-primary)]/50 transition-colors">
-                                    <item.icon className="w-4 h-4 text-[var(--color-primary)]" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-white/90">{item.title}</h3>
-                                    <p className="text-sm text-[var(--text-card)]">{item.desc}</p>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="flex gap-4 pt-4">
+                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                            <Lock className="w-4 h-4 text-blue-200" />
+                            <span className="text-sm font-semibold text-blue-50">Secure Access</span>
+                        </div>
+                        <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                            <ArrowRight className="w-4 h-4 text-blue-200" />
+                            <span className="text-sm font-semibold text-blue-50">Fast Workflow</span>
+                        </div>
                     </div>
+                </div>
+
+                <div className="relative z-10 flex gap-4 text-blue-100/60 text-sm font-medium">
+                    <span>© 2026 EstateFlow. All rights reserved.</span>
                 </div>
             </div>
 
-            {/* Right Section - Login Form */}
-            <div className="w-full lg:w-[55%] flex items-center justify-center p-6 relative z-10">
-                <div className="w-full max-w-[480px] bg-[var(--bg-card)]/40 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 sm:p-12 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-white/20">
-                    <div className="mb-10">
-                        <h2 className="text-3xl font-bold mb-3">Welcome Back</h2>
-                        <p className="text-[var(--text-card)]">
-                            Sign in to continue to your dashboard
+            {/* Right Section - Aesthetic Login Form */}
+            <div className="w-full lg:w-[50%] flex items-center justify-center p-6 relative z-10 bg-[var(--bg-main)]">
+                <div className="w-full max-w-[440px] bg-white rounded-[2rem] p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100">
+                    <div className="mb-10 text-center sm:text-left">
+                        <h2 className="text-3xl font-black mb-2 text-[var(--color-secondary)] tracking-tight">Welcome Back</h2>
+                        <p className="font-medium text-[var(--text-muted)] text-base">
+                            Enter your credentials to access your dashboard.
                         </p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 mb-1.5 ml-1">
-                                <Mail className="w-4 h-4 text-[var(--color-primary)]" />
-                                <span className="text-sm font-medium text-[var(--text-card)] uppercase tracking-wider">Email Address</span>
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 ml-1">
+                                <span className="font-semibold text-sm text-[var(--text-secondary)] opacity-90">Email Address</span>
+                            </label>
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <Mail className="w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                                </div>
+                                <Input
+                                    type="email"
+                                    name="email"
+                                    value={user.email}
+                                    onChange={handleInput}
+                                    placeholder="name@example.com"
+                                    className="w-full pl-11 bg-white border-gray-200 focus:bg-white focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/10 h-14 transition-all rounded-xl font-medium shadow-sm hover:border-gray-300"
+                                    required
+                                />
                             </div>
-                            <Input
-                                type="email"
-                                name="email"
-                                value={user.email}
-                                onChange={handleInput}
-                                placeholder="name@example.com"
-                                className="bg-white/5 border-white/10 focus:bg-white/10 focus:border-[var(--color-primary)] h-13 transition-all rounded-2xl"
-                                required
-                            />
                         </div>
 
-                        <div className="space-y-1">
-                            <div className="flex items-center justify-between mb-1.5 ml-1">
-                                <div className="flex items-center gap-2">
-                                    <Lock className="w-4 h-4 text-[var(--color-primary)]" />
-                                    <span className="text-sm font-medium text-[var(--text-card)] uppercase tracking-wider">Password</span>
-                                </div>
-                                <NavLink to="/forgot-password" title="reset password">
-                                    <span className="text-[var(--color-primary)] text-xs font-semibold cursor-pointer hover:underline underline-offset-4">
-                                        Forgot?
-                                    </span>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between ml-1">
+                                <label className="flex items-center gap-2">
+                                    <span className="font-semibold text-sm text-[var(--text-secondary)] opacity-90">Password</span>
+                                </label>
+                                <NavLink to="/forgot-password" className="text-sm font-bold text-[var(--color-primary)] hover:text-blue-700 hover:underline underline-offset-4 transition-colors">
+                                    Forgot password?
                                 </NavLink>
                             </div>
-                            <Input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleInput}
-                                placeholder="••••••••"
-                                className="bg-white/5 border-white/10 focus:bg-white/10 focus:border-[var(--color-primary)] h-13 transition-all rounded-2xl"
-                                required
-                            />
+                            <div className="relative group">
+                                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <Lock className="w-5 h-5 text-gray-400 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                                </div>
+                                <Input
+                                    type="password"
+                                    name="password"
+                                    value={user.password}
+                                    onChange={handleInput}
+                                    placeholder="••••••••"
+                                    className="w-full pl-11 bg-white border-gray-200 focus:bg-white focus:border-[var(--color-primary)] focus:ring-4 focus:ring-[var(--color-primary)]/10 h-14 transition-all rounded-xl font-medium shadow-sm hover:border-gray-300"
+                                    required
+                                />
+                            </div>
                         </div>
 
-                        <Button type="primary" className="w-full h-14 rounded-2xl text-lg font-bold group shadow-[0_10px_20px_-5px_rgba(0,161,255,0.4)] hover:shadow-[0_15px_25px_-5px_rgba(0,161,255,0.5)]" htmlType="submit">
+                        <Button type="primary" className="w-full h-14 outline-none border-none rounded-xl text-lg font-extrabold group bg-[var(--color-primary)] hover:bg-blue-700 text-white shadow-[0_8px_20px_-6px_rgba(0,118,255,0.4)] hover:shadow-[0_12px_25px_-6px_rgba(0,118,255,0.5)] transition-all hover:-translate-y-0.5 mt-2" htmlType="submit">
                             <span className="flex items-center justify-center gap-2">
                                 Sign In
-                                <LogIn className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                <LogIn className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                             </span>
                         </Button>
                     </form>
 
-                    <div className="mt-12 text-center">
-                        <p className="text-[var(--text-card)]">
+                    <div className="mt-10 text-center">
+                        <p className="font-medium text-[var(--text-muted)] text-sm">
                             Don't have an account?{" "}
                             <NavLink
                                 to="/signup"
-                                className="text-[var(--color-primary)] font-bold hover:underline underline-offset-4 decoration-2"
+                                className="text-[var(--color-primary)] font-bold hover:underline underline-offset-4 ml-1 transition-colors hover:text-blue-700"
                             >
-                                Get Started
+                                Register now
                             </NavLink>
                         </p>
                     </div>

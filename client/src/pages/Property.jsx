@@ -10,7 +10,15 @@ import {
     LayoutGrid,
     Search,
     Filter,
-    Eye
+    Eye,
+    ChevronDown,
+    ArrowRight,
+    TrendingUp,
+    ShieldCheck,
+    Globe,
+    Briefcase,
+    Loader2,
+    User
 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
@@ -173,7 +181,7 @@ const Property = () => {
             if (response.ok) {
                 toast.success("Property Deleted Successfully");
                 setProperties(prev => prev.filter(p => p._id !== id));
-            } (prev => prev.filter(p => p._id !== id));
+            }
         } catch (error) {
             console.error(error);
             toast.error("Something went wrong");
@@ -188,456 +196,313 @@ const Property = () => {
     });
 
     return (
-        <div className="space-y-6 animate-fadeIn pt-4 px-4 sm:px-0">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
 
-            {/* Page Header Area */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            {/* Header Section */}
+            <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
                 <div className="space-y-1">
-                    <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
-                        Property Assets
+                    <h1 className="font-black text-[var(--color-secondary)] tracking-tight">
+                        Property Management
                     </h1>
                 </div>
-            </div>
-
-            {/* Simplified Controls Bar */}
-            <div className="w-full flex flex-col lg:flex-row items-center gap-4 px-4 sm:px-0">
-
-                {/* 🔍 Search Input */}
-                <div className="relative flex-1 w-full lg:w-auto">
-                    <Search
-                        size={18}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-card)]"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Search properties by name..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-12 pl-12 pr-4 bg-[var(--bg-card)] border border-[var(--color-card)] rounded-2xl text-[var(--text-secondary)] placeholder-[var(--text-card)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
-                    />
-                </div>
-
-                {/* Filters & Actions */}
-                <div className="flex items-center gap-3 w-full lg:w-auto">
-
-                    {/* Category Selector */}
-                    <div className="relative min-w-[200px] flex-1 sm:flex-initial">
-                        <select
-                            value={filterType}
-                            onChange={(e) => setFilterType(e.target.value)}
-                            className="w-full h-12 px-4 pr-10 bg-[var(--bg-card)] border border-[var(--color-card)] rounded-2xl text-sm font-semibold text-[var(--text-secondary)] appearance-none focus:outline-none transition-all"
-                        >
-                            <option value="All">All Categories</option>
-                            <option value="RESIDENTIAL">Residential</option>
-                            <option value="COMMERCIAL">Commercial</option>
-                            <option value="INDUSTRIAL">Industrial</option>
-                        </select>
-                        <Filter size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-card)] pointer-events-none" />
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
+                        {["All", "RESIDENTIAL", "COMMERCIAL", "INDUSTRIAL"].map((type) => (
+                            <Button
+                                key={type}
+                                onClick={() => setFilterType(type)}
+                                variant={filterType === type ? "primary" : "ghost"}
+                                size="xs"
+                                className="whitespace-nowrap"
+                            >
+                                {type === "All" ? "All Assets" : type}
+                            </Button>
+                        ))}
                     </div>
-
-                    {/* Add Property Button */}
                     {(user?.role === "OWNER" || user?.role === "MANAGER") && (
                         <Button
                             onClick={() => { resetForm(); setOpenForm(true); }}
+                            className="w-full sm:w-auto"
+                            variant="primary"
+                            size="md"
+                            icon={<Plus size={18} />}
                         >
-                            <Plus size={18} className="mr-2" />
-                            Add Property
+                            NEW PROPERTY
                         </Button>
                     )}
                 </div>
-            </div>
+            </header>
 
-            {/* List Table container */}
-            <div className="bg-[var(--bg-card)]/40 backdrop-blur-md rounded-[2rem] lg:rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative">
-                {/* Desktop/Tablet View */}
-                <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-[var(--color-card)]/30 border-b border-[var(--color-card)]">
-                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Property Details</th>
-                                {user?.role === "SUPER_ADMIN" && (
-                                    <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Owner</th>
-                                )}
-                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Category</th>
-                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Location</th>
-                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)]">Total Revenue</th>
-                                <th className="p-4 lg:p-6 font-bold text-xs uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[var(--color-card)]">
-                            {loading ? (
-                                <tr><td colSpan={user?.role === "SUPER_ADMIN" ? "7" : "6"} className="p-16 text-center text-[var(--text-card)] font-medium animate-pulse">Synchronizing database...</td></tr>
-                            ) : filteredProperties.length > 0 ? (
-                                filteredProperties.map((property) => (
-                                    <tr key={property._id} className="group hover:bg-[var(--color-card)]/20 transition-all duration-300">
-                                        <td className="p-4 lg:p-6">
-                                            <div className="flex items-center gap-4">
-                                                <div>
-                                                    <div className="font-bold text-[var(--text-secondary)] group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</div>
-                                                    <div className="text-xs text-[var(--text-card)] font-medium mt-1 truncate max-w-[150px] lg:max-w-[200px]">{property.address}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        {user?.role === "SUPER_ADMIN" && (
-                                            <td className="p-4 lg:p-6">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="text-sm font-bold text-[var(--text-secondary)]">
-                                                        {property.owner?.user?.name || "N/A"}
-                                                        {property.owner?.companyName && (
-                                                            <span className="block text-[10px] text-[var(--text-card)] font-medium uppercase">
-                                                                {property.owner.companyName}
-                                                            </span>
-                                                        )}
+            {/* Content Area */}
+            <section className="space-y-6">
+                <div className="relative group w-full lg:w-96">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] opacity-50 group-focus-within:opacity-100 group-focus-within:text-[var(--color-primary)] transition-all font-bold" size={16} />
+                    <input
+                        type="text"
+                        placeholder="Search by property name or location..."
+                        className="w-full bg-white border border-gray-100 rounded-2xl py-3.5 pl-12 pr-6 text-[13px] font-bold text-[var(--color-secondary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--color-primary)]/20 focus:ring-4 focus:ring-[var(--color-primary)]/5 transition-all shadow-sm"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] min-h-[400px] relative">
+                    {loading ? (
+                        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm">
+                            <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
+                            <p className="mt-4 text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] opacity-60">Synchronizing database...</p>
+                        </div>
+                    ) : null}
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left font-['Inter']">
+                            <thead className="bg-gray-50/50 border-b border-gray-50">
+                                <tr>
+                                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Property Details</th>
+                                    {user?.role === "SUPER_ADMIN" && (
+                                        <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Owner</th>
+                                    )}
+                                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Category</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Location</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Total Revenue</th>
+                                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {filteredProperties.length > 0 ? (
+                                    filteredProperties.map((property) => (
+                                        <tr key={property._id} className="hover:bg-gray-50/50 transition-all group border-l-4 border-l-transparent hover:border-l-[var(--color-primary)]">
+                                            <td className="px-8 py-7">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-[14px] bg-slate-100 flex items-center justify-center text-[var(--color-primary)] group-hover:bg-[var(--color-primary)] group-hover:text-white transition-all shadow-sm">
+                                                        <Building2 size={20} />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="text-sm font-black text-[var(--color-secondary)] truncate max-w-[200px]">{property.propertyName}</p>
+                                                        <p className="text-[10px] text-[var(--text-muted)] font-bold truncate max-w-[200px] opacity-60 mt-0.5">{property.address}</p>
                                                     </div>
                                                 </div>
                                             </td>
-                                        )}
-                                        <td className="p-4 lg:p-6">
-                                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase border ${property.propertyType === 'RESIDENTIAL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                                property.propertyType === 'COMMERCIAL' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                                                    'bg-purple-500/10 text-purple-500 border-purple-500/20'
-                                                }`}>
-                                                {property.propertyType}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 lg:p-6">
-                                            <div className="flex items-center gap-2 text-[var(--text-secondary)] font-semibold text-sm">
-                                                {property.location}
-                                            </div>
-                                        </td>
-
-                                        <td className="p-4 lg:p-6">
-                                            <div className="text-lg font-black text-green-600 dark:text-green-400">₹{property.totalRevenue?.toLocaleString() || 0}</div>
-                                        </td>
-                                        <td className="p-4 lg:p-6">
-                                            <div className="flex items-center justify-center gap-1">
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedProperty(property);
-                                                        setOpenViewProperty(true);
-                                                    }} className="p-2 lg:p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Eye size={18} /></button>
-                                                {(user?.role === "OWNER" || user?.role === "MANAGER") && (
-                                                    <>
-                                                        <button onClick={() => handleEdit(property)} className="p-2 lg:p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                                                        <button onClick={() => handleDelete(property._id)} className="p-2 lg:p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
-                                                    </>
-                                                )}
+                                            {user?.role === "SUPER_ADMIN" && (
+                                                <td className="px-8 py-7">
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-[12px] font-black text-[var(--color-secondary)]">{property.owner?.user?.name || "N/A"}</p>
+                                                        {property.owner?.companyName && <p className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">{property.owner.companyName}</p>}
+                                                    </div>
+                                                </td>
+                                            )}
+                                            <td className="px-8 py-7">
+                                                <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${property.propertyType === 'RESIDENTIAL' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                                                    property.propertyType === 'COMMERCIAL' ? 'bg-amber-50 text-amber-600 border-amber-100' :
+                                                        'bg-purple-50 text-purple-600 border-purple-100'
+                                                    }`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${property.propertyType === 'RESIDENTIAL' ? 'bg-indigo-500' : property.propertyType === 'COMMERCIAL' ? 'bg-amber-500' : 'bg-purple-500'}`} />
+                                                    {property.propertyType}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-7">
+                                                <div className="flex items-center gap-2 text-[12px] font-bold text-[var(--color-secondary)]">
+                                                    <MapPin size={12} className="text-rose-500" />
+                                                    {property.location}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-7 text-right">
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-[15px] font-black text-emerald-600 tracking-tight">₹{property.totalRevenue?.toLocaleString() || 0}</span>
+                                                    <div className="flex items-center gap-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase mt-1 opacity-40">
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-7">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button onClick={() => { setSelectedProperty(property); setOpenViewProperty(true); }} iconOnly variant="secondary" size="xs" icon={<Eye size={18} />} title="Inspect Asset" />
+                                                    {(user?.role === "OWNER" || user?.role === "MANAGER") && (
+                                                        <>
+                                                            <Button onClick={() => handleEdit(property)} iconOnly variant="secondary" size="xs" icon={<Edit size={18} />} title="Modify Asset" className="hover:text-blue-600 hover:border-blue-100" />
+                                                            <Button onClick={() => handleDelete(property._id)} iconOnly variant="secondary" size="xs" icon={<Trash2 size={18} />} title="Purge Asset" className="text-rose-300 hover:text-rose-600 hover:border-rose-100" />
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={user?.role === "SUPER_ADMIN" ? "6" : "5"} className="p-20 text-center">
+                                            <div className="flex flex-col items-center gap-4 opacity-30">
+                                                <Building2 size={60} className="text-gray-300" />
+                                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">No match in portfolio manifest</p>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={user?.role === "SUPER_ADMIN" ? "7" : "6"} className="p-20 text-center">
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className="w-24 h-24 bg-[var(--color-card)] rounded-full flex items-center justify-center text-[var(--text-card)] border-4 border-[var(--color-card)] border-dashed animate-spin-slow">
-                                                <Building2 size={40} />
-                                            </div>
-                                            <div className="text-xl font-black text-[var(--text-secondary)] mt-4 tracking-tight">No Estates Found</div>
-                                            <p className="text-[var(--text-card)] text-sm max-w-xs">Your portfolio is currently empty. Start building your real estate empire today.</p>
-                                            {(user?.role === "OWNER" || user?.role === "MANAGER") && (
-                                                <Button onClick={() => setOpenForm(true)} className="mt-4 rounded-2xl px-10">Add Your First Property</Button>
-                                            )}
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </section>
 
-                {/* Mobile Card View */}
-                <div className="md:hidden p-4 space-y-4">
-                    {loading ? (
-                        <div className="p-10 text-center text-[var(--text-card)] animate-pulse">Synchronizing database...</div>
-                    ) : filteredProperties.length > 0 ? (
-                        filteredProperties.map((property) => (
-                            <div key={property._id} className="p-5 space-y-4 bg-[var(--color-card)]/10 border border-[var(--color-card)] rounded-[1.5rem] hover:bg-[var(--color-card)]/20 transition-all shadow-sm">
-                                <div className="flex justify-between items-start">
-                                    <div className="space-y-1">
-                                        <h4 className="font-bold text-white text-lg group-hover:text-[var(--color-primary)] transition-colors">{property.propertyName}</h4>
-                                        <div className="flex items-center gap-2 text-xs text-[var(--text-card)] font-medium">
-                                            <MapPin size={12} />
-                                            {property.location}
-                                        </div>
-                                    </div>
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase border ${property.propertyType === 'RESIDENTIAL' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                                        property.propertyType === 'COMMERCIAL' ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' :
-                                            'bg-purple-500/10 text-purple-500 border-purple-500/20'
-                                        }`}>
-                                        {property.propertyType}
-                                    </span>
+            {/* View Property Drawer */}
+            {openViewProperty && selectedProperty && (
+                <ViewProperty property={selectedProperty} onClose={() => setOpenViewProperty(false)} />
+            )}
+
+            {/* Add Property Modal */}
+            {openForm && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={resetForm}></div>
+                    <div className="relative w-full max-w-2xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
+
+                        <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between bg-white z-10">
+                            <div>
+                                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">
+                                    {isEditing ? "Modify Asset Config" : "Deploy New Asset"}
+                                </h2>
+                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Architectural & Logistics specification</p>
+                            </div>
+                            <Button onClick={resetForm} iconOnly variant="secondary" size="sm" icon={<X size={24} />} className="hover:bg-rose-50 hover:text-rose-600" />
+                        </div>
+
+                        <form className="p-10 pt-8 space-y-12 overflow-y-auto custom-scrollbar" onSubmit={handleSubmit}>
+
+                            {/* Core Specification */}
+                            <section className="space-y-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-sm"><Building2 size={20} /></div>
+                                    <h3 className="text-sm font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Core Specification</h3>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4 py-2 border-y border-white/5">
-                                    <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Total Revenue</p>
-                                        <p className="text-lg font-black text-green-500">₹{property.totalRevenue?.toLocaleString() || 0}</p>
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Legal Name</label>
+                                        <input
+                                            name="propertyName"
+                                            value={formData.propertyName}
+                                            onChange={handleChange}
+                                            required
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all"
+                                            placeholder="e.g. Skyline Corporate Center"
+                                        />
                                     </div>
-                                    {user?.role === "SUPER_ADMIN" && (
-                                        <div className="space-y-1">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-card)]">Owner</p>
-                                            <p className="text-sm font-bold text-[var(--text-secondary)]">{property.owner?.user?.name || "N/A"}</p>
+
+                                    <div className="grid grid-cols-2 gap-8">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Category</label>
+                                            <div className="relative">
+                                                <select
+                                                    name="propertyType"
+                                                    value={formData.propertyType}
+                                                    onChange={handleChange}
+                                                    required
+                                                    className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-black uppercase text-[var(--color-secondary)] transition-all cursor-pointer focus:outline-none appearance-none shadow-sm"
+                                                >
+                                                    <option value="RESIDENTIAL">Residential Asset</option>
+                                                    <option value="COMMERCIAL">Commercial Hub</option>
+                                                    <option value="INDUSTRIAL">Industrial Site</option>
+                                                </select>
+                                                <ChevronDown size={14} className="absolute right-6 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-40" />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Manifest Status</label>
+                                            <div className="flex items-center h-[52px] px-6 bg-gray-50 rounded-2xl border border-transparent hover:bg-white hover:border-indigo-100 transition-all cursor-pointer group" onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}>
+                                                <div className={`w-8 h-4 rounded-full relative transition-all duration-300 ${formData.isActive ? 'bg-indigo-600' : 'bg-gray-300'}`}>
+                                                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all duration-300 ${formData.isActive ? 'left-[18px]' : 'left-0.5'}`} />
+                                                </div>
+                                                <span className="ml-3 text-[10px] font-black uppercase text-[var(--color-secondary)]">Mark as Operational</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {user?.role === "OWNER" && (
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Commander (Manager)</label>
+                                            <div className="relative">
+                                                <select
+                                                    name="manager"
+                                                    value={formData.manager}
+                                                    onChange={handleChange}
+                                                    className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer"
+                                                >
+                                                    <option value="">Retain Direct Command (No Manager)</option>
+                                                    {managers.map(m => <option key={m._id} value={m._id}>{m.name} ({m.email})</option>)}
+                                                </select>
+                                                <ChevronDown size={14} className="absolute right-6 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-40" />
+                                            </div>
                                         </div>
                                     )}
-                                </div>
 
-                                <div className="flex items-center justify-between gap-3 pt-2">
-                                    <p className="text-[10px] text-[var(--text-card)] font-medium truncate max-w-[150px]">{property.address}</p>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => {
-                                                setSelectedProperty(property);
-                                                setOpenViewProperty(true);
-                                            }}
-                                            className="p-2 bg-blue-500/10 text-blue-500 rounded-xl transition-all active:scale-95"
-                                        >
-                                            <Eye size={16} />
-                                        </button>
-                                        {(user?.role === "OWNER" || user?.role === "MANAGER") && (
-                                            <>
-                                                <button
-                                                    onClick={() => handleEdit(property)}
-                                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-xl transition-all active:scale-95"
-                                                >
-                                                    <Edit size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(property._id)}
-                                                    className="p-2 bg-red-500/10 text-red-500 rounded-xl transition-all active:scale-95"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="p-10 text-center text-[var(--text-card)]">No Estates Found</div>
-                    )}
-                </div>
-            </div>
-
-            {/* Modal - Modern & Slick */}
-            {
-                openForm && (
-                    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-                        <div className="absolute inset-0  backdrop-blur-xl animate-fadeIn" onClick={resetForm}></div>
-
-                        <div className="bg-[var(--bg-card)] w-full max-w-xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-                            {/* Modal Header */}
-                            <div className="p-8 pb-4 flex justify-between items-center relative z-10">
-                                <div>
-                                    <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
-                                        {isEditing ? "Modify Property" : "Establish Property"}
-                                    </h3>
-                                    <p className="text-[var(--text-card)] font-medium mt-1">Configure your real estate asset details</p>
-                                </div>
-                                <button onClick={resetForm} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
-                            </div>
-
-                            {/* Decoration Line */}
-                            <div className="h-1 w-24 bg-gradient-to-r from-[var(--color-primary)] to-blue-600 rounded-full mx-8 mb-6"></div>
-
-                            <form
-                                onSubmit={handleSubmit}
-                                className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto relative z-10 custom-scrollbar"
-                            >
-                                <div className="space-y-6">
-
-                                    {/* Property Name */}
-                                    <Input
-                                        label="Property Name"
-                                        name="propertyName"
-                                        value={formData.propertyName}
-                                        onChange={handleChange}
-                                        placeholder="e.g. Skyline Residency"
-                                        variant="formInput"
-                                        className="text-sm py-4 rounded-2xl bg-[var(--color-card)] border border-white/10 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition"
-                                        required
-                                    />
-
-                                    {/* Description */}
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                            Property Description
-                                        </label>
+                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Narrative (Description)</label>
                                         <textarea
                                             name="description"
                                             value={formData.description}
                                             onChange={handleChange}
-                                            rows="2"
-                                            placeholder="Brief description of the property..."
-                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
+                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-medium text-[var(--color-secondary)] shadow-sm focus:outline-none min-h-[100px] resize-none"
+                                            placeholder="Specify property highlights, structural details, or strategic advantages..."
                                         />
                                     </div>
+                                </div>
+                            </section>
 
-                                    {/* Category */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Logistics Location */}
+                            <section className="space-y-8">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 bg-rose-50 text-rose-600 rounded-2xl shadow-sm"><MapPin size={20} /></div>
+                                    <h3 className="text-sm font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Geographical Logistics</h3>
+                                </div>
+
+                                <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 space-y-6">
+                                    <div className="grid md:grid-cols-2 gap-8">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                                Category
-                                            </label>
-                                            <select
-                                                name="propertyType"
-                                                value={formData.propertyType}
-                                                onChange={handleChange}
-                                                className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
-                                                required
-                                            >
-                                                <option value="RESIDENTIAL">Residential</option>
-                                                <option value="COMMERCIAL">Commercial</option>
-                                                <option value="INDUSTRIAL">Industrial</option>
-                                            </select>
+                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Location Hub</label>
+                                            <input name="location" value={formData.location} onChange={handleChange} required className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Bandra West" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                                Status
-                                            </label>
-                                            <div className="flex items-center gap-3 p-3.5 bg-[var(--color-card)] border border-white/10 rounded-2xl">
-                                                <input
-                                                    type="checkbox"
-                                                    name="isActive"
-                                                    checked={formData.isActive}
-                                                    onChange={handleChange}
-                                                    className="w-5 h-5 rounded-lg accent-[var(--color-primary)]"
-                                                />
-                                                <span className="text-sm font-bold text-[var(--text-secondary)]">Property Active</span>
-                                            </div>
+                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Political City</label>
+                                            <input name="city" value={formData.city} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Mumbai" />
                                         </div>
                                     </div>
-
-                                    {/* Assign Manager (Owner Only) */}
-                                    {user?.role === "OWNER" && (
+                                    <div className="grid md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                                Assign Manager
-                                            </label>
-                                            <select
-                                                name="manager"
-                                                value={formData.manager}
-                                                onChange={handleChange}
-                                                className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition appearance-none cursor-pointer"
-                                            >
-                                                <option value="">No Manager Assigned</option>
-                                                {managers.map(m => (
-                                                    <option key={m._id} value={m._id}>{m.name} ({m.email})</option>
-                                                ))}
-                                            </select>
+                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">State / Province</label>
+                                            <input name="state" value={formData.state} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="Maharashtra" />
                                         </div>
-                                    )}
-
-                                    {/* Location & City/State */}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Input
-                                            label="Location"
-                                            name="location"
-                                            value={formData.location}
-                                            onChange={handleChange}
-                                            placeholder="e.g. Manhattan"
-                                            variant="formInput"
-                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                            required
-                                        />
-                                        <Input
-                                            label="City"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                            placeholder="e.g. New York"
-                                            variant="formInput"
-                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        />
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Zip / Postal Code</label>
+                                            <input name="zipCode" value={formData.zipCode} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="400050" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Country Sovereign</label>
+                                            <input name="country" value={formData.country} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="India" />
+                                        </div>
                                     </div>
-
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <Input
-                                            label="State"
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange}
-                                            placeholder="e.g. NY"
-                                            variant="formInput"
-                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        />
-                                        <Input
-                                            label="Zip Code"
-                                            name="zipCode"
-                                            value={formData.zipCode}
-                                            onChange={handleChange}
-                                            placeholder="10001"
-                                            variant="formInput"
-                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        />
-                                        <Input
-                                            label="Country"
-                                            name="country"
-                                            value={formData.country}
-                                            onChange={handleChange}
-                                            placeholder="USA"
-                                            variant="formInput"
-                                            className="text-sm py-4 rounded-2xl bg-[var(--color-card)]"
-                                        />
-                                    </div>
-
-                                    {/* Address */}
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">
-                                            Full Address
-                                        </label>
-
+                                    <div className="space-y-2 pt-2">
+                                        <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Logistics Address</label>
                                         <textarea
                                             name="address"
                                             value={formData.address}
                                             onChange={handleChange}
-                                            rows="2"
-                                            placeholder="Enter precise location coordinates..."
-                                            className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 transition resize-none placeholder-[var(--text-card)]"
                                             required
+                                            className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-4 text-xs font-medium text-[var(--color-secondary)] shadow-sm focus:outline-none min-h-[80px] resize-none"
+                                            placeholder="Enter precise logistical address coordinate..."
                                         />
                                     </div>
-
                                 </div>
+                            </section>
 
-                                {/* Buttons */}
-                                <div className="flex gap-4 pt-4 sticky  bg-[var(--bg-card)] mt-4 border-t border-white/5">
-
-                                    <Button
-                                        type="button"
-                                        onClick={resetForm}
-                                        className="w-full"
-                                    >
-                                        Discard
-                                    </Button>
-
-                                    <Button
-                                        type="primary"
-                                        htmlType="submit"
-                                        className="w-full"
-                                    >
-                                        {isEditing ? "Update Asset" : "Deploy Property"}
-                                    </Button>
-
-                                </div>
-                            </form>
-
-                        </div>
+                            <div className="flex items-center justify-end gap-6 pt-6 sticky bottom-0 bg-white border-t border-gray-50 mt-4 py-8 z-10">
+                                <Button type="button" variant="ghost" size="sm" onClick={resetForm}>Abort Establishment</Button>
+                                <Button type="submit" variant="primary" size="lg" icon={isEditing ? <Edit size={18} /> : <ArrowRight size={18} />}>
+                                    {isEditing ? "FINALIZE CONFIG" : "ESTABLISH ASSET"}
+                                </Button>
+                            </div>
+                        </form>
                     </div>
-                )
-            }
+                </div>
+            )}
 
-
-
-            <style jsx>{`
-                @keyframes spin-slow {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-                .animate-spin-slow {
-                    animation: spin-slow 12s linear infinite;
-                }
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }
@@ -645,160 +510,138 @@ const Property = () => {
                     background: transparent;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: var(--color-card);
+                    background: rgba(0,0,0,0.05);
                     border-radius: 10px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: var(--text-card);
+                    background: var(--color-primary);
+                }
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
                 }
             `}</style>
-
-            {
-                openViewProperty && selectedProperty && (
-                    <ViewProperty
-                        property={selectedProperty}
-                        onClose={() => setOpenViewProperty(false)}
-                    />
-                )
-            }
-        </div >
+        </div>
     );
 };
 
 export default Property;
 
-
 function ViewProperty({ property, onClose }) {
-    return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={onClose}></div>
+    if (!property) return null;
 
-            <div className="bg-[var(--bg-card)] w-full max-w-2xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-                {/* Modal Header */}
-                <div className="p-8 pb-4 flex justify-between items-center relative z-10">
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500">
-                                <Building2 size={24} />
-                            </div>
-                            <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">
-                                Property Details
-                            </h3>
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div
+                className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+                onClick={onClose}
+            />
+
+            {/* Modal Content */}
+            <div className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+
+                {/* Header */}
+                <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                            <Building2 size={24} />
                         </div>
-                        <p className="text-[var(--text-card)] font-medium mt-1 ml-11">
-                            Comprehensive analysis of {property.propertyName}
-                            {property.owner?.user?.name && <span className="ml-1 text-blue-500 text-xs font-bold"> • Owned by {property.owner.user.name}</span>}
-                        </p>
+                        <div>
+                            <h2 className="text-xl font-black text-[var(--color-secondary)] tracking-tight">Property Details</h2>
+                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest leading-none mt-1">
+                                {property.propertyType} • #{property._id.slice(-6).toUpperCase()}
+                            </p>
+                        </div>
                     </div>
-                    <button onClick={onClose} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+                    <Button
+                        onClick={onClose}
+                        iconOnly
+                        variant="secondary"
+                        size="xs"
+                        icon={<X size={18} />}
+                        className="hover:bg-gray-100"
+                    />
                 </div>
 
-                <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-8 mb-6"></div>
+                {/* Body */}
+                <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
 
-                <div className="p-8 pt-0 space-y-8 max-h-[75vh] overflow-y-auto relative z-10 custom-scrollbar">
-                    {/* Hero Stats */}
+                    {/* Basic Info */}
+                    <div className="space-y-4">
+                        <h3 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight leading-tight">
+                            {property.propertyName}
+                        </h3>
+                        <p className="text-sm text-[var(--text-muted)] leading-relaxed">
+                            {property.description || "No description provided for this property."}
+                        </p>
+                    </div>
+
+                    {/* Stats Grid */}
                     <div className="grid grid-cols-3 gap-4">
-                        <div className="p-4 bg-[var(--color-card)] rounded-3xl border border-white/5 space-y-1">
-                            <div className="text-[10px] font-bold text-[var(--text-card)] uppercase tracking-wider">Total Units</div>
-                            <div className="text-xl font-black text-[var(--text-secondary)]">{property.totalUnits}</div>
+                        <div className="p-5 bg-gray-50 rounded-3xl text-center space-y-1">
+                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest">Units</p>
+                            <p className="text-lg font-black text-[var(--color-secondary)]">{property.totalUnits || 0}</p>
                         </div>
-                        <div className="p-4 bg-green-500/5 rounded-3xl border border-green-500/10 space-y-1">
-                            <div className="text-[10px] font-bold text-green-600/70 uppercase tracking-wider">Revenue</div>
-                            <div className="text-xl font-black text-green-600">₹{property.totalRevenue?.toLocaleString()}</div>
+                        <div className="p-5 bg-indigo-50 rounded-3xl text-center space-y-1">
+                            <p className="text-[8px] font-black text-indigo-600 uppercase tracking-widest">Revenue</p>
+                            <p className="text-lg font-black text-indigo-700">₹{(property.totalRevenue || 0).toLocaleString()}</p>
                         </div>
-                        <div className="p-4 bg-purple-500/5 rounded-3xl border border-purple-500/10 space-y-1">
-                            <div className="text-[10px] font-bold text-purple-600/70 uppercase tracking-wider">Occupancy</div>
-                            <div className="text-xl font-black text-purple-600">{Math.round(((property.totalUnits - property.vacantUnits) / property.totalUnits) * 100) || 0}%</div>
+                        <div className="p-5 bg-gray-50 rounded-3xl text-center space-y-1">
+                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest">Floors</p>
+                            <p className="text-lg font-black text-[var(--color-secondary)]">{property.totalFloors || 1}</p>
                         </div>
                     </div>
 
-                    {/* Information Grid */}
-                    <div className="grid grid-cols-2 gap-8">
-                        {/* Basic Info */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-xs font-black text-[var(--color-primary)] uppercase tracking-widest">
-                                <LayoutGrid size={14} />
-                                Basic Information
-                            </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">Category</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.propertyType}</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">Floors</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.totalFloors || 1}</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">Status</span>
-                                    <span className={`text-xs font-black px-2 py-0.5 rounded-md ${property.isActive ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                                        {property.isActive ? 'OPERATIONAL' : 'INACTIVE'}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">Assigned Manager</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">
-                                        {property.manager?.name || "Not Assigned"}
-                                    </span>
-                                </div>
-                            </div>
+                    {/* Location Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 px-1">
+                            <MapPin size={14} className="text-indigo-600" />
+                            <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Location Info</h4>
                         </div>
-
-                        {/* Location Details */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-xs font-black text-[var(--color-primary)] uppercase tracking-widest">
-                                <MapPin size={14} />
-                                Geographical Data
+                        <div className="p-6 bg-white border border-gray-100 rounded-3xl shadow-sm space-y-3">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">City</p>
+                                    <p className="text-xs font-bold text-[var(--color-secondary)]">{property.city || "N/A"}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">State</p>
+                                    <p className="text-xs font-bold text-[var(--color-secondary)]">{property.state || "N/A"}</p>
+                                </div>
                             </div>
-                            <div className="space-y-3">
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">City</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.city || "N/A"}</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">State</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.state || "N/A"}</span>
-                                </div>
-                                <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                    <span className="text-sm font-medium text-[var(--text-card)]">Country</span>
-                                    <span className="text-sm font-bold text-[var(--text-secondary)]">{property.country || "N/A"}</span>
-                                </div>
+                            <div className="pt-2 border-t border-gray-50">
+                                <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Address</p>
+                                <p className="text-xs font-medium text-[var(--color-secondary)] leading-relaxed">{property.address}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Large Text Sections */}
-                    <div className="space-y-6">
-                        <div className="p-6 bg-[var(--color-card)] rounded-[2rem] border border-white/5 relative group overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                                <MapPin size={48} />
+                    {/* Manager Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 px-1">
+                            <User size={14} className="text-indigo-600" />
+                            <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Assigned Manager</h4>
+                        </div>
+                        <div className="flex items-center gap-4 p-5 bg-gray-50 rounded-[2rem]">
+                            <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-sm font-black text-indigo-600 shadow-sm">
+                                {property.manager?.name ? property.manager.name[0] : "A"}
                             </div>
-                            <div className="text-[10px] font-black text-[var(--text-card)] uppercase tracking-widest mb-2">Primary Logistics Address</div>
-                            <div className="text-sm font-bold text-[var(--text-secondary)] leading-relaxed">
-                                {property.address}
-                                <div className="text-xs text-[var(--text-card)] mt-1 font-medium">{property.zipCode && `Postal Code: ${property.zipCode}`}</div>
+                            <div>
+                                <p className="text-sm font-black text-[var(--color-secondary)]">{property.manager?.name || "Unassigned"}</p>
+                                <p className="text-xs font-medium text-[var(--text-muted)]">{property.manager?.email || "No contact info"}</p>
                             </div>
                         </div>
-
-                        {property.description && (
-                            <div className="p-6 bg-[var(--color-card)] rounded-[2rem] border border-white/5 min-h-[100px]">
-                                <div className="text-[10px] font-black text-[var(--text-card)] uppercase tracking-widest mb-2">Asset Description</div>
-                                <div className="text-sm font-medium text-[var(--text-card)] leading-relaxed italic">
-                                    "{property.description}"
-                                </div>
-                            </div>
-                        )}
                     </div>
 
-                    {/* Action Footer */}
-                    <div className="pt-4">
-                        <Button
-                            onClick={onClose}
-                            className="w-full"
-                        >
-                            CLOSE INSPECTION
-                        </Button>
-                    </div>
+                </div>
+
+                {/* Footer / Status */}
+                <div className="px-8 py-6 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between mt-auto">
+                    <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${property.isActive ? 'bg-white text-emerald-600 border-emerald-100' : 'bg-white text-rose-600 border-rose-100'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${property.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+                        {property.isActive ? 'Active Status' : 'Inactive Status'}
+                    </span>
+                    <p className="text-[8px] font-bold text-[var(--text-muted)] uppercase tracking-widest opacity-50 italic">Property Registry ID: {property._id}</p>
                 </div>
             </div>
         </div>

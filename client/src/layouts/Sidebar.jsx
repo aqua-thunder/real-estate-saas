@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import Button from "../components/ui/Button";
 
 const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard", roles: ["SUPER_ADMIN", "OWNER", "MANAGER"] },
@@ -51,34 +52,36 @@ const Sidebar = ({ isOpen, onClose }) => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed z-50 lg:static top-0 left-0 h-full w-72 bg-[var(--color-card)] text-[var(--text-secondary)]
-        transform transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none
+                className={`fixed z-50 lg:static top-0 left-0 h-full w-72 bg-white text-[var(--text-secondary)]
+        transform transition-transform duration-300 ease-in-out border-r border-gray-100
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0 flex flex-col`}
+        lg:translate-x-0 flex flex-col font-['Inter']`}
             >
                 {/* Header  */}
-                <div className="flex items-center justify-between px-6 py-6 border-b border-slate-700/50">
-                    <div className="hidden md:flex items-center gap-2.5 px-4 py-2 bg-gradient-to-r from-[var(--color-primary)]/20 to-transparent rounded-xl border-l-4 border-[var(--color-primary)] shadow-sm">
-                        <Layers size={18} className="text-[var(--color-primary)]" />
-                        <span className="text-white text-sm font-extrabold uppercase tracking-widest whitespace-nowrap">
-                            {user?.role === "OWNER" && "Owner Panel"}
-                            {user?.role === "MANAGER" && "Manager Panel"}
-                            {user?.role === "SUPER_ADMIN" && "Super Admin Panel"}
-                            {user?.role === "TENANT" && "Tenant Panel"}
-                            {user?.role === "MAINTENANCE_STAFF" && "Staff Panel"}
-                            {!["OWNER", "MANAGER", "SUPER_ADMIN", "TENANT", "MAINTENANCE_STAFF"].includes(user?.role) && "User Panel"}
-                        </span>
+                <div className="flex items-center justify-between px-7 py-8">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-gradient-to-br from-[var(--color-primary)] to-[#ff6b6b] rounded-xl shadow-lg shadow-[var(--color-primary)]/20 transition-transform hover:rotate-3">
+                            <Layers size={20} className="text-white" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[var(--color-secondary)] text-lg font-black tracking-tighter leading-none">EstateFlow</span>
+                            <span className="text-[var(--text-muted)] text-[10px] font-black uppercase tracking-[0.2em] mt-1">
+                                {user?.role?.replace('_', ' ')}
+                            </span>
+                        </div>
                     </div>
-                    <button
-                        className="lg:hidden p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition-colors"
+                    <Button
+                        variant="ghost"
+                        size="xs"
+                        iconOnly
+                        icon={<X size={20} />}
                         onClick={onClose}
-                    >
-                        <X size={20} />
-                    </button>
+                        className="lg:hidden text-[var(--text-muted)]"
+                    />
                 </div>
 
                 {/* Menu */}
-                <nav className="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
+                <nav className="flex-1 mt-4 px-6 space-y-1.5 overflow-y-auto custom-scrollbar">
                     {filteredMenuItems.map((item, index) => {
                         const Icon = item.icon;
                         return (
@@ -87,18 +90,15 @@ const Sidebar = ({ isOpen, onClose }) => {
                                 to={item.path}
                                 onClick={onClose}
                                 className={({ isActive }) =>
-                                    `flex items-center gap-3 px-4 py-3.5 rounded-full text-sm font-medium transition-all duration-300  group
-                   ${isActive
-                                        ? "bg-[#17344f] text-[var(--text-primary)] shadow-lg translate-x-1 "
-                                        : "hover:bg-slate-800/50 hover:text-white hover:translate-x-1 text-[var(--text-secondary)]"
+                                    `flex items-center gap-3.5 px-5 py-3.5 rounded-2xl text-[13px] font-bold transition-all duration-300 group
+                                    ${isActive
+                                        ? "bg-[var(--color-primary)] text-white shadow-[0_12px_24px_-8px_rgba(231,76,60,0.4)] scale-[1.02] translate-x-1"
+                                        : "text-[var(--text-muted)] hover:bg-gray-50 hover:text-[var(--color-secondary)] hover:translate-x-1"
                                     }`
                                 }
                             >
-                                <Icon size={20} className={`transition-colors ${
-                                    // You can add logic here if you want icon color to change differently
-                                    ""
-                                    }`} />
-                                <span className="font-[var(--font-body)]">{item.name}</span>
+                                <Icon size={18} className="transition-transform group-hover:scale-110" />
+                                <span className="tracking-wide">{item.name}</span>
                             </NavLink>
                         );
                     })}
@@ -107,8 +107,8 @@ const Sidebar = ({ isOpen, onClose }) => {
 
 
                 {/* Footer */}
-                <div className="px-6 py-4 border-t border-slate-800 text-xs text-slate-400">
-                    © 2026 Your SaaS
+                <div className="px-8 py-6 border-t border-gray-50 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] opacity-50">
+                    © 2026 EstateFlow
                 </div>
             </aside>
         </>

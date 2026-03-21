@@ -1,33 +1,117 @@
-@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
 :root {
-
-    /* Brand colors */
-    --color-primary: #00a1ff;
-    --color-main: #111c2d;
-    --color-card: #1a2537;
-
-
+    /* Brand colors from image */
+    --color-primary: #E74C3C;
+    --color-secondary: #1C2834;
+    --color-main: #FAFAFA;
+    --color-card: #FFFFFF;
 
     /* text colors */
-    --text-primary: #00a1ff;
-    --text-secondary: #ffffff;
-    --text-card: #7b877e;
+    --text-primary: #E74C3C;
+    --text-secondary: #1C2834;
+    --text-card: #333333;
+    --text-muted: #7b877e;
 
     /* Backgrounds */
-    --bg-main: #111c2d;
-    --bg-card: #1a2537;
+    --bg-main: #ffffff3f;
+    --bg-card: #FAFAFA;
+    --bg-subtle: #ECF0F1;
 
     /* Fonts */
-    --font-heading: "Lexend", sans-serif;
-    --font-body: "Jost", sans-serif;
+    --font-heading: "Inter", sans-serif;
+    --font-body: "Inter", sans-serif;
 
     /* UI */
-    --border-radius: 15px;
+    --border-radius: 10px;
+
+    /* Font Sizes - Keeping them small as requested */
+    --fs-sm: 12px;
+    --fs-md: 14px;
+    --fs-lg: 16px;
 }
+
+/* Utility classes for font sizes */
+.font-sm {
+    font-size: var(--fs-sm);
+}
+
+.font-md {
+    font-size: var(--fs-md);
+}
+
+.font-lg {
+    font-size: var(--fs-lg);
+}
+
+.font-xl {
+    font-size: 18px;
+}
+
+/* Max size for "attractive" headings */
 
 body {
     font-family: var(--font-body);
+    font-size: 14px;
+    /* Maintain small fonts */
+    color: var(--text-secondary);
+    background-color: var(--bg-main);
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+/* 🌟 Premium Aesthetic Utilities */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.soft-shadow {
+    box-shadow: 0 10px 30px -10px rgba(28, 40, 52, 0.08);
+}
+
+.premium-card {
+    background: #FFFFFF;
+    border: 1px solid #F0F0F0;
+    box-shadow: 0 20px 50px -15px rgba(28, 40, 52, 0.05);
+    transition: all 0.3s ease;
+}
+
+.premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -15px rgba(28, 40, 52, 0.08);
+}
+
+.hero-gradient-text {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-mesh {
+    background-color: #ffffff;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(231, 76, 60, 0.03) 0, transparent 50%),
+        radial-gradient(at 50% 0%, rgba(28, 40, 52, 0.02) 0, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(231, 76, 60, 0.03) 0, transparent 50%);
 }
 
 /* Hide native number input arrows across browsers */
@@ -42,34 +126,34 @@ input[type="number"].no-spinner {
     appearance: textfield;
 }
 
-/* 🎨 Premium Global Scrollbar */
+/* 🎨 Premium Global Scrollbar - Adapted for Light Theme */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--bg-subtle);
     border-radius: 100px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 100px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     background-clip: padding-box;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--color-primary);
-    box-shadow: 0 0 12px var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary);
     border: 1px solid transparent;
 }
 
 ::-webkit-scrollbar-thumb:active {
-    background: #0081cc;
-    box-shadow: 0 0 15px var(--color-primary);
+    background: #c0392b;
+    box-shadow: 0 0 10px var(--color-primary);
 }
 
 ::-webkit-scrollbar-corner {
@@ -79,7 +163,7 @@ input[type="number"].no-spinner {
 /* For Firefox */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.02);
+    scrollbar-color: rgba(0, 0, 0, 0.1) var(--bg-subtle);
 }
 
 /* Selection style for extra polish */
@@ -129,7 +213,7 @@ input[type="number"].no-spinner {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
 

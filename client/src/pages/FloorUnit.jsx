@@ -10,7 +10,14 @@ import {
   Bath,
   IndianRupee,
   Edit,
-  Trash2
+  Trash2,
+  ChevronRight,
+  ArrowUpRight,
+  Monitor,
+  CheckCircle2,
+  HelpCircle,
+  Hash,
+  Scale
 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useToast } from "../store/ToastContext";
@@ -346,154 +353,147 @@ const FloorUnit = () => {
   };
 
 
-
-  const filteredFloorsForUnit = floors.filter(f => f.propertyId?._id === selectedPropertyForUnit);
+  const filteredFloorsForUnit = floors.filter(f => (f.propertyId?._id || f.propertyId) === selectedPropertyForUnit);
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-10">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[var(--text-secondary)] tracking-tight">Floor & Unit Management</h1>
+    <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+
+      {/* Header Area */}
+      <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">Floor & Unit Management</h1>
         </div>
-        <div className="flex gap-2 p-1 bg-[var(--color-card)]/50 rounded-2xl w-fit">
+        <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm">
           <Button
             onClick={() => setActiveTab("floors")}
-            variant={activeTab === "floors" ? "primary" : "outline"}
+            variant={activeTab === "floors" ? "primary" : "ghost"}
+            size="sm"
+            className={activeTab === "floors" ? "scale-105" : ""}
           >
-            Floors
+            Floor
           </Button>
           <Button
             onClick={() => setActiveTab("units")}
-            variant={activeTab === "units" ? "primary" : "outline"}
+            variant={activeTab === "units" ? "primary" : "ghost"}
+            size="sm"
+            className={activeTab === "units" ? "scale-105" : ""}
           >
-            Units
+            Unit
           </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="p-6 bg-[var(--bg-card)] rounded-3xl border border-[var(--color-card)] shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500"></div>
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="p-4 bg-blue-500/10 rounded-2xl text-blue-500">
-              <Layers size={24} />
+      {/* Stats Cards Row */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { icon: Layers, label: "Structural Levels", val: floors.length, color: "text-indigo-600", bg: "bg-indigo-50" },
+          { icon: LayoutGrid, label: "Live Units", val: units.length, color: "text-purple-600", bg: "bg-purple-50" },
+          { icon: IndianRupee, label: "Projected Rev", val: `₹${units.reduce((acc, u) => acc + (u.rentAmount || 0), 0).toLocaleString()}`, color: "text-emerald-600", bg: "bg-emerald-50" }
+        ].map((stat, idx) => (
+          <div key={idx} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-center gap-5 transition-transform hover:scale-[1.02] duration-300">
+            <div className={`w-14 h-14 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center shadow-sm`}>
+              <stat.icon size={26} />
             </div>
-            <div>
-              <div className="text-2xl font-black text-[var(--text-secondary)]">{floors.length}</div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">Total Floors</div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] opacity-50">{stat.label}</p>
+              <p className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">{stat.val}</p>
             </div>
           </div>
-        </div>
-        <div className="p-6 bg-[var(--bg-card)] rounded-3xl border border-[var(--color-card)] shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500"></div>
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="p-4 bg-purple-500/10 rounded-2xl text-purple-500">
-              <LayoutGrid size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[var(--text-secondary)]">{units.length}</div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">Total Units</div>
-            </div>
-          </div>
-        </div>
-        <div className="p-6 bg-[var(--bg-card)] rounded-3xl border border-[var(--color-card)] shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 rounded-full -mr-8 -mt-8 group-hover:scale-125 transition-transform duration-500"></div>
-          <div className="relative z-10 flex items-center gap-4">
-            <div className="p-4 bg-green-500/10 rounded-2xl text-green-500">
-              <IndianRupee size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[var(--text-secondary)]">₹{units.reduce((acc, u) => acc + (u.rentAmount || 0), 0).toLocaleString()}</div>
-              <div className="text-xs font-bold uppercase tracking-wider text-[var(--text-card)]">Total Rent Pipeline</div>
-            </div>
-          </div>
-        </div>
-      </div>
+        ))}
+      </section>
 
-      {/* Main Content Area */}
-      <div className="bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--color-card)] shadow-2xl overflow-hidden min-h-[500px] relative">
-        {/* Decoration */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--color-primary)]/20 via-[var(--color-primary)] to-[var(--color-primary)]/20"></div>
-
-        <div className="p-8 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-2xl font-black text-[var(--text-secondary)] flex items-center gap-3">
-            {activeTab === "floors" ? <Layers className="text-[var(--color-primary)]" /> : <LayoutGrid className="text-[var(--color-primary)]" />}
-            {activeTab === "floors" ? "Floor Inventory" : "Unit Directory"}
-            <span className="ml-2 px-3 py-1 bg-[var(--color-card)] rounded-full text-xs font-bold text-[var(--text-card)] uppercase tracking-widest leading-none">
-              {activeTab === "floors" ? floors.length : units.length} Recorded
-            </span>
-          </h2>
-          <Button
-            onClick={() => {
-              if (activeTab === "floors") {
-                setEditFloorId(null);
-                setFloorData(initialFloorData);
-                setOpenFloorForm(true);
-                return;
-              }
+      {/* Control Area */}
+      <section className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 bg-white px-5 py-3 rounded-2xl border border-gray-100 shadow-sm">
+          <Monitor size={16} className="text-gray-400" />
+          <span className="text-[11px] font-black uppercase tracking-widest text-[var(--text-muted)]">Current Scope: <span className="text-[var(--color-secondary)]">{activeTab === "floors" ? "Vertical Mapping" : "Horizontal Inventory"}</span></span>
+        </div>
+        <Button
+          onClick={() => {
+            if (activeTab === "floors") {
+              setEditFloorId(null);
+              setFloorData(initialFloorData);
+              setOpenFloorForm(true);
+            } else {
               resetUnitForm();
               setOpenUnitForm(true);
-            }}
-          >
-            <Plus size={18} className="mr-2" />
-            Create {activeTab === "floors" ? "Floor" : "Unit"}
-          </Button>
-        </div>
+            }
+          }}
+          variant="primary"
+          icon={<Plus size={18} />}
+          size="md"
+        >
+          Create {activeTab === "floors" ? "New Floor" : "New Unit"}
+        </Button>
+      </section>
 
-        <div className="overflow-x-auto p-2">
-          {loading ? (
-            <div className="p-20 text-center animate-pulse text-[var(--text-card)] font-bold tracking-widest uppercase">Initializing Structure...</div>
-          ) : activeTab === "floors" ? (
+      {/* Main Table Content */}
+      <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] min-h-[500px] relative">
+        <div className="overflow-x-auto">
+          {activeTab === "floors" ? (
             <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[var(--color-card)]">
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Floor Name</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Property</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Floor Level</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Description</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Units</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
+              <thead className="bg-gray-50/50 border-b border-gray-50">
+                <tr>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Floor</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Property</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center">Floor Number</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center">Units</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-card)]/50">
+              <tbody className="divide-y divide-gray-50">
                 {floors.length > 0 ? floors.map(floor => (
-                  <tr key={floor._id} className="group hover:bg-[var(--color-card)]/20 transition-all">
-                    <td className="p-6">
-                      <div className="font-bold text-[var(--text-secondary)]">{floor.name}</div>
-                    </td>
-                    <td className="p-6">
-                      <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-card)]">
-                        <Building2 size={14} />
-                        {floor.propertyId?.propertyName || "N/A"}
+                  <tr key={floor._id} className="hover:bg-gray-50/50 transition-all group border-l-4 border-l-transparent hover:border-l-[var(--color-primary)]">
+                    <td className="px-8 py-7">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-[14px] bg-slate-100 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                          <Layers size={18} />
+                        </div>
+                        <span className="text-sm font-black text-[var(--color-secondary)] uppercase tracking-tight">{floor.name}</span>
                       </div>
                     </td>
-                    <td className="p-6 text-center">
-                      <span className="px-4 py-1.5 bg-blue-500/10 text-blue-500 rounded-full text-xs font-black border border-blue-500/20">
-                        Level {floor.floorNumber}
+                    <td className="px-8 py-7">
+                      <div className="flex items-center gap-2 text-[12px] font-bold text-[var(--color-secondary)]">
+                        <Building2 size={13} className="text-rose-500" />
+                        {floor.propertyId?.propertyName || "Unlinked Asset"}
+                      </div>
+                    </td>
+                    <td className="px-8 py-7 text-center">
+                      <span className="inline-flex px-4 py-1.5 bg-gray-50 text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-[0.1em] rounded-full border border-gray-100">
+                        Floor: {floor.floorNumber}
                       </span>
                     </td>
-                    <td className="p-6">
-                      <div className="text-sm text-[var(--text-card)] max-w-xs truncate">{floor.description || "—"}</div>
+                    <td className="px-8 py-7 text-center">
+                      <div className="flex flex-col items-center">
+                        <span className="text-sm font-black text-indigo-600">{units.filter(u => u.floorId?._id === floor._id).length}</span>
+                        <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">Active Units</span>
+                      </div>
                     </td>
-                    <td className="p-6 text-center text-sm font-bold text-[var(--text-secondary)]">
-                      {units.filter(u => u.floorId?._id === floor._id).length}
-                    </td>
-                    <td className="p-6 text-center text-sm font-bold text-[var(--text-secondary)]">
-                      <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => handleEditFloor(floor)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                        <button onClick={() => handleDeleteFloor(floor._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                    <td className="px-8 py-7">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          onClick={() => handleEditFloor(floor)}
+                          variant="secondary"
+                          size="xs"
+                          iconOnly
+                          icon={<Edit size={16} />}
+                        />
+                        <Button
+                          onClick={() => handleDeleteFloor(floor._id)}
+                          variant="danger"
+                          size="xs"
+                          iconOnly
+                          icon={<Trash2 size={16} />}
+                        />
                       </div>
                     </td>
                   </tr>
                 )) : (
                   <tr>
-                    <td colSpan="6" className="p-20 text-center">
-                      <div className="flex flex-col items-center opacity-40">
-                        <Layers size={64} className="mb-4" />
-                        <div className="text-xl font-black">No Floors Established</div>
-                        <p className="text-sm">Establish floors to begin unit organization</p>
+                    <td colSpan="5" className="p-20 text-center">
+                      <div className="flex flex-col items-center gap-4 opacity-30">
+                        <Layers size={60} className="text-gray-300" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">No floor levels established</p>
                       </div>
                     </td>
                   </tr>
@@ -502,56 +502,92 @@ const FloorUnit = () => {
             </table>
           ) : (
             <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-[var(--color-card)]">
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Unit</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Property Name</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Type</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)]">Rent</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Status</th>
-                  <th className="p-6 text-xs font-black uppercase tracking-widest text-[var(--text-card)] text-center">Actions</th>
+              <thead className="bg-gray-50/50 border-b border-gray-50">
+                <tr>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Unit Specification</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Physical Location</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Type & Area</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-center">Occupancy</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Rent Yield</th>
+                  <th className="px-8 py-5 text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--color-card)]/50">
+              <tbody className="divide-y divide-gray-50">
                 {units.length > 0 ? units.map(unit => (
-                  <tr key={unit._id} className="group hover:bg-[var(--color-card)]/20 transition-all">
-                    <td className="p-6">
-                      <div className="font-black text-[var(--text-secondary)] text-lg">{unit.unitNumber}</div>
-
+                  <tr key={unit._id} className="hover:bg-gray-50/50 transition-all group border-l-4 border-l-transparent hover:border-l-indigo-600">
+                    <td className="px-8 py-7">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-gray-900 flex items-center justify-center text-white text-xs font-black shadow-xl shadow-gray-200 group-hover:-rotate-6 transition-transform">
+                          {unit.unitNumber}
+                        </div>
+                        <div className="space-y-0.5">
+                          <p className="text-[12px] font-black text-[var(--color-secondary)] uppercase">Ref ID: {unit._id.slice(-6).toUpperCase()}</p>
+                          <p className="text-[10px] text-[var(--text-muted)] font-black uppercase tracking-tighter opacity-40">Established Unit</p>
+                        </div>
+                      </div>
                     </td>
-                    <td className="p-6">
-                      <div className="text-sm font-bold text-[var(--text-secondary)]">{unit.propertyId?.propertyName}</div>
+                    <td className="px-8 py-7">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-[12px] font-black text-[var(--color-secondary)]">
+                          <Building2 size={13} className="text-indigo-400" />
+                          {unit.propertyId?.propertyName}
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--text-muted)]">
+                          <Layers size={10} className="text-gray-300" />
+                          Level {unit.floorId?.floorNumber || "?"}
+                        </div>
+                      </div>
                     </td>
-                    <td className="p-6">
-                      <span className="px-3 py-1 bg-slate-500/10 text-[var(--text-card)] rounded-lg text-[10px] font-black tracking-widest uppercase border border-white/5">
-                        {unit.unitType}
-                      </span>
+                    <td className="px-8 py-7">
+                      <div className="space-y-1.5">
+                        <span className="inline-flex px-3 py-1 bg-gray-50 text-[9px] font-black text-[var(--color-secondary)] uppercase tracking-widest rounded-lg border border-gray-100">
+                          {unit.unitType}
+                        </span>
+                        <p className="flex items-center gap-1.5 text-[11px] font-black text-[var(--text-muted)] opacity-60 ml-1">
+                          <Maximize2 size={11} /> {unit.area} Sq.Ft
+                        </p>
+                      </div>
                     </td>
-                    <td className="p-6">
-                      <div className="text-lg font-black text-green-500">₹{unit.rentAmount}</div>
-                    </td>
-                    <td className="p-6 text-center">
-                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black border ${unit.status === 'Vacant' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                        unit.status === 'Occupied' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-                          'bg-orange-500/10 text-orange-500 border-orange-500/20'
+                    <td className="px-8 py-7 text-center">
+                      <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${unit.status === 'Vacant' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
+                        unit.status === 'Occupied' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' :
+                          'bg-rose-50 text-rose-600 border-rose-100'
                         }`}>
-                        {unit.status?.toUpperCase()}
+                        <span className={`w-1.5 h-1.5 rounded-full ${unit.status === 'Vacant' ? 'bg-emerald-500' : unit.status === 'Occupied' ? 'bg-indigo-500' : 'bg-rose-500'}`} />
+                        {unit.status}
                       </span>
                     </td>
-                    <td className="p-6 text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => handleEditUnit(unit)} className="p-3 text-blue-500 hover:bg-blue-500/10 rounded-2xl transition-all"><Edit size={18} /></button>
-                        <button onClick={() => handleDeleteUnit(unit._id)} className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"><Trash2 size={18} /></button>
+                    <td className="px-8 py-7 text-right">
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm font-black text-emerald-600 tracking-tight">₹{unit.rentAmount?.toLocaleString()}</span>
+                        <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40 mt-1">Monthly Cycle</span>
+                      </div>
+                    </td>
+                    <td className="px-8 py-7">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          onClick={() => handleEditUnit(unit)}
+                          variant="secondary"
+                          size="xs"
+                          iconOnly
+                          icon={<Edit size={16} />}
+                        />
+                        <Button
+                          onClick={() => handleDeleteUnit(unit._id)}
+                          variant="danger"
+                          size="xs"
+                          iconOnly
+                          icon={<Trash2 size={16} />}
+                        />
                       </div>
                     </td>
                   </tr>
                 )) : (
                   <tr>
                     <td colSpan="6" className="p-20 text-center">
-                      <div className="flex flex-col items-center opacity-40">
-                        <LayoutGrid size={64} className="mb-4" />
-                        <div className="text-xl font-black">No Units Deployed</div>
-                        <p className="text-sm">Establish properties and floors first, then add units</p>
+                      <div className="flex flex-col items-center gap-4 opacity-30">
+                        <LayoutGrid size={60} className="text-gray-300" />
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)]">No individual units deployed</p>
                       </div>
                     </td>
                   </tr>
@@ -560,89 +596,63 @@ const FloorUnit = () => {
             </table>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Floor Modal */}
       {openFloorForm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => {
-            setOpenFloorForm(false);
-            setEditFloorId(null);
-            setFloorData(initialFloorData);
-          }}></div>
-          <div className="bg-[var(--bg-card)] w-full max-w-xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-            <div className="p-8 pb-4 flex justify-between items-center relative z-10">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300 font-['Inter']">
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }}></div>
+          <div className="relative w-full max-w-xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col">
+
+            <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-white z-10">
               <div>
-                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">{isEditingFloor ? "Modify Floor" : "Establish Floor"}</h3>
-                <p className="text-[var(--text-card)] font-medium mt-1">Define properties floor levels</p>
+                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingFloor ? "Modify Floor" : "Deploy Floor"}</h2>
               </div>
-              <button onClick={() => {
-                setOpenFloorForm(false);
-                setEditFloorId(null);
-                setFloorData(initialFloorData);
-              }} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+              <Button onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }} variant="secondary" size="sm" iconOnly icon={<X size={24} />} />
             </div>
-            <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mx-8 mb-6"></div>
-            <form onSubmit={handleFloorSubmit} className="p-8 pt-0 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+
+            <form className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar" onSubmit={handleFloorSubmit}>
               <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">Select Property</label>
-                  {floorData.propertyId && (
-                    <span className="text-[10px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-500/20">
-                      Current Floors: {floors.filter(f => (f.propertyId?._id || f.propertyId) === floorData.propertyId).length}
-                    </span>
-                  )}
-                </div>
-                <select
-                  name="propertyId"
-                  value={floorData.propertyId}
-                  onChange={handleFloorChange}
-                  required
-                  disabled={isEditingFloor}
-                  className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer disabled:opacity-50"
-                >
-                  <option value="">-- Choose Property --</option>
-                  {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
-                </select>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Floor Name/ID"
-                    name="name"
-                    value={floorData.name}
-                    onChange={handleFloorChange}
-                    placeholder="e.g. Ground Floor"
-                    required
-                    variant="formInput"
-                  />
-                  <Input
-                    label="Floor Number"
-                    name="floorNumber"
-                    type="number"
-                    value={floorData.floorNumber}
-                    onChange={handleFloorChange}
-                    placeholder="e.g. 0"
-                    required
-                    variant="formInput"
-                  />
-                </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">Additional Notes</label>
-                  <textarea
-                    name="description"
-                    value={floorData.description}
-                    onChange={handleFloorChange}
-                    placeholder="Specific floor details..."
-                    className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-4 text-sm font-medium text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition resize-none min-h-[100px]"
-                  />
+                  <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Select Property</label>
+                  <div className="relative">
+                    <select
+                      name="propertyId"
+                      value={floorData.propertyId}
+                      onChange={handleFloorChange}
+                      required
+                      disabled={isEditingFloor}
+                      className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer transition-all disabled:opacity-50"
+                    >
+                      <option value="">-- Choose Host Asset --</option>
+                      {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
+                    </select>
+                    <ChevronRight size={14} className="absolute right-6 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none opacity-40 rotate-90" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Name</label>
+                    <input name="name" value={floorData.name} onChange={handleFloorChange} required className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Executive Level" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Number</label>
+                    <input name="floorNumber" type="number" value={floorData.floorNumber} onChange={handleFloorChange} required className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="0" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Description</label>
+                  <textarea name="description" value={floorData.description} onChange={handleFloorChange} className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-medium text-[var(--color-secondary)] shadow-sm focus:outline-none min-h-[120px] resize-none transition-all" placeholder="Structural highlights or floor-specific constraints..." />
                 </div>
               </div>
-              <div className="flex gap-4 pt-4 border-t border-white/5 justify-end">
-                <Button type="button" onClick={() => {
-                  setOpenFloorForm(false);
-                  setEditFloorId(null);
-                  setFloorData(initialFloorData);
-                }}>Cancel</Button>
-                <Button type="primary" htmlType="submit">{isEditingFloor ? "UPDATE FLOOR" : "DEPLOY FLOOR"}</Button>
+
+              <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-50 bg-white sticky bottom-0 z-10 py-4">
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }}>Cancel</Button>
+                <Button type="submit" variant="primary" size="md">
+                  {isEditingFloor ? "UPDATE" : "DEPLOY"}
+                </Button>
               </div>
             </form>
           </div>
@@ -651,105 +661,143 @@ const FloorUnit = () => {
 
       {/* Unit Modal */}
       {openUnitForm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xl animate-fadeIn" onClick={() => {
-            setOpenUnitForm(false);
-            resetUnitForm();
-          }}></div>
-          <div className="bg-[var(--bg-card)] w-full max-w-2xl p-0 rounded-[3rem] border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] relative overflow-hidden animate-slideUp">
-            <div className="p-8 pb-4 flex justify-between items-center relative z-10">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => { setOpenUnitForm(false); resetUnitForm(); }}></div>
+          <div className="relative w-full max-w-3xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+
+            <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-white z-10">
               <div>
-                <h3 className="text-3xl font-black text-[var(--text-secondary)] tracking-tight">{isEditingUnit ? "Modify Unit" : "Establish Unit"}</h3>
-                <p className="text-[var(--text-card)] font-medium mt-1">Deploy individual living or commercial spaces</p>
+                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingUnit ? "Modify Unit" : "Deploy Unit"}</h2>
               </div>
-              <button onClick={() => {
-                setOpenUnitForm(false);
-                resetUnitForm();
-              }} className="p-3 bg-[var(--color-card)] hover:bg-white/10 rounded-2xl text-[var(--text-secondary)] transition-all"><X size={24} /></button>
+              <Button onClick={() => { setOpenUnitForm(false); resetUnitForm(); }} variant="secondary" size="sm" iconOnly icon={<X size={24} />} />
             </div>
-            <div className="h-1 w-24 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full mx-8 mb-6"></div>
-            <form onSubmit={handleUnitSubmit} className="p-8 pt-0 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-2 gap-6">
-                {/* Left Side - Identification */}
-                <div className="space-y-4">
-                  <div className="space-y-4 p-4 bg-[var(--color-card)] rounded-2xl border border-white/5">
-                    <div className="text-[10px] font-black uppercase text-[var(--color-primary)] tracking-widest">Structural Link</div>
+
+            <form className="p-6 pt-5 space-y-8 overflow-y-auto custom-scrollbar" onSubmit={handleUnitSubmit}>
+              <div className="grid md:grid-cols-2 gap-12">
+
+                {/* Identification & Layout */}
+                <section className="space-y-8">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Unit Details</h3>
+                  </div>
+
+                  <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-[var(--text-card)] uppercase">Target Property</label>
-                      <select name="propertyId" value={unitData.propertyId} onChange={handleUnitChange} required className="w-full bg-[var(--bg-main)] border border-white/5 rounded-xl p-3 text-sm font-bold text-[var(--text-secondary)]">
-                        <option value="">-- Choose Property --</option>
-                        {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
-                      </select>
+                      <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Select Property</label>
+                      <div className="relative">
+                        <select name="propertyId" value={unitData.propertyId} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm appearance-none cursor-pointer focus:outline-none">
+                          <option value="">-- Choose Asset --</option>
+                          {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
+                        </select>
+                        <ChevronRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 rotate-90" />
+                      </div>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[10px] font-bold text-[var(--text-card)] uppercase">Assigned Floor</label>
-                        {unitData.floorId && (
-                          <span className="text-[8px] font-black text-purple-500 bg-purple-500/5 px-2 py-0.5 rounded-md border border-purple-500/10 uppercase tracking-tighter">
-                            Current Units: {units.filter(u => (u.floorId?._id || u.floorId) === unitData.floorId).length}
-                          </span>
-                        )}
+                      <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Target Level</label>
+                      <div className="relative">
+                        <select name="floorId" value={unitData.floorId} onChange={handleUnitChange} required disabled={!selectedPropertyForUnit} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm appearance-none cursor-pointer focus:outline-none disabled:opacity-30">
+                          <option value="">-- Choose Floor --</option>
+                          {filteredFloorsForUnit.map(f => <option key={f._id} value={f._id}>{f.name} (Lvl {f.floorNumber})</option>)}
+                        </select>
+                        <ChevronRight size={14} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 rotate-90" />
                       </div>
-                      <select name="floorId" value={unitData.floorId} onChange={handleUnitChange} required disabled={!selectedPropertyForUnit} className="w-full bg-[var(--bg-main)] border border-white/5 rounded-xl p-3 text-sm font-bold text-[var(--text-secondary)] disabled:opacity-30">
-                        <option value="">-- Choose Floor --</option>
-                        {filteredFloorsForUnit.map(f => <option key={f._id} value={f._id}>{f.name} (Lvl {f.floorNumber})</option>)}
-                      </select>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Unit Tag</label>
+                        <input name="unitNumber" value={unitData.unitNumber} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-black text-[var(--color-secondary)] shadow-sm focus:outline-none" placeholder="A-101" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Space Type</label>
+                        <select name="unitType" value={unitData.unitType} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-black uppercase text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer">
+                          {["Flat", "Shop", "Office", "Warehouse", "Parking"].map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-5 bg-gray-50/50 rounded-[2rem] border border-gray-100 space-y-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Scale size={14} className="text-gray-400" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">Configuration Metrics</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Bedrooms</label>
+                        <input type="number" name="bedrooms" value={unitData.bedrooms} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Bathrooms</label>
+                        <input type="number" name="bathrooms" value={unitData.bathrooms} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Total Hub Area (Sq.Ft)</label>
+                      <input type="number" name="area" value={unitData.area} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" placeholder="1200" />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Finance & Features */}
+                <section className="space-y-8">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Financials</h3>
+                  </div>
+
+                  <div className="p-5 bg-emerald-50/30 rounded-[2rem] border border-emerald-100 space-y-5">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest ml-1">Monthly Cycle Yield (INR)</label>
+                      <div className="relative">
+                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black">₹</span>
+                        <input type="number" name="rentAmount" value={unitData.rentAmount} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-emerald-200 rounded-2xl pl-12 pr-6 py-4 text-sm font-black text-emerald-600 shadow-sm focus:outline-none" placeholder="25,000" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest ml-1">Security Collateral</label>
+                      <input type="number" name="securityDeposit" value={unitData.securityDeposit} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-emerald-200 rounded-2xl px-6 py-4 text-xs font-bold text-emerald-700 shadow-sm focus:outline-none" placeholder="Deposit Amount" />
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <Input label="Unit Identifier" name="unitNumber" value={unitData.unitNumber} onChange={handleUnitChange} placeholder="e.g. A-101" required variant="formInput" />
-                    <div className="space-y-2">
-                      <label className="text-xs font-black uppercase tracking-widest text-[var(--text-secondary)] ml-1">Space Categorize</label>
-                      <select name="unitType" value={unitData.unitType} onChange={handleUnitChange} className="w-full bg-[var(--color-card)] border border-white/10 rounded-2xl p-3.5 text-sm font-bold text-[var(--text-secondary)] focus:border-[var(--color-primary)] transition appearance-none cursor-pointer">
-                        {["Flat", "Shop", "Office", "Warehouse", "Parking"].map(t => <option key={t} value={t}>{t}</option>)}
-                      </select>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Maximize2 size={14} className="text-gray-400" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">Unit Infrastructure</span>
                     </div>
-                    <Input label="Net Area (Sq/Ft)" name="area" type="number" value={unitData.area} onChange={handleUnitChange} placeholder="e.g. 1200" required variant="formInput" />
-                  </div>
-                </div>
-
-                {/* Right Side - Features & Financials */}
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input label="Bedrooms" name="bedrooms" type="number" value={unitData.bedrooms} onChange={handleUnitChange} placeholder="3" variant="formInput" />
-                    <Input label="Bathrooms" name="bathrooms" type="number" value={unitData.bathrooms} onChange={handleUnitChange} placeholder="2" variant="formInput" />
-                  </div>
-
-                  <div className="space-y-4 p-4 bg-[var(--color-card)] rounded-2xl border border-white/5">
-                    <div className="text-[10px] font-black uppercase text-green-500 tracking-widest">Financial Configuration</div>
-                    <Input label="Monthly Rent (₹)" name="rentAmount" type="number" value={unitData.rentAmount} onChange={handleUnitChange} placeholder="1500" required variant="formInput" />
-                    <div className="grid grid-cols-1">
-                      <Input label="Deposit" name="securityDeposit" type="number" value={unitData.securityDeposit} onChange={handleUnitChange} placeholder="2000" variant="formInput" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-3">
-                    <label className="flex items-center gap-3 p-4 bg-[var(--color-card)] rounded-2xl cursor-pointer hover:bg-white/5 transition border border-white/10">
-                      <input type="checkbox" name="balcony" checked={unitData.balcony} onChange={handleUnitChange} className="w-5 h-5 rounded-lg accent-blue-500" />
-                      <span className="text-sm font-bold text-[var(--text-secondary)] select-none">Private Balcony Access</span>
+                    <label className="flex items-center gap-4 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl cursor-pointer hover:bg-indigo-50/50 hover:border-indigo-100 transition-all group shadow-sm">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${unitData.balcony ? 'bg-indigo-600 text-white' : 'bg-white text-gray-300 border border-gray-100'}`}>
+                        {unitData.balcony ? <CheckCircle2 size={18} /> : <HelpCircle size={18} />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-tight">Private Vertical Space</p>
+                        <p className="text-[9px] text-[var(--text-muted)] font-black uppercase opacity-40">Balcony access verified</p>
+                      </div>
+                      <input type="checkbox" name="balcony" checked={unitData.balcony} onChange={handleUnitChange} className="hidden" />
                     </label>
-                    <label className="flex items-center gap-3 p-4 bg-[var(--color-card)] rounded-2xl cursor-pointer hover:bg-white/5 transition border border-white/10">
-                      <input type="checkbox" name="utilityIncluded" checked={unitData.utilityIncluded} onChange={handleUnitChange} className="w-5 h-5 rounded-lg accent-blue-500" />
-                      <span className="text-sm font-bold text-[var(--text-secondary)] select-none">Utilities Infrastructure Included</span>
+
+                    <label className="flex items-center gap-4 p-4 bg-gray-50/50 border border-gray-100 rounded-2xl cursor-pointer hover:bg-indigo-50/50 hover:border-indigo-100 transition-all group shadow-sm">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${unitData.utilityIncluded ? 'bg-indigo-600 text-white' : 'bg-white text-gray-300 border border-gray-100'}`}>
+                        {unitData.utilityIncluded ? <CheckCircle2 size={18} /> : <HelpCircle size={18} />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-tight">Utility Infrastructure</p>
+                        <p className="text-[9px] text-[var(--text-muted)] font-black uppercase opacity-40">Integrated in yield cycle</p>
+                      </div>
+                      <input type="checkbox" name="utilityIncluded" checked={unitData.utilityIncluded} onChange={handleUnitChange} className="hidden" />
                     </label>
                   </div>
-                </div>
+                </section>
               </div>
 
-              <div className="flex gap-4 pt-4 border-t border-white/5 justify-end">
-                <Button type="button" onClick={() => {
-                  setOpenUnitForm(false);
-                  resetUnitForm();
-                }}>{isEditingUnit ? "Cancel" : "Discard"}</Button>
-                <Button type="primary" htmlType="submit">{isEditingUnit ? "UPDATE UNIT" : "DEPLOY UNIT"}</Button>
+              <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-50 bg-white sticky bottom-0 z-10 py-4">
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setOpenUnitForm(false); resetUnitForm(); }}>Discard Deployment</Button>
+                <Button type="submit" variant="primary" size="lg">
+                  {isEditingUnit ? "AUTHORIZE UPDATE" : "AUTHORIZE DEPLOYMENT"}
+                </Button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-
     </div>
   );
 };
