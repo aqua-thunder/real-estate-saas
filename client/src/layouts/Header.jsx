@@ -249,7 +249,7 @@ const Header = ({ onToggleSidebar }) => {
                                         onClick={() => navigate("/logout")}
                                         icon={<LogOut size={16} />}
                                     >
-                                        LOGOUT SESSION
+                                        LOGOUT
                                     </Button>
                                 </div>
                             </div>

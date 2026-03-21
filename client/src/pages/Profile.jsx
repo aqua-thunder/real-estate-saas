@@ -75,7 +75,7 @@ const Profile = () => {
 
 
    return (
-      <div className="max-h-screen bg-[var(--bg-main)]  p-4 sm:p-6 lg:p-2 space-y-5 font-['Inter']">
+      <div className="max-h-screen bg-[var(--bg-main)]  p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
          {/* Header Area */}
          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
@@ -90,7 +90,7 @@ const Profile = () => {
             {/* Left Column: Profile Card */}
             <div className="lg:col-span-1">
                {/* Personal Card */}
-               <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] p-10 flex flex-col items-center text-center relative overflow-hidden group">
+               <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-sm p-10 flex flex-col items-center text-center relative overflow-hidden group">
                   <div className="absolute top-0 left-0 w-full h-32 bg-gray-50 transition-colors" />
 
                   <div className="relative z-10 mt-6 mb-8">
@@ -119,7 +119,7 @@ const Profile = () => {
 
             {/* Right Column: Personal Information Form */}
             <div className="lg:col-span-2">
-               <section className="bg-white rounded-[4rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col">
+               <section className="bg-white rounded-[4rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                   <div className="p-10 sm:p-5 border-b border-gray-50 flex items-center justify-between">
                      <div className="space-y-1">
                         <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3 uppercase">

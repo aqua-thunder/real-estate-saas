@@ -288,7 +288,7 @@ const Tenant = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Header Section */}
             <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
@@ -360,7 +360,7 @@ const Tenant = () => {
                         onChange={(e) => setFilterProperty(e.target.value)}
                         className="w-full h-12 bg-white border border-gray-100 rounded-2xl px-6 text-[12px] font-black uppercase tracking-widest text-[var(--color-secondary)] focus:outline-none focus:ring-4 focus:ring-gray-100 transition-all appearance-none cursor-pointer shadow-sm"
                     >
-                        <option value="All">All Portfolio Properties</option>
+                        <option value="All">All Properties</option>
                         {properties.map((p) => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
                     </select>
                     <ChevronDown size={14} className="absolute right-6 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
@@ -368,7 +368,7 @@ const Tenant = () => {
             </div>
 
             {/* Table Area */}
-            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] min-h-[400px] relative">
+            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm min-h-[400px] relative">
                 {loading ? (
                     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm">
                         <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
@@ -457,14 +457,14 @@ const Tenant = () => {
             {selectedTenant && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     {/* Backdrop */}
-                    <div 
+                    <div
                         className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
                         onClick={() => setSelectedTenant(null)}
                     />
 
                     {/* Modal Content */}
-                    <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
-                        
+                    <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-lg overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+
                         {/* Header */}
                         <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10">
                             <div className="flex items-center gap-4">
@@ -478,19 +478,19 @@ const Tenant = () => {
                                     </p>
                                 </div>
                             </div>
-                            <Button 
-                                onClick={() => setSelectedTenant(null)} 
-                                iconOnly 
-                                variant="secondary" 
-                                size="xs" 
-                                icon={<X size={18} />} 
+                            <Button
+                                onClick={() => setSelectedTenant(null)}
+                                iconOnly
+                                variant="secondary"
+                                size="xs"
+                                icon={<X size={18} />}
                                 className="hover:bg-gray-100"
                             />
                         </div>
 
                         {/* Body */}
                         <div className="p-8 overflow-y-auto space-y-8 custom-scrollbar">
-                            
+
                             {/* Personal Information */}
                             <section className="space-y-4 text-center">
                                 <div className="inline-block relative">
@@ -619,7 +619,7 @@ const Tenant = () => {
             {isAddingTenant && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => { setIsAddingTenant(false); setEditId(null); setFormData(initialFormData); }}></div>
-                    <div className="relative w-full max-w-4xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
+                    <div className="relative w-full max-w-4xl bg-white rounded-[3.5rem] shadow-lg border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
 
                         <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between bg-white z-10">
                             <div>

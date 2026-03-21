@@ -107,7 +107,7 @@ export default function ManagerDashboard() {
                     { label: "Inventory Lead", value: stats?.vacantUnits || 0, icon: Key, color: "amber", desc: "Units available for lease" },
                     { label: "Pending Fixes", value: stats?.pendingMaintenance || 0, icon: Wrench, color: "rose", desc: "Open maintenance issues" },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.03)] group transition-all duration-500 hover:shadow-[0_25px_60px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden">
+                    <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-sm group transition-all duration-500 hover:shadow-md relative overflow-hidden">
                         <div className="flex items-center justify-between mb-6 relative z-10">
                             <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 shadow-sm border border-${stat.color}-100 transition-all duration-700 group-hover:bg-${stat.color}-600 group-hover:text-white group-hover:rotate-[360deg]`}>
                                 <stat.icon size={20} />
@@ -130,7 +130,7 @@ export default function ManagerDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 
                 {/* Revenue Momentum Chart */}
-                <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col">
+                <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm relative overflow-hidden flex flex-col">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10">
                         <div className="space-y-1">
                             <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
@@ -184,7 +184,7 @@ export default function ManagerDashboard() {
                 </div>
 
                 {/* Occupancy Logic - Donut Chart */}
-                <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] flex flex-col relative overflow-hidden">
+                <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm flex flex-col relative overflow-hidden">
                     <div className="mb-12 space-y-1 relative z-10">
                         <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
                             Asset Utilization <PieChartIcon className="text-indigo-500" size={24} />
@@ -244,7 +244,7 @@ export default function ManagerDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 
                 {/* Deployment Payments */}
-                <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col">
+                <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="p-10 border-b border-gray-50 flex items-center justify-between">
                         <div className="space-y-1">
                             <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
@@ -293,7 +293,7 @@ export default function ManagerDashboard() {
                 </div>
 
                 {/* Lease Chronology */}
-                <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col">
+                <div className="bg-white rounded-[3.5rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                     <div className="p-10 border-b border-gray-50 flex items-center justify-between">
                         <div className="space-y-1">
                             <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">

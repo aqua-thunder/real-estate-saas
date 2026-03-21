@@ -27,8 +27,8 @@ export default function Input({
       focus:border-[var(--color-primary)]
       text-[var(--text-secondary)] rounded-xl
     `,
-    formInput:`
-    border border-gray-600
+        formInput: `
+    border border-gray-400
       focus:border-[var(--color-primary)]
       text-[var(--text-secondary)] rounded-full
     `

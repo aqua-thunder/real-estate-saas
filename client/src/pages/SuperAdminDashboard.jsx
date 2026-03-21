@@ -116,7 +116,7 @@ export default function SuperAdminDashboard() {
     );
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-12 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Global Command Header */}
             <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
@@ -134,7 +134,7 @@ export default function SuperAdminDashboard() {
                     { label: "Total Tenants", value: stats?.totalTenants || 0, icon: Layers, color: "amber", trend: "+4.2%", desc: "Active tenants" },
                     { label: "Total Revenue", value: `₹${stats?.monthlyRevenue?.toLocaleString() || 0}`, icon: IndianRupee, color: "rose", trend: "+14%", desc: "Network revenue" },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] group transition-all duration-700 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] relative overflow-hidden flex flex-col justify-between min-h-[150px]">
+                    <div key={i} className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm group transition-all duration-700 hover:shadow-md relative overflow-hidden flex flex-col justify-between min-h-[150px]">
                         <div className="flex items-center justify-between relative z-10 mb-6">
                             <div className={`p-5 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 border border-${stat.color}-100 transition-all duration-700 group-hover:bg-gray-900 group-hover:text-white group-hover:shadow-xl`}>
                                 <stat.icon size={15} />
@@ -152,7 +152,7 @@ export default function SuperAdminDashboard() {
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                 {/* Network Growth Curve */}
-                <div className="lg:col-span-2 bg-white p-12 rounded-[4rem] border border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] relative overflow-hidden flex flex-col min-h-[550px]">
+                <div className="lg:col-span-2 bg-white p-12 rounded-[4rem] border border-gray-100 shadow-sm relative overflow-hidden flex flex-col min-h-[550px]">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 mb-16 relative z-10">
                         <div className="space-y-2">
                             <h2 className="text-3xl font-black text-[var(--color-secondary)] flex items-center gap-4">
@@ -214,7 +214,7 @@ export default function SuperAdminDashboard() {
                 </div>
 
                 {/* Asset Portfolio Distribution */}
-                <div className="bg-white p-12 rounded-[4rem] border border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] flex flex-col relative overflow-hidden">
+                <div className="bg-white p-12 rounded-[4rem] border border-gray-100 shadow-sm flex flex-col relative overflow-hidden">
                     <div className="mb-16 space-y-2 relative z-10">
                         <h2 className="text-3xl font-black text-[var(--color-secondary)] flex items-center gap-4">
                             Portfolio Logic
@@ -258,7 +258,7 @@ export default function SuperAdminDashboard() {
             </section>
 
             {/* Verification Queue (Critical Action) */}
-            <section className="bg-white rounded-[4rem] border border-gray-100 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col">
+            <section className="bg-white rounded-[4rem] border border-gray-100 shadow-sm overflow-hidden flex flex-col">
                 <div className="p-12 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-8 bg-gray-50/20">
                     <div className="space-y-2">
                         <h2 className="text-3xl font-black text-[var(--color-secondary)] flex items-center gap-4">

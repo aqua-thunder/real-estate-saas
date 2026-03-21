@@ -124,13 +124,18 @@ const Property = () => {
 
             const method = isEditing ? "PUT" : "POST";
 
+            const submitData = { ...formData };
+            if (!submitData.manager || submitData.manager === "") {
+                delete submitData.manager;
+            }
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(submitData)
             });
 
             const data = await response.json();
@@ -196,7 +201,7 @@ const Property = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Header Section */}
             <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
@@ -246,7 +251,7 @@ const Property = () => {
                     />
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] min-h-[400px] relative">
+                <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm min-h-[400px] relative">
                     {loading ? (
                         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/60 backdrop-blur-sm">
                             <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
@@ -351,50 +356,42 @@ const Property = () => {
             {openForm && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={resetForm}></div>
-                    <div className="relative w-full max-w-2xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden max-h-[90vh] flex flex-col">
+                    <div className="relative w-full max-w-5xl bg-white rounded-[2rem] shadow-lg border border-gray-100 overflow-hidden flex flex-col">
 
-                        <div className="px-10 py-8 border-b border-gray-50 flex items-center justify-between bg-white z-10">
+                        <div className="px-8 py-5 border-b border-gray-50 flex items-center justify-between bg-white z-10">
                             <div>
-                                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">
-                                    {isEditing ? "Modify Asset Config" : "Deploy New Asset"}
+                                <h2 className="text-xl font-black text-[var(--color-secondary)] tracking-tight">
+                                    {isEditing ? "Modify Property" : "Create New Property"}
                                 </h2>
-                                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-muted)] opacity-60">Architectural & Logistics specification</p>
                             </div>
-                            <Button onClick={resetForm} iconOnly variant="secondary" size="sm" icon={<X size={24} />} className="hover:bg-rose-50 hover:text-rose-600" />
+                            <Button onClick={resetForm} iconOnly variant="secondary" size="sm" icon={<X size={20} />} className="hover:bg-rose-50 hover:text-rose-600" />
                         </div>
 
-                        <form className="p-10 pt-8 space-y-12 overflow-y-auto custom-scrollbar" onSubmit={handleSubmit}>
-
-                            {/* Core Specification */}
-                            <section className="space-y-8">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-sm"><Building2 size={20} /></div>
-                                    <h3 className="text-sm font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Core Specification</h3>
-                                </div>
-
+                        <form className="p-8 pt-6" onSubmit={handleSubmit}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Core Specification */}
+                                <section className="space-y-6">
                                 <div className="space-y-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Legal Name</label>
-                                        <input
-                                            name="propertyName"
-                                            value={formData.propertyName}
-                                            onChange={handleChange}
-                                            required
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all"
-                                            placeholder="e.g. Skyline Corporate Center"
-                                        />
-                                    </div>
+                                    <Input
+                                        label="Property Name"
+                                        name="propertyName"
+                                        value={formData.propertyName}
+                                        onChange={handleChange}
+                                        required
+                                        variant="formInput"
+                                        placeholder="e.g. Skyline Corporate Center"
+                                    />
 
                                     <div className="grid grid-cols-2 gap-8">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Category</label>
+                                            <label className="block text-[var(--text-secondary)] text-sm font-semibold">Property Type</label>
                                             <div className="relative">
                                                 <select
                                                     name="propertyType"
                                                     value={formData.propertyType}
                                                     onChange={handleChange}
                                                     required
-                                                    className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-black uppercase text-[var(--color-secondary)] transition-all cursor-pointer focus:outline-none appearance-none shadow-sm"
+                                                    className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer"
                                                 >
                                                     <option value="RESIDENTIAL">Residential Asset</option>
                                                     <option value="COMMERCIAL">Commercial Hub</option>
@@ -404,7 +401,7 @@ const Property = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Manifest Status</label>
+                                            <label className="block text-[var(--text-secondary)] text-sm font-semibold">Status</label>
                                             <div className="flex items-center h-[52px] px-6 bg-gray-50 rounded-2xl border border-transparent hover:bg-white hover:border-indigo-100 transition-all cursor-pointer group" onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}>
                                                 <div className={`w-8 h-4 rounded-full relative transition-all duration-300 ${formData.isActive ? 'bg-indigo-600' : 'bg-gray-300'}`}>
                                                     <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all duration-300 ${formData.isActive ? 'left-[18px]' : 'left-0.5'}`} />
@@ -416,13 +413,13 @@ const Property = () => {
 
                                     {user?.role === "OWNER" && (
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Commander (Manager)</label>
+                                            <label className="block text-[var(--text-secondary)] text-sm font-semibold">Property Manager</label>
                                             <div className="relative">
                                                 <select
                                                     name="manager"
                                                     value={formData.manager}
                                                     onChange={handleChange}
-                                                    className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer"
+                                                    className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer"
                                                 >
                                                     <option value="">Retain Direct Command (No Manager)</option>
                                                     {managers.map(m => <option key={m._id} value={m._id}>{m.name} ({m.email})</option>)}
@@ -433,7 +430,7 @@ const Property = () => {
                                     )}
 
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Asset Narrative (Description)</label>
+                                        <label className="block text-[var(--text-secondary)] text-sm font-semibold">Property Description</label>
                                         <textarea
                                             name="description"
                                             value={formData.description}
@@ -446,7 +443,7 @@ const Property = () => {
                             </section>
 
                             {/* Logistics Location */}
-                            <section className="space-y-8">
+                            <section className="space-y-6">
                                 <div className="flex items-center gap-3">
                                     <div className="p-3 bg-rose-50 text-rose-600 rounded-2xl shadow-sm"><MapPin size={20} /></div>
                                     <h3 className="text-sm font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Geographical Logistics</h3>
@@ -454,31 +451,52 @@ const Property = () => {
 
                                 <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-gray-100 space-y-6">
                                     <div className="grid md:grid-cols-2 gap-8">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Location Hub</label>
-                                            <input name="location" value={formData.location} onChange={handleChange} required className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Bandra West" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Political City</label>
-                                            <input name="city" value={formData.city} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Mumbai" />
-                                        </div>
+                                        <Input
+                                            label="Location"
+                                            name="location"
+                                            value={formData.location}
+                                            onChange={handleChange}
+                                            required
+                                            variant="formInput"
+                                            placeholder="e.g. Bandra West"
+                                        />
+                                        <Input
+                                            label="City"
+                                            name="city"
+                                            value={formData.city}
+                                            onChange={handleChange}
+                                            variant="formInput"
+                                            placeholder="e.g. Mumbai"
+                                        />
                                     </div>
                                     <div className="grid md:grid-cols-3 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">State / Province</label>
-                                            <input name="state" value={formData.state} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="Maharashtra" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Zip / Postal Code</label>
-                                            <input name="zipCode" value={formData.zipCode} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="400050" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Country Sovereign</label>
-                                            <input name="country" value={formData.country} onChange={handleChange} className="w-full bg-white border border-transparent focus:border-rose-100 rounded-2xl px-6 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="India" />
-                                        </div>
+                                        <Input
+                                            label="State"
+                                            name="state"
+                                            value={formData.state}
+                                            onChange={handleChange}
+                                            variant="formInput"
+                                            placeholder="Maharashtra"
+                                        />
+                                        <Input
+                                            label="Zip Code"
+                                            name="zipCode"
+                                            value={formData.zipCode}
+                                            onChange={handleChange}
+                                            variant="formInput"
+                                            placeholder="400050"
+                                        />
+                                        <Input
+                                            label="Country"
+                                            name="country"
+                                            value={formData.country}
+                                            onChange={handleChange}
+                                            variant="formInput"
+                                            placeholder="India"
+                                        />
                                     </div>
                                     <div className="space-y-2 pt-2">
-                                        <label className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Logistics Address</label>
+                                        <label className="block text-[var(--text-secondary)] text-sm font-semibold">Address</label>
                                         <textarea
                                             name="address"
                                             value={formData.address}
@@ -488,13 +506,14 @@ const Property = () => {
                                             placeholder="Enter precise logistical address coordinate..."
                                         />
                                     </div>
-                                </div>
-                            </section>
+                                    </div>
+                                </section>
+                            </div>
 
-                            <div className="flex items-center justify-end gap-6 pt-6 sticky bottom-0 bg-white border-t border-gray-50 mt-4 py-8 z-10">
-                                <Button type="button" variant="ghost" size="sm" onClick={resetForm}>Abort Establishment</Button>
-                                <Button type="submit" variant="primary" size="lg" icon={isEditing ? <Edit size={18} /> : <ArrowRight size={18} />}>
-                                    {isEditing ? "FINALIZE CONFIG" : "ESTABLISH ASSET"}
+                            <div className="flex items-center justify-end gap-6 pt-6 mt-6 border-t border-gray-50 bg-white">
+                                <Button type="button" variant="ghost" size="sm" onClick={resetForm}>Cancel</Button>
+                                <Button type="submit" htmlType="submit" variant="primary" size="lg" icon={isEditing ? <Edit size={18} /> : <ArrowRight size={18} />}>
+                                    {isEditing ? "Update Property" : "Create Property"}
                                 </Button>
                             </div>
                         </form>

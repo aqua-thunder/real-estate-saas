@@ -136,7 +136,7 @@ const User = () => {
     );
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Header Section */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
@@ -173,7 +173,7 @@ const User = () => {
             </header>
 
             {/* Content Area */}
-            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
                 {/* Desktop view */}
                 <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left">
@@ -280,7 +280,7 @@ const User = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={resetForm}></div>
 
-                    <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
+                    <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] border border-gray-100 shadow-lg overflow-hidden">
 
                         <div className="px-10 pt-4 border-b border-gray-50 flex items-center justify-between">
                             <div className="space-y-1">
@@ -293,89 +293,75 @@ const User = () => {
 
                         <form onSubmit={handleSubmit} className="px-10 pb-10 space-y-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
                             <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Name</label>
-                                    <div className="relative">
-                                        <UserIcon size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            required
-                                            placeholder="Full Name"
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
-                                            value={formData.name}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
+                                <Input
+                                    label="Name"
+                                    type="text"
+                                    name="name"
+                                    required
+                                    variant="formInput"
+                                    placeholder="Full Name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                />
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Email Address</label>
-                                    <div className="relative">
-                                        <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] opacity-60" />
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            required
-                                            placeholder="Email Address"
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
+                                <Input
+                                    label="Email"
+                                    type="email"
+                                    name="email"
+                                    required
+                                    variant="formInput"
+                                    placeholder="Email Address"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                />
 
                                 <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Password</label>
-                                        <input
-                                            type="password"
-                                            name="password"
-                                            placeholder={isEditing ? "Stay Current" : "Passphrase"}
-                                            required={!isEditing}
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
-                                            value={formData.password}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Phone</label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            placeholder="Contact"
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl px-6 py-4 text-[13px] font-bold text-[var(--color-secondary)] transition-all focus:outline-none"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                                    <Input
+                                        label="Password"
+                                        type="password"
+                                        name="password"
+                                        variant="formInput"
+                                        placeholder={isEditing ? "Leave blank to keep" : "Password"}
+                                        required={!isEditing}
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                    />
+                                    <Input
+                                        label="Phone"
+                                        type="tel"
+                                        name="phone"
+                                        variant="formInput"
+                                        placeholder="Phone Number"
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                    />
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Role</label>
+                                    <label className="block text-[var(--text-secondary)] text-sm font-semibold">Role</label>
                                     <div className="relative">
                                         <ShieldCheck size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]" />
                                         <select
                                             name="role"
                                             value={formData.role}
                                             onChange={handleChange}
-                                            className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-[var(--color-primary)]/20 rounded-2xl pl-12 pr-6 py-4 text-[13px] font-black text-[var(--color-secondary)] transition-all appearance-none cursor-pointer focus:outline-none"
+                                            className="w-full px-4 py-3 pl-10 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer"
                                             disabled={["MANAGER", "OWNER"].includes(currentUser?.role) && isEditing}
                                         >
-                                            {currentUser?.role === "MANAGER" && <option value="TENANT">Tenant Access</option>}
+                                            {currentUser?.role === "MANAGER" && <option value="TENANT">Tenant</option>}
                                             {currentUser?.role === "OWNER" && (
                                                 <>
-                                                    <option value="MANAGER">Facility Manager</option>
-                                                    <option value="TENANT">Tenant Access</option>
+                                                    <option value="MANAGER">Manager</option>
+                                                    <option value="TENANT">Tenant</option>
                                                 </>
                                             )}
                                             {currentUser?.role === "SUPER_ADMIN" && (
                                                 <>
                                                     <option value="TENANT">Tenant</option>
-                                                    <option value="OWNER">Property Owner</option>
-                                                    <option value="MANAGER">Facility Manager</option>
-                                                    <option value="MAINTENANCE_STAFF">Ground Crew</option>
-                                                    <option value="SUPER_ADMIN">System Root</option>
+                                                    <option value="OWNER">Owner</option>
+                                                    <option value="MANAGER">Manager</option>
+                                                    <option value="MAINTENANCE_STAFF">Maintenance</option>
+                                                    <option value="SUPER_ADMIN">Admin</option>
                                                 </>
                                             )}
                                         </select>
@@ -385,7 +371,7 @@ const User = () => {
                             </div>
 
                             <div className="flex justify-end">
-                                <Button type="submit" variant="primary" size="lg" className="min-w-[170px]">
+                                <Button type="submit" htmlType="submit" variant="primary" size="lg" className="min-w-[170px]">
                                     {isEditing ? "UPDATE USER" : "ADD USER"}
                                 </Button>
                             </div>

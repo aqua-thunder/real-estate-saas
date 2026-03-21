@@ -22,8 +22,8 @@ const Dashboard = () => {
 
   return (
     <div className="flex items-center justify-center min-h-[70vh] font-['Inter']">
-        <div className="text-center space-y-8 animate-in fade-in duration-1000 max-w-xl mx-auto p-12 bg-white rounded-[4rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
-            <div className="w-24 h-24 bg-gray-900 rounded-[2.5rem] flex items-center justify-center text-3xl font-black text-white mx-auto shadow-2xl group cursor-wait hover:rounded-full transition-all duration-700">
+        <div className="text-center space-y-8 animate-in fade-in duration-1000 max-w-xl mx-auto p-12 bg-white rounded-[4rem] border border-gray-100 shadow-sm">
+            <div className="w-24 h-24 bg-gray-900 rounded-[2.5rem] flex items-center justify-center text-3xl font-black text-white mx-auto shadow-sm group cursor-wait hover:rounded-full transition-all duration-700">
                {user?.name?.[0] || 'U'}
             </div>
             <div className="space-y-4">

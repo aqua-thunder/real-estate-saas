@@ -75,15 +75,14 @@ const RevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-2 space-y-4 selection:bg-[var(--color-primary)]/30 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-0 space-y-5 selection:bg-[var(--color-primary)]/30 font-['Inter']">
 
             {/* --- HEADER --- */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
                 <div className="space-y-1">
                     <h1 className="font-black text-[var(--color-secondary)] tracking-tight">
-                        Revenue Analytics
+                        Revenue Report
                     </h1>
-                    <p className="text-[var(--text-muted)] font-medium text-sm">Comprehensive breakdown of your property earnings and overheads.</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -112,9 +111,9 @@ const RevenueReport = () => {
 
                         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
                             <div>
-                                <h2 className="text-sm font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-3">Total Net Profit</h2>
+                                <span className="text-sm font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-3 text-xl">Total Net Profit</span>
                                 <div className="flex items-baseline gap-4">
-                                    <span className="text-6xl font-black text-[var(--color-secondary)] tracking-tighter">{stats.netProfit}</span>
+                                    <span className="text-4xl font-black text-[var(--color-secondary)] tracking-tighter">{stats.netProfit}</span>
                                     <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-xs font-black italic">
                                         <TrendingUp size={14} /> ACTIVE GROWTH
                                     </div>

@@ -201,15 +201,14 @@ export default function Maintenance() {
     );
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-8 space-y-8 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Header Section */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
                 <div className="space-y-1">
                     <h1 className="text-3xl font-black text-[var(--color-secondary)] tracking-tight">
-                        Asset Maintenance
+                        Maintenance Request
                     </h1>
-                    <p className="text-[var(--text-muted)] font-medium text-sm">Monitor property health, track repair workflows, and satisfy resident needs.</p>
                 </div>
 
                 {isAuthorizedToCreate && (
@@ -217,9 +216,8 @@ export default function Maintenance() {
                         onClick={() => setShowForm(true)}
                         variant="primary"
                         size="md"
-                        icon={<Plus size={18} />}
                     >
-                        NEW REPAIR REQUEST
+                        NEW REQUEST
                     </Button>
                 )}
             </header>
@@ -329,17 +327,16 @@ export default function Maintenance() {
                                                     <div className="flex gap-2">
                                                         {req.status === "Pending" && (
                                                             <Button onClick={() => handleUpdateStatus(req._id, "In Progress")} variant="primary" size="sm" className="bg-gray-900 border-gray-900">
-                                                                DEPLOY CREW
+                                                                In Progress
                                                             </Button>
                                                         )}
                                                         <Button onClick={() => handleUpdateStatus(req._id, "Completed")} variant="primary" size="sm" className="bg-emerald-600 border-emerald-600 hover:bg-emerald-700">
-                                                            MARK RESOLVED
+                                                            Completed
                                                         </Button>
                                                     </div>
                                                 )}
                                             </>
                                         )}
-                                        <Button iconOnly variant="secondary" size="xs" icon={<Eye size={18} />} title="View Details" />
                                     </div>
                                     <div className={`inline-flex self-start lg:self-auto items-center gap-2 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.1em] border shadow-sm ${getStatusStyle(req.status)}`}>
                                         <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${req.status === 'Completed' ? 'bg-emerald-500' : 'bg-current'}`}></span>

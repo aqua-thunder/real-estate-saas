@@ -185,7 +185,7 @@ export default function LeaseAgrement() {
     }
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
             {/* Header Section */}
             <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
@@ -224,7 +224,7 @@ export default function LeaseAgrement() {
             </header>
 
             {/* Table Area */}
-            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+            <section className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead className="bg-gray-50/50 border-b border-gray-50">
@@ -307,7 +307,7 @@ export default function LeaseAgrement() {
                     />
 
                     {/* Modal Content */}
-                    <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+                    <div className="relative w-full max-w-xl bg-white rounded-[2.5rem] shadow-lg overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
 
                         {/* Header */}
                         <div className="px-8 py-6 border-b border-gray-50 flex items-center justify-between bg-white sticky top-0 z-10">

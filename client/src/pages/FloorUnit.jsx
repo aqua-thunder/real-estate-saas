@@ -356,7 +356,7 @@ const FloorUnit = () => {
   const filteredFloorsForUnit = floors.filter(f => (f.propertyId?._id || f.propertyId) === selectedPropertyForUnit);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-8 font-['Inter']">
+    <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
       {/* Header Area */}
       <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
@@ -602,19 +602,19 @@ const FloorUnit = () => {
       {openFloorForm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300 font-['Inter']">
           <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }}></div>
-          <div className="relative w-full max-w-xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col">
+          <div className="relative w-full max-w-xl bg-white rounded-[2rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col">
 
-            <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-white z-10">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between bg-white z-10">
               <div>
-                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingFloor ? "Modify Floor" : "Deploy Floor"}</h2>
+                <h2 className="text-xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingFloor ? "Edit Floor" : "Create Floor"}</h2>
               </div>
-              <Button onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }} variant="secondary" size="sm" iconOnly icon={<X size={24} />} />
+              <Button onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }} variant="secondary" size="sm" iconOnly icon={<X size={20} />} />
             </div>
 
-            <form className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar" onSubmit={handleFloorSubmit}>
-              <div className="space-y-6">
+            <form className="p-6 space-y-4" onSubmit={handleFloorSubmit}>
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Select Property</label>
+                  <label className="block text-[var(--text-secondary)] text-sm font-semibold">Select Property</label>
                   <div className="relative">
                     <select
                       name="propertyId"
@@ -622,7 +622,7 @@ const FloorUnit = () => {
                       onChange={handleFloorChange}
                       required
                       disabled={isEditingFloor}
-                      className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer transition-all disabled:opacity-50"
+                      className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer disabled:opacity-50"
                     >
                       <option value="">-- Choose Host Asset --</option>
                       {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
@@ -632,26 +632,37 @@ const FloorUnit = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Name</label>
-                    <input name="name" value={floorData.name} onChange={handleFloorChange} required className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="e.g. Executive Level" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Number</label>
-                    <input name="floorNumber" type="number" value={floorData.floorNumber} onChange={handleFloorChange} required className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-bold text-[var(--color-secondary)] shadow-sm focus:outline-none transition-all" placeholder="0" />
-                  </div>
+                  <Input
+                    label="Floor Name"
+                    name="name"
+                    value={floorData.name}
+                    onChange={handleFloorChange}
+                    required
+                    variant="formInput"
+                    placeholder="e.g. Executive Level"
+                  />
+                  <Input
+                    label="Floor Number"
+                    name="floorNumber"
+                    type="number"
+                    value={floorData.floorNumber}
+                    onChange={handleFloorChange}
+                    required
+                    variant="formInput"
+                    placeholder="0"
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest ml-1">Floor Description</label>
-                  <textarea name="description" value={floorData.description} onChange={handleFloorChange} className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-medium text-[var(--color-secondary)] shadow-sm focus:outline-none min-h-[120px] resize-none transition-all" placeholder="Structural highlights or floor-specific constraints..." />
+                  <label className="block text-[var(--text-secondary)] text-sm font-semibold">Description</label>
+                  <textarea name="description" value={floorData.description} onChange={handleFloorChange} className="w-full bg-gray-50 border border-transparent focus:bg-white focus:border-indigo-100 rounded-2xl px-6 py-4 text-xs font-medium text-[var(--color-secondary)] shadow-sm focus:outline-none min-h-[100px] resize-none transition-all" placeholder="Structural highlights or floor-specific constraints..." />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-50 bg-white sticky bottom-0 z-10 py-4">
-                <Button type="button" variant="ghost" size="sm" onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }}>Cancel</Button>
+              <div className="flex items-center justify-end gap-4 pt-4 mt-4 border-t border-gray-50 bg-white">
+                <Button type="button" htmlType="submit" variant="ghost" size="sm" onClick={() => { setOpenFloorForm(false); setEditFloorId(null); setFloorData(initialFloorData); }}>Cancel</Button>
                 <Button type="submit" variant="primary" size="md">
-                  {isEditingFloor ? "UPDATE" : "DEPLOY"}
+                  {isEditingFloor ? "Update" : "Save"}
                 </Button>
               </div>
             </form>
@@ -663,29 +674,29 @@ const FloorUnit = () => {
       {openUnitForm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-white/40 backdrop-blur-md" onClick={() => { setOpenUnitForm(false); resetUnitForm(); }}></div>
-          <div className="relative w-full max-w-3xl bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="relative w-full max-w-4xl bg-white rounded-[2rem] shadow-[0_40px_100px_-20_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden flex flex-col">
 
-            <div className="px-6 py-5 border-b border-gray-50 flex items-center justify-between bg-white z-10">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between bg-white z-10">
               <div>
-                <h2 className="text-2xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingUnit ? "Modify Unit" : "Deploy Unit"}</h2>
+                <h2 className="text-xl font-black text-[var(--color-secondary)] tracking-tight">{isEditingUnit ? "Edit Unit" : "Create Unit"}</h2>
               </div>
-              <Button onClick={() => { setOpenUnitForm(false); resetUnitForm(); }} variant="secondary" size="sm" iconOnly icon={<X size={24} />} />
+              <Button onClick={() => { setOpenUnitForm(false); resetUnitForm(); }} variant="secondary" size="sm" iconOnly icon={<X size={20} />} />
             </div>
 
-            <form className="p-6 pt-5 space-y-8 overflow-y-auto custom-scrollbar" onSubmit={handleUnitSubmit}>
-              <div className="grid md:grid-cols-2 gap-12">
+            <form className="p-6 space-y-4" onSubmit={handleUnitSubmit}>
+              <div className="grid md:grid-cols-2 gap-8">
 
                 {/* Identification & Layout */}
-                <section className="space-y-8">
+                <section className="space-y-4">
                   <div className="flex items-center gap-3">
                     <h3 className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Unit Details</h3>
                   </div>
 
                   <div className="space-y-4 bg-gray-50/50 p-5 rounded-[2rem] border border-gray-100">
                     <div className="space-y-2">
-                      <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Select Property</label>
+                      <label className="block text-[var(--text-secondary)] text-sm font-semibold">Property</label>
                       <div className="relative">
-                        <select name="propertyId" value={unitData.propertyId} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm appearance-none cursor-pointer focus:outline-none">
+                        <select name="propertyId" value={unitData.propertyId} onChange={handleUnitChange} required className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer">
                           <option value="">-- Choose Asset --</option>
                           {properties.map(p => <option key={p._id} value={p._id}>{p.propertyName}</option>)}
                         </select>
@@ -693,9 +704,9 @@ const FloorUnit = () => {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Target Level</label>
+                      <label className="block text-[var(--text-secondary)] text-sm font-semibold">Floor</label>
                       <div className="relative">
-                        <select name="floorId" value={unitData.floorId} onChange={handleUnitChange} required disabled={!selectedPropertyForUnit} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-bold text-[var(--color-secondary)] shadow-sm appearance-none cursor-pointer focus:outline-none disabled:opacity-30">
+                        <select name="floorId" value={unitData.floorId} onChange={handleUnitChange} required disabled={!selectedPropertyForUnit} className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer disabled:opacity-50">
                           <option value="">-- Choose Floor --</option>
                           {filteredFloorsForUnit.map(f => <option key={f._id} value={f._id}>{f.name} (Lvl {f.floorNumber})</option>)}
                         </select>
@@ -703,13 +714,18 @@ const FloorUnit = () => {
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Unit Tag</label>
-                        <input name="unitNumber" value={unitData.unitNumber} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-black text-[var(--color-secondary)] shadow-sm focus:outline-none" placeholder="A-101" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest ml-1">Space Type</label>
-                        <select name="unitType" value={unitData.unitType} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-2xl px-5 py-3.5 text-xs font-black uppercase text-[var(--color-secondary)] shadow-sm focus:outline-none appearance-none cursor-pointer">
+                      <Input
+                        label="Unit Prefix"
+                        name="unitNumber"
+                        value={unitData.unitNumber}
+                        onChange={handleUnitChange}
+                        required
+                        variant="formInput"
+                        placeholder="A-101"
+                      />
+                      <div className="space-y-2">
+                        <label className="block text-[var(--text-secondary)] text-sm font-semibold">Type</label>
+                        <select name="unitType" value={unitData.unitType} onChange={handleUnitChange} className="w-full px-4 py-3 border border-gray-600 focus:border-[var(--color-primary)] text-[var(--text-secondary)] rounded-xl outline-none transition appearance-none cursor-pointer">
                           {["Flat", "Shop", "Office", "Warehouse", "Parking"].map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
                       </div>
@@ -722,40 +738,62 @@ const FloorUnit = () => {
                       <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">Configuration Metrics</span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Bedrooms</label>
-                        <input type="number" name="bedrooms" value={unitData.bedrooms} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Bathrooms</label>
-                        <input type="number" name="bathrooms" value={unitData.bathrooms} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" />
-                      </div>
+                      <Input
+                        type="number"
+                        label="Bedrooms"
+                        name="bedrooms"
+                        variant="formInput"
+                        value={unitData.bedrooms}
+                        onChange={handleUnitChange}
+                      />
+                      <Input
+                        type="number"
+                        label="Bathrooms"
+                        name="bathrooms"
+                        variant="formInput"
+                        value={unitData.bathrooms}
+                        onChange={handleUnitChange}
+                      />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Total Hub Area (Sq.Ft)</label>
-                      <input type="number" name="area" value={unitData.area} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-indigo-100 rounded-xl px-4 py-3 text-xs font-black text-[var(--color-secondary)]" placeholder="1200" />
-                    </div>
+                    <Input
+                      label="Area (Sq.Ft)"
+                      type="number"
+                      name="area"
+                      value={unitData.area}
+                      onChange={handleUnitChange}
+                      required
+                      variant="formInput"
+                      placeholder="e.g. 1200"
+                    />
                   </div>
                 </section>
 
                 {/* Finance & Features */}
-                <section className="space-y-8">
+                <section className="space-y-4">
                   <div className="flex items-center gap-3">
                     <h3 className="text-[11px] font-black text-[var(--color-secondary)] uppercase tracking-[0.1em]">Financials</h3>
                   </div>
 
                   <div className="p-5 bg-emerald-50/30 rounded-[2rem] border border-emerald-100 space-y-5">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest ml-1">Monthly Cycle Yield (INR)</label>
-                      <div className="relative">
-                        <span className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black">₹</span>
-                        <input type="number" name="rentAmount" value={unitData.rentAmount} onChange={handleUnitChange} required className="w-full bg-white border border-transparent focus:border-emerald-200 rounded-2xl pl-12 pr-6 py-4 text-sm font-black text-emerald-600 shadow-sm focus:outline-none" placeholder="25,000" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-emerald-800 uppercase tracking-widest ml-1">Security Collateral</label>
-                      <input type="number" name="securityDeposit" value={unitData.securityDeposit} onChange={handleUnitChange} className="w-full bg-white border border-transparent focus:border-emerald-200 rounded-2xl px-6 py-4 text-xs font-bold text-emerald-700 shadow-sm focus:outline-none" placeholder="Deposit Amount" />
-                    </div>
+                    <Input
+                      label="Rent Amount (Monthly)"
+                      type="number"
+                      name="rentAmount"
+                      value={unitData.rentAmount}
+                      onChange={handleUnitChange}
+                      required
+                      variant="formInput"
+                      placeholder="25000"
+                    />
+                    <Input
+                      label="Security Deposit"
+                      type="number"
+                      name="securityDeposit"
+                      value={unitData.securityDeposit}
+                      onChange={handleUnitChange}
+                      variant="formInput"
+                      placeholder="e.g. 50000"
+                    />
                   </div>
 
                   <div className="space-y-4">
@@ -788,10 +826,10 @@ const FloorUnit = () => {
                 </section>
               </div>
 
-              <div className="flex items-center justify-end gap-6 pt-6 border-t border-gray-50 bg-white sticky bottom-0 z-10 py-4">
-                <Button type="button" variant="ghost" size="sm" onClick={() => { setOpenUnitForm(false); resetUnitForm(); }}>Discard Deployment</Button>
-                <Button type="submit" variant="primary" size="lg">
-                  {isEditingUnit ? "AUTHORIZE UPDATE" : "AUTHORIZE DEPLOYMENT"}
+              <div className="flex items-center justify-end gap-4 pt-4 mt-6 border-t border-gray-50 bg-white">
+                <Button type="button" variant="ghost" size="sm" onClick={() => { setOpenUnitForm(false); resetUnitForm(); }}>Cancel</Button>
+                <Button type="submit" variant="primary" size="md">
+                  {isEditingUnit ? "Update" : "Save"}
                 </Button>
               </div>
             </form>

@@ -75,16 +75,16 @@ const OwnerDashboard = () => {
   const occupancyData = stats?.occupancyChart?.filter(entry => entry.value > 0) || [];
 
   const kpis = [
-    { label: "Assets", val: stats?.totalProperties || 0, icon: Building2, color: "indigo", trend: "+2.4%" },
-    { label: "Inventory", val: stats?.totalUnits || 0, icon: Home, color: "blue", trend: "+1.2%" },
-    { label: "Live", val: stats?.occupiedUnits || 0, icon: DoorClosed, color: "emerald", trend: "+4.1%" },
-    { label: "Leads", val: stats?.vacantUnits || 0, icon: Key, color: "amber", trend: "-0.8%" },
-    { label: "Yield", val: `₹${(stats?.monthlyRentalIncome || 0).toLocaleString()}`, icon: IndianRupee, color: "violet", trend: "+12.5%" },
-    { label: "Alerts", val: stats?.pendingMaintenanceApprovals || 0, icon: Wrench, color: "rose", trend: "Critical" },
+    { label: "Total Properties", val: stats?.totalProperties || 0, icon: Building2, color: "indigo", trend: "+2.4%" },
+    { label: "Total Units", val: stats?.totalUnits || 0, icon: Home, color: "blue", trend: "+1.2%" },
+    { label: "Occupied Units", val: stats?.occupiedUnits || 0, icon: DoorClosed, color: "emerald", trend: "+4.1%" },
+    { label: "Vacant Units", val: stats?.vacantUnits || 0, icon: Key, color: "amber", trend: "-0.8%" },
+    { label: "Monthly Rental", val: `₹${(stats?.monthlyRentalIncome || 0).toLocaleString()}`, icon: IndianRupee, color: "violet", trend: "+12.5%" },
+    { label: "Pending Maintenance", val: stats?.pendingMaintenanceApprovals || 0, icon: Wrench, color: "rose", trend: "Critical" },
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-2 space-y-2 font-['Inter']">
+    <div className="min-h-screen bg-[var(--bg-main)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
 
       {/* Header Intel */}
       <header className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 pb-4">
@@ -102,12 +102,11 @@ const OwnerDashboard = () => {
       {/* KPI Matrix */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {kpis.map((kpi, idx) => (
-          <div key={idx} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.03)] group transition-all duration-500 hover:shadow-[0_25px_60px_-20px_rgba(0,0,0,0.08)] relative overflow-hidden">
+          <div key={idx} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-sm group transition-all duration-500 hover:shadow-md relative overflow-hidden">
             <div className="flex items-center justify-between mb-6 relative z-10">
-              <div className={`p-4 rounded-2xl bg-${kpi.color}-50 text-${kpi.color}-600 shadow-sm border border-${kpi.color}-100 transition-all duration-700 group-hover:bg-${kpi.color}-600 group-hover:text-white`}>
+              <div className={`p-4 rounded-2xl bg-${kpi.color}-50 text-${kpi.color}-600 shadow-sm border border-${kpi.color}-100 transition-all duration-700 group-hover:bg-${kpi.color}`}>
                 <kpi.icon size={20} />
               </div>
-
             </div>
             <div className="relative z-10">
               <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-1.5 opacity-50">{kpi.label}</p>
@@ -123,25 +122,12 @@ const OwnerDashboard = () => {
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
         {/* Yield Curve - Area Chart */}
-        <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] lg:col-span-2 relative overflow-hidden flex flex-col">
+        <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm lg:col-span-2 relative overflow-hidden flex flex-col">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-12 relative z-10">
             <div className="space-y-1">
               <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
-                Yield Vector <TrendingUp className="text-emerald-500" size={24} />
+                Rent Return
               </h2>
-              <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">Financial velocity over last 6 months</p>
-            </div>
-            <div className="flex gap-2">
-              {['6M', '1Y', 'ALL'].map(t => (
-                <Button
-                  key={t}
-                  onClick={() => { }}
-                  variant={t === '6M' ? 'primary' : 'secondary'}
-                  size="xs"
-                >
-                  {t}
-                </Button>
-              ))}
             </div>
           </div>
 
@@ -202,12 +188,11 @@ const OwnerDashboard = () => {
         </div>
 
         {/* Occupancy Logic - Donut Chart */}
-        <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] flex flex-col relative overflow-hidden">
-          <div className="mb-12 space-y-1 relative z-10">
+        <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm flex flex-col relative overflow-hidden">
+          <div className="mb-5 space-y-1 relative z-10">
             <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
-              Asset Status <PieChartIcon className="text-indigo-500" size={24} />
+              Asset Status
             </h2>
-            <p className="text-[11px] font-black text-[var(--text-muted)] uppercase tracking-widest opacity-40">Portfolio occupancy distribution</p>
           </div>
 
           <div className="h-[300px] w-full relative z-10">
@@ -252,50 +237,11 @@ const OwnerDashboard = () => {
               </div>
             )}
           </div>
-
-          <div className="mt-auto grid grid-cols-2 gap-4 relative z-10 pt-8 border-t border-gray-50">
-            <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/50">
-              <p className="text-[8px] font-black text-emerald-800 uppercase tracking-widest leading-none">Market Share</p>
-              <p className="text-lg font-black text-emerald-600 mt-2 tracking-tight">Prime</p>
-            </div>
-            <div className="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/50">
-              <p className="text-[8px] font-black text-indigo-800 uppercase tracking-widest leading-none">Visibility</p>
-              <p className="text-lg font-black text-indigo-600 mt-2 tracking-tight">Active</p>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Tertiary Insights & Action Feed */}
-      <section className="grid grid-cols-1 xl:grid-cols-4 gap-8 pb-10">
-
-        {/* Live Operations Feed */}
-        <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm xl:col-span-1 space-y-6">
-          <h3 className="text-xs font-black text-[var(--color-secondary)] uppercase tracking-[0.2em] flex items-center gap-2">
-            <Activity size={16} className="text-indigo-500" /> System Ops Feed
-          </h3>
-          <div className="space-y-4">
-            {[
-              { action: "Rent Inflow", client: "Hub-01", time: "2m ago", color: "emerald", icon: IndianRupee },
-              { action: "Lease Renew", client: "John Doe", time: "1h ago", color: "blue", icon: FileText },
-              { action: "Unit Repair", client: "Unit A-12", time: "5h ago", color: "rose", icon: Wrench },
-              { action: "New Lead", client: "Sarah K.", time: "Yesterday", color: "amber", icon: Users }
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center gap-4 group cursor-help transition-all hover:translate-x-1">
-                <div className={`w-10 h-10 rounded-xl bg-${item.color}-50 text-${item.color}-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
-                  <item.icon size={16} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-black text-[var(--color-secondary)] uppercase truncate">{item.action}</p>
-                  <p className="text-[9px] text-[var(--text-muted)] font-bold truncate opacity-60 underline decoration-indigo-100">{item.client}</p>
-                </div>
-                <div className="text-[8px] font-black text-[var(--text-muted)] uppercase opacity-30 whitespace-nowrap">{item.time}</div>
-              </div>
-            ))}
-          </div>
-          <Button fullWidth variant="secondary" size="sm">Audit Manifest</Button>
-        </div>
-
+      <section className="grid grid-cols-1 xl:grid-cols-1 gap-8 pb-10">
         {/* Maintenance Spotlight */}
         <div className="bg-white p-10 rounded-[3.5rem] border border-gray-100 shadow-sm xl:col-span-2 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-110 transition-transform duration-1000">
@@ -334,35 +280,6 @@ const OwnerDashboard = () => {
             </Button>
           </div>
         </div>
-
-        {/* Quick Links / Profile Status */}
-        <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm xl:col-span-1 flex flex-col items-center justify-center text-center space-y-6">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-[2rem] bg-indigo-50 flex items-center justify-center text-3xl font-black text-indigo-600 shadow-inner group cursor-pointer overflow-hidden transition-all duration-500 hover:rounded-full">
-              {user?.name?.[0] || 'O'}
-              <div className="absolute inset-0 bg-gray-900/0 hover:bg-gray-900/10 transition-colors" />
-            </div>
-            <div className="absolute -bottom-1 -right-1 p-1.5 bg-emerald-500 rounded-full border-4 border-white" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-tight">{user?.name}</p>
-            <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest underline decoration-2 underline-offset-4 decoration-indigo-200">Portfolio Owner</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <Button variant="secondary" size="md" iconOnly icon={<Settings size={18} />} className="w-full h-16" />
-            <Button variant="secondary" size="md" iconOnly icon={<Heart size={18} />} className="w-full h-16 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100" />
-          </div>
-          <div className="pt-4 w-full">
-            <div className="flex justify-between items-center text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-2 px-2">
-              <span>Account Integrity</span>
-              <span>98%</span>
-            </div>
-            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="w-[98%] h-full bg-gradient-to-r from-indigo-500 to-emerald-500" />
-            </div>
-          </div>
-        </div>
-
       </section>
 
       {/* Global CSS for Charts & Scrollbars */}

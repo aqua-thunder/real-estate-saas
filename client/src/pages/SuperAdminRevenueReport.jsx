@@ -109,7 +109,7 @@ const SuperAdminRevenueReport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-2 space-y-10 font-['Inter']">
+        <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-secondary)] p-4 sm:p-6 lg:p-0 space-y-5 font-['Inter']">
             {/* Header */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
                 <div className="space-y-1">
@@ -128,7 +128,7 @@ const SuperAdminRevenueReport = () => {
             {/* 1️⃣ Revenue Summary Cards */}
             <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 {statsConfig.map((stat, idx) => (
-                    <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[2rem] hover:border-[var(--color-primary)]/30 transition-all group relative overflow-hidden shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)]">
+                    <div key={idx} className="bg-white border border-gray-100 p-8 rounded-[2rem] hover:border-[var(--color-primary)]/30 transition-all group relative overflow-hidden shadow-sm hover:shadow-md">
                         <div className={`w-12 h-12 rounded-2xl ${stat.color} flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-500`}>
                             <stat.icon size={22} />
                         </div>
@@ -143,7 +143,7 @@ const SuperAdminRevenueReport = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* 2️⃣ Revenue by Owner */}
-                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-sm">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
                             <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
@@ -190,7 +190,7 @@ const SuperAdminRevenueReport = () => {
                 </div>
 
                 {/* 3️⃣ Revenue by Property */}
-                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-sm">
                     <div className="flex items-center justify-between">
                         <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
                             <span className="w-1.5 h-6 bg-emerald-500 rounded-full"></span>
@@ -239,7 +239,7 @@ const SuperAdminRevenueReport = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* 4️⃣ Monthly Revenue Trend */}
-                <div className="lg:col-span-2 bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden relative">
+                <div className="lg:col-span-2 bg-white border border-gray-100 p-10 rounded-[2.5rem] space-y-8 shadow-sm overflow-hidden relative">
                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-50 blur-[80px] rounded-full opacity-50"></div>
                     <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4 relative z-10">
                         <span className="w-1.5 h-6 bg-purple-500 rounded-full"></span>
@@ -268,7 +268,7 @@ const SuperAdminRevenueReport = () => {
                 </div>
 
                 {/* 5️⃣ Occupancy Flow */}
-                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] flex flex-col items-center justify-center space-y-8 relative overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+                <div className="bg-white border border-gray-100 p-10 rounded-[2.5rem] flex flex-col items-center justify-center space-y-8 relative overflow-hidden shadow-sm">
                     <div className="absolute top-8 left-8">
                         <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
                             <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span>
@@ -312,7 +312,7 @@ const SuperAdminRevenueReport = () => {
             </div>
 
             {/* 6️⃣ Pending Rent Report */}
-            <section className="bg-white border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)]">
+            <section className="bg-white border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm">
                 <div className="p-10 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <h3 className="text-lg font-black text-[var(--color-secondary)] uppercase tracking-widest flex items-center gap-4">
                         <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
