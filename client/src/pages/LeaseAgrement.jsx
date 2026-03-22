@@ -339,20 +339,20 @@ export default function LeaseAgrement() {
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <User size={14} className="text-indigo-600" />
-                                    <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Tenant Information</h4>
+                                    <h4 className="text-[12px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Tenant Information</h4>
                                 </div>
                                 <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 space-y-4">
                                     <div>
-                                        <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Full Name</p>
+                                        <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Full Name</p>
                                         <p className="text-lg font-black text-[var(--color-secondary)]">{selectedLease.userId?.name || selectedLease.name}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Email</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Email</p>
                                             <p className="text-xs font-bold text-[var(--color-secondary)] truncate">{selectedLease.userId?.email || selectedLease.email || "N/A"}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Phone</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Phone</p>
                                             <p className="text-xs font-bold text-[var(--color-secondary)]">{selectedLease.userId?.phone || selectedLease.phone || "N/A"}</p>
                                         </div>
                                     </div>
@@ -367,16 +367,16 @@ export default function LeaseAgrement() {
                                 </div>
                                 <div className="p-6 bg-white border border-gray-100 rounded-3xl shadow-sm space-y-4">
                                     <div>
-                                        <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Property Name</p>
+                                        <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Property Name</p>
                                         <p className="text-sm font-black text-[var(--color-secondary)]">{selectedLease.propertyId?.propertyName}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="p-4 bg-gray-50 rounded-2xl">
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Unit Number</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Unit Number</p>
                                             <p className="text-xs font-black text-[var(--color-secondary)]">#{selectedLease.unitId?.unitNumber || "N/A"}</p>
                                         </div>
                                         <div className="p-4 bg-gray-50 rounded-2xl">
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Floor</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Floor</p>
                                             <p className="text-xs font-black text-[var(--color-secondary)]">{selectedLease.floorId?.name || "N/A"}</p>
                                         </div>
                                     </div>

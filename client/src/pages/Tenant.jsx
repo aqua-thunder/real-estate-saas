@@ -300,7 +300,7 @@ const Tenant = () => {
 
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                     <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
-                        {["All", "Paid", "Pending", "Expiring"].map((status) => (
+                        {["All", "Active", "Expiring", "Expired", "Terminated"].map((status) => (
                             <Button
                                 key={status}
                                 onClick={() => setFilterStatus(status)}
@@ -421,7 +421,10 @@ const Tenant = () => {
                                                 tenant.leaseStatus === 'Expiring' ? 'bg-amber-50 text-amber-600 border-amber-100' :
                                                     'bg-rose-50 text-rose-600 border-rose-100'
                                                 }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${tenant.leaseStatus === 'Active' ? 'bg-emerald-500 animate-pulse' : tenant.leaseStatus === 'Expiring' ? 'bg-amber-500' : 'bg-rose-500'}`} />
+                                                <span className={`w-1.5 h-1.5 rounded-full ${tenant.leaseStatus === 'Active' ? 'bg-emerald-500 animate-pulse' :
+                                                    tenant.leaseStatus === 'Expiring' ? 'bg-amber-500' :
+                                                        'bg-rose-500'
+                                                    }`} />
                                                 {tenant.leaseStatus}
                                             </span>
                                         </td>
@@ -522,20 +525,20 @@ const Tenant = () => {
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <Home size={14} className="text-indigo-600" />
-                                    <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Property Assignment</h4>
+                                    <h4 className="text-[12px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Property Assignment</h4>
                                 </div>
                                 <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 space-y-4">
                                     <div>
-                                        <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Property</p>
+                                        <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Property</p>
                                         <p className="text-sm font-black text-[var(--color-secondary)]">{selectedTenant.propertyId?.propertyName || "N/A"}</p>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 text-center">
                                         <div className="p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Unit</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Unit</p>
                                             <p className="text-xs font-black text-[var(--color-secondary)]">Suite {selectedTenant.unitId?.unitNumber || "N/A"}</p>
                                         </div>
                                         <div className="p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Floor</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Floor</p>
                                             <p className="text-xs font-black text-[var(--color-secondary)]">{selectedTenant.floorId?.name || "N/A"}</p>
                                         </div>
                                     </div>
@@ -546,25 +549,25 @@ const Tenant = () => {
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <IndianRupee size={14} className="text-indigo-600" />
-                                    <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Financial Summary</h4>
+                                    <h4 className="text-[12px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Financial Summary</h4>
                                 </div>
                                 <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
                                     <div className="p-6 bg-emerald-600 text-white flex justify-between items-center">
                                         <div>
-                                            <p className="text-[9px] font-black uppercase tracking-widest opacity-60 mb-1">Monthly Rent</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1">Monthly Rent</p>
                                             <p className="text-2xl font-black">₹{(selectedTenant.rent || 0).toLocaleString()}</p>
                                         </div>
-                                        <span className={`text-[9px] font-black uppercase px-3 py-1 rounded-full bg-white/20 backdrop-blur-md`}>
+                                        <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full bg-white/20 backdrop-blur-md`}>
                                             {selectedTenant.paymentStatus}
                                         </span>
                                     </div>
                                     <div className="grid grid-cols-2 p-6 gap-6 text-center">
                                         <div>
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Paid Amount</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Paid Amount</p>
                                             <p className="text-sm font-black text-emerald-600">₹{(selectedTenant.totalCollected || 0).toLocaleString()}</p>
                                         </div>
                                         <div>
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Balance Due</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Balance Due</p>
                                             <p className={`text-sm font-black ${selectedTenant.pending > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>₹{(selectedTenant.pending || 0).toLocaleString()}</p>
                                         </div>
                                     </div>
@@ -575,21 +578,21 @@ const Tenant = () => {
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 px-1">
                                     <FileText size={14} className="text-indigo-600" />
-                                    <h4 className="text-[10px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Lease Information</h4>
+                                    <h4 className="text-[12px] font-black text-[var(--color-secondary)] uppercase tracking-widest">Lease Information</h4>
                                 </div>
                                 <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 grid grid-cols-2 gap-6">
                                     <div>
-                                        <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Lease Start</p>
+                                        <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Lease Start</p>
                                         <p className="text-sm font-black text-[var(--color-secondary)]">{formatDate(selectedTenant.leaseStart)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Lease End</p>
+                                        <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-1">Lease End</p>
                                         <p className="text-sm font-black text-[var(--color-secondary)]">{formatDate(selectedTenant.leaseEnd)}</p>
                                     </div>
                                     <div className="col-span-2 flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-50">
                                         <div className="flex items-center gap-2">
                                             <ShieldCheck size={14} className="text-indigo-600" />
-                                            <p className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-widest">Agreement</p>
+                                            <p className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">Agreement</p>
                                         </div>
                                         <Button variant="secondary" size="xs" icon={<Download size={14} />} className="text-[10px] font-black">
                                             Download PDF
@@ -631,8 +634,8 @@ const Tenant = () => {
                         </div>
 
                         <form className="p-6" onSubmit={handleFormSubmit}>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div className="space-y-4">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                                <div className="space-y-2">
                                     {/* Identity Section */}
                                     <section className="space-y-3">
                                         <div className="flex items-center gap-2">
@@ -728,6 +731,7 @@ const Tenant = () => {
                                                         <select className="w-full bg-white border border-emerald-200 focus:border-emerald-400 text-[var(--color-secondary)] rounded-xl px-4 py-2.5 outline-none shadow-sm cursor-pointer appearance-none" value={formData.leaseStatus || "Active"} onChange={(e) => setFormData({ ...formData, leaseStatus: e.target.value })}>
                                                             <option value="Active">Active</option>
                                                             <option value="Expiring">Expiring</option>
+                                                            <option value="Expired">Expired</option>
                                                             <option value="Terminated">Terminated</option>
                                                         </select>
                                                         <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />

@@ -41,9 +41,10 @@ const getManagerDashboardStats = async (req, res) => {
         });
 
         // 3. Chart Data: Rent Collection (Last 6 Months)
-        // We'll group by month from the Invoice model
         const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+        sixMonthsAgo.setDate(1);
+        sixMonthsAgo.setHours(0, 0, 0, 0);
 
         const rentAggregation = await Invoice.aggregate([
             {
@@ -63,10 +64,22 @@ const getManagerDashboardStats = async (req, res) => {
             { $sort: { paidDate: 1 } }
         ]);
 
-        const revenueData = rentAggregation.map(item => ({
-            name: item._id,
-            amount: item.total
-        }));
+        // Generate the last 6 months including the current month
+        const months = [];
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const monthLabel = d.toLocaleString('default', { month: 'short' }) + " " + d.getFullYear();
+            months.push(monthLabel);
+        }
+
+        const revenueData = months.map(m => {
+            const match = rentAggregation.find(r => r._id === m);
+            return {
+                name: m,
+                amount: match ? match.total : 0
+            };
+        });
 
         // 4. Chart Data: Occupancy
         const occupancyData = [

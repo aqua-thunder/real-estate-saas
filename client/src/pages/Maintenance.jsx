@@ -351,7 +351,7 @@ export default function Maintenance() {
 
             {/* Create Request Modal */}
             {showForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowForm(false)}></div>
                     <div className="relative bg-white w-full max-w-2xl rounded-[3rem] border border-gray-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] overflow-hidden">
                         <div className="px-10 pt-8 border-b border-gray-50 flex items-center justify-between">

@@ -88,12 +88,27 @@ const getOwnerDashboardData = async (req, res) => {
             { $sort: { "_id.year": 1, "_id.month": 1 } }
         ]);
 
-        const formattedIncomeChart = incomeData.map(item => {
-            const date = new Date(item._id.year, item._id.month - 1);
-            const monthName = date.toLocaleString('default', { month: 'short' });
+        // Generate the last 6 months including the current month
+        const months = [];
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const monthName = d.toLocaleString('default', { month: 'short' });
+            months.push({
+                name: `${monthName} ${d.getFullYear()}`,
+                shortName: `${monthName} ${d.getFullYear()}`
+            });
+        }
+
+        const formattedIncomeChart = months.map(m => {
+            const match = incomeData.find(item => {
+                const date = new Date(item._id.year, item._id.month - 1);
+                const name = `${date.toLocaleString('default', { month: 'short' })} ${item._id.year}`;
+                return name === m.name;
+            });
             return {
-                name: `${monthName} ${item._id.year}`,
-                income: item.total
+                name: m.name,
+                income: match ? match.total : 0
             };
         });
 

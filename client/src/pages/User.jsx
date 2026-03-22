@@ -277,7 +277,7 @@ const User = () => {
 
             {/* Identity Modal */}
             {openForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-300">
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-md" onClick={resetForm}></div>
 
                     <div className="relative bg-white w-full max-w-lg rounded-[3.5rem] border border-gray-100 shadow-lg overflow-hidden">

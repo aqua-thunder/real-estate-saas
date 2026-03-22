@@ -96,7 +96,7 @@ export default function ManagerDashboard() {
                 ].map((stat, i) => (
                     <div key={i} className="bg-white p-7 rounded-[2.5rem] border border-gray-100 shadow-sm group transition-all duration-500 hover:shadow-md relative overflow-hidden">
                         <div className="flex items-center justify-between mb-6 relative z-10">
-                            <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 shadow-sm border border-${stat.color}-100 transition-all duration-700 group-hover:bg-${stat.color}-600 group-hover:text-white group-hover:rotate-[360deg]`}>
+                            <div className={`p-4 rounded-2xl bg-${stat.color}-50 text-${stat.color}-600 shadow-sm border border-${stat.color}-100 transition-all duration-700 group-hover:bg-${stat.color}-600 group-hover:text-white`}>
                                 <stat.icon size={20} />
                             </div>
                         </div>
@@ -261,7 +261,7 @@ export default function ManagerDashboard() {
                     <div className="p-10 border-b border-gray-50 flex items-center justify-between">
                         <div className="space-y-1">
                             <h2 className="text-2xl font-black text-[var(--color-secondary)] flex items-center gap-3">
-                                upcoming Expiries
+                                Upcoming Expiries
                             </h2>
                         </div>
                         <div className="relative">
